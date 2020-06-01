@@ -31,7 +31,7 @@
 							<archive>
 								<manifest>
 									<mainClass>
-										io.github.jmif.JMIF
+										io.github.jmif.gui.swing.JMIF
 									</mainClass>
 								</manifest>
 							</archive>

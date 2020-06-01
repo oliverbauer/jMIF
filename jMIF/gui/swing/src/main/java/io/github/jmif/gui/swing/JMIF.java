@@ -1,4 +1,4 @@
-package io.github.jmif;
+package io.github.jmif.gui.swing;
 
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
