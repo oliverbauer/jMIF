@@ -8,4 +8,4 @@ jMIF - Java MLT ImageMagick FFmpeg (not yet pushed)
 * ImageMagick [https://imagemagick.org/index.php](https://imagemagick.org/index.php)
 * FFmpeg [https://ffmpeg.org](https://ffmpeg.org/)
 
-![Image of jMIF](jMIF/jMIF/src/early-images/2020.06.01.png)
+![Image of jMIF](jMIF/src/early-images/2020.06.01.png)
