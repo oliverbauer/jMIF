@@ -90,8 +90,7 @@ public class MIFAudioFile {
 		} catch (IOException e) {
 			logger.error("Unable to check length of audio file", e);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Unable to check length of audio file", e);
 		}
 	}
 }
