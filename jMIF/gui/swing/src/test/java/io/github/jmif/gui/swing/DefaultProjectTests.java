@@ -1,4 +1,4 @@
-package io.github.jmif.tests;
+package io.github.jmif.gui.swing;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -10,11 +10,11 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import io.github.jmif.JMIF;
 import io.github.jmif.builder.MIFProjectExecutor;
 import io.github.jmif.data.GraphWrapper;
 import io.github.jmif.entities.MIFAudioFile;
 import io.github.jmif.entities.MIFFile;
+import io.github.jmif.gui.swing.JMIF;
 
 public class DefaultProjectTests {
 	@Test
