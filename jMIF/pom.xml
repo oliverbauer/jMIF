@@ -10,7 +10,7 @@
 
 	<modules>
 		<module>core</module>
-		<module>gui/swing</module>
+		<module>gui</module>
 	</modules>
 
 	<properties>
