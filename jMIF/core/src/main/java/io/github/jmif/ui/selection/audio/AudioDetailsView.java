@@ -16,7 +16,6 @@ import io.github.jmif.config.Configuration;
 import io.github.jmif.data.GraphWrapper;
 import io.github.jmif.entities.MIFAudioFile;
 
-// TODO show bitrate etc. of audio
 public class AudioDetailsView {
 	private static final Logger logger = LoggerFactory.getLogger(AudioDetailsView.class);
 	
@@ -26,6 +25,7 @@ public class AudioDetailsView {
 	
 	private JLabel file = new JLabel();
 	private JLabel length = new JLabel();
+	private JLabel bitrate = new JLabel();
 	private JTextField encodeStart = new JTextField();
 	private JTextField encodeEnd = new JTextField();
 	private JLabel encodeLength = new JLabel();
@@ -34,6 +34,7 @@ public class AudioDetailsView {
 
 	private JLabel labelFile = new JLabel("File");
 	private JLabel labelLength = new JLabel("Length");
+	private JLabel labelBitrate = new JLabel("Bitrate");
 	private JLabel labelEncodeStart = new JLabel("Encode from");
 	private JLabel labelEncodeEnd = new JLabel("Encode to");
 	private JLabel labelEncodeLength = new JLabel("Encode length");
@@ -45,6 +46,7 @@ public class AudioDetailsView {
 		
 	    wrap(box, labelFile, file);
 	    wrap(box, labelLength, length);
+	    wrap(box, labelBitrate, bitrate);
 	    wrap(box, labelEncodeStart, encodeStart);
 	    wrap(box, labelEncodeEnd, encodeEnd);
 	    wrap(box, labelEncodeLength, encodeLength);   
@@ -87,7 +89,6 @@ public class AudioDetailsView {
 	    
 	    box.add(Box.createRigidArea(new Dimension(0,10)));
 		box.add(Box.createHorizontalGlue());
-//		box.add(Box.createRigidArea(new Dimension(0,10)));
 		
 		panel = Box.createHorizontalBox();
 		panel.add(box);
@@ -96,11 +97,6 @@ public class AudioDetailsView {
 		if (Configuration.useBorders) {
 			panel.setBorder(BorderFactory.createLineBorder(Color.RED, 2, true));
 		}
-//		
-//		Dimension dim = new Dimension(5200, 200);
-//		panel.setPreferredSize(dim);
-//		panel.setMinimumSize(dim);
-//		panel.setMaximumSize(dim);
 	}
 	
 	private void wrap(Box box, JComponent c1, JComponent c2) {
@@ -123,6 +119,7 @@ public class AudioDetailsView {
 		
 		file.setText(audioFile.getAudiofile());
 		length.setText(String.valueOf(audioFile.getLengthOfInput())+"sec.");
+		bitrate.setText(String.valueOf(audioFile.getBitrate()/1000)+" kb/s");
 		encodeStart.setText(String.valueOf(audioFile.getEncodeStart()));
 		encodeEnd.setText(String.valueOf(audioFile.getEncodeEnde()));
 		encodeLength.setText("TODO compute end-start");
