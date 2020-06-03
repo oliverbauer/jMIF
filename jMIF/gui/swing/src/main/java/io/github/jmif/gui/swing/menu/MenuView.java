@@ -1,4 +1,4 @@
-package io.github.jmif.ui.menu;
+package io.github.jmif.gui.swing.menu;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -19,7 +19,7 @@ import io.github.jmif.builder.MIFProjectExecutor;
 import io.github.jmif.config.Configuration;
 import io.github.jmif.data.GraphWrapper;
 import io.github.jmif.data.listener.ProjectListener.type;
-import io.github.jmif.ui.menu.util.ButtonFactory;
+import io.github.jmif.gui.swing.menu.util.ButtonFactory;
 
 public class MenuView {
 	private JPanel panel;

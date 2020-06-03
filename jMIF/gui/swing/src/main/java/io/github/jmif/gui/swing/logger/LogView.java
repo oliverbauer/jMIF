@@ -1,4 +1,4 @@
-package io.github.jmif.ui.logger;
+package io.github.jmif.gui.swing.logger;
 
 import java.awt.Color;
 import java.awt.Component;

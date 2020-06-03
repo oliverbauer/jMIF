@@ -1,4 +1,4 @@
-package io.github.jmif.ui.selection.frame;
+package io.github.jmif.gui.swing.selection.frame;
 
 import javax.swing.Box;
 import javax.swing.ImageIcon;

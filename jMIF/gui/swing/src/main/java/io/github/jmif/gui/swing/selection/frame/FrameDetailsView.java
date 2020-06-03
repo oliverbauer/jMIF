@@ -1,4 +1,4 @@
-package io.github.jmif.ui.selection.frame;
+package io.github.jmif.gui.swing.selection.frame;
 
 import java.awt.Color;
 import java.awt.Dimension;

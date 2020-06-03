@@ -1,4 +1,4 @@
-package io.github.jmif.ui.selection;
+package io.github.jmif.gui.swing.selection;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -20,14 +20,14 @@ import io.github.jmif.entities.MIFAudioFile;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFVideo;
-import io.github.jmif.ui.selection.audio.AudioDetailsView;
-import io.github.jmif.ui.selection.audio.AudioView;
-import io.github.jmif.ui.selection.frame.FrameDetailsView;
-import io.github.jmif.ui.selection.frame.FrameView;
-import io.github.jmif.ui.selection.image.ImageDetailsView;
-import io.github.jmif.ui.selection.image.ImageView;
-import io.github.jmif.ui.selection.video.VideoDetailsView;
-import io.github.jmif.ui.selection.video.VideoView;
+import io.github.jmif.gui.swing.selection.audio.AudioDetailsView;
+import io.github.jmif.gui.swing.selection.audio.AudioView;
+import io.github.jmif.gui.swing.selection.frame.FrameDetailsView;
+import io.github.jmif.gui.swing.selection.frame.FrameView;
+import io.github.jmif.gui.swing.selection.image.ImageDetailsView;
+import io.github.jmif.gui.swing.selection.image.ImageView;
+import io.github.jmif.gui.swing.selection.video.VideoDetailsView;
+import io.github.jmif.gui.swing.selection.video.VideoView;
 
 public class SelectionView {
 	private static final Logger logger = LoggerFactory.getLogger(SelectionView.class);

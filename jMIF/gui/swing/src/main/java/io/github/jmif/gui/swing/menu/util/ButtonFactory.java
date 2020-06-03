@@ -1,4 +1,4 @@
-package io.github.jmif.ui.menu.util;
+package io.github.jmif.gui.swing.menu.util;
 
 import java.awt.Dimension;
 import java.awt.Graphics2D;
