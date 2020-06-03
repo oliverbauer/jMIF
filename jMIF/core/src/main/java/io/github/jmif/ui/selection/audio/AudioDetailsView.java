@@ -5,6 +5,7 @@ import java.awt.Dimension;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -29,6 +30,7 @@ public class AudioDetailsView {
 	private JTextField encodeStart = new JTextField();
 	private JTextField encodeEnd = new JTextField();
 	private JLabel encodeLength = new JLabel();
+	private JCheckBox normalize = new JCheckBox();
 	private JTextField fadeIn = new JTextField();
 	private JTextField fadeOut = new JTextField();
 
@@ -38,6 +40,7 @@ public class AudioDetailsView {
 	private JLabel labelEncodeStart = new JLabel("Encode from");
 	private JLabel labelEncodeEnd = new JLabel("Encode to");
 	private JLabel labelEncodeLength = new JLabel("Encode length");
+	private JLabel labelNormalize = new JLabel("Normalize");
 	private JLabel labelFadeIn = new JLabel("FadeIn");
 	private JLabel labelFadeOut = new JLabel("FadeOut");
 
@@ -49,9 +52,12 @@ public class AudioDetailsView {
 	    wrap(box, labelBitrate, bitrate);
 	    wrap(box, labelEncodeStart, encodeStart);
 	    wrap(box, labelEncodeEnd, encodeEnd);
-	    wrap(box, labelEncodeLength, encodeLength);   
+	    wrap(box, labelEncodeLength, encodeLength);
+	    wrap(box, labelNormalize, normalize);
 	    wrap(box, labelFadeIn, fadeIn);
 	    wrap(box, labelFadeOut, fadeOut);
+	    
+	    normalize.addActionListener(e -> audioFile.setNormalize(normalize.isSelected()));
 	    
 	    encodeStart.addActionListener(e -> {
 	    	String input = encodeEnd.getText();
@@ -82,6 +88,36 @@ public class AudioDetailsView {
 	    		
 	    		audioFile.setEncodeEnde(i);
 	    		mifProject.redrawGraph();
+	    	} catch (Exception t) {
+	    		logger.warn("Not allowed: ", t);
+	    	}
+	    });
+	    fadeIn.addActionListener(e -> {
+	    	String input = fadeIn.getText();
+	    	try {
+	    		int i = Integer.parseInt(input);
+	    		if (i<0) {
+	    			throw new IllegalArgumentException("Not allowed to be negative");
+	    		}
+	    		if (i>audioFile.getLengthOfInput()) {
+	    			throw new IllegalArgumentException("Not allowed to be longer than the input file");
+	    		}
+	    		audioFile.setFadeIn(i);
+	    	} catch (Exception t) {
+	    		logger.warn("Not allowed: ", t);
+	    	}
+	    });
+	    fadeOut.addActionListener(e -> {
+	    	String input = fadeOut.getText();
+	    	try {
+	    		int i = Integer.parseInt(input);
+	    		if (i<0) {
+	    			throw new IllegalArgumentException("Not allowed to be negative");
+	    		}
+	    		if (i>audioFile.getLengthOfInput()) {
+	    			throw new IllegalArgumentException("Not allowed to be longer than the input file");
+	    		}
+	    		audioFile.setFadeOut(i);
 	    	} catch (Exception t) {
 	    		logger.warn("Not allowed: ", t);
 	    	}
@@ -125,6 +161,7 @@ public class AudioDetailsView {
 		encodeLength.setText("TODO compute end-start");
 		fadeIn.setText(String.valueOf(audioFile.getFadeIn()));
 		fadeOut.setText(String.valueOf(audioFile.getFadeOut()));
+		normalize.setSelected(audioFile.isNormalize());
 		
 		panel.updateUI();
 	}

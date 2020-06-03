@@ -66,10 +66,7 @@ public class MIFProjectExecutor {
 			createMeltFile(consumerRender.replace("${1}", output), "melt.sh");
 		}
 		
-		// TODO Audio: start audio from second x to second y?
 		copyMP3();
-	
-		
 		executeMELT("sh melt.sh");
 		
 		LOGGER.info("Runtime for {}: {}", project.getOutputVideo(), TimeUtil.getMessage(startTime));
@@ -85,10 +82,98 @@ public class MIFProjectExecutor {
 				
 				String input = project.getWorkingDir()+"temp.mp3";
 				String output = project.getWorkingDir()+count+"_mp3.mp3";
-				// -y: overwrite
-				execute("ffmpeg -y -i "+input+" -ss "+audio.getEncodeStart()+" -t "+audio.getEncodeEnde()+" "+output);
-				
-				// TODO Audio: Fadein/Fadeout
+
+				if (audio.isNormalize()) {
+					/*
+					 * ffmpeg -y -i .../temp.mp3 -ss 0 -t 10  -filter:a loudnorm .../1_xx_mp3.mp3
+					 * ffmpeg -y -i .../1_xx_mp3.mp3 -ss 0 -t 10 -filter_complex "afade=d=1, areverse, afade=d=1, areverse" .../1_mp3.mp3
+					 * 
+					 * or, if no fadein/fadeout defined, directly to
+					 * 
+					 * ffmpeg -y -i .../temp.mp3 -ss 0 -t 10  -filter:a loudnorm .../1_mp3.mp3
+					 * 
+					 * Two commands are necessary because of:
+					 * 
+					 * Filtergraph 'loudnorm' was specified through the -vf/-af/-filter option for output stream 0:0, which is fed from a complex filtergraph.
+					 * -vf/-af/-filter and -filter_complex cannot be used together for the same stream.
+					 */
+					StringBuilder sb = new StringBuilder("ffmpeg -y -i ");
+					sb.append(input);
+					sb.append(" -ss ");
+					sb.append(audio.getEncodeStart());
+					sb.append(" -t ");
+					sb.append(audio.getEncodeEnde());
+					sb.append(" ");
+					if (audio.isNormalize()) {
+						sb.append(" -filter:a loudnorm ");
+					}
+					String tempOutput = output;
+					if (audio.getFadeIn() > 0 || audio.getFadeOut() > 0) {
+						tempOutput = project.getWorkingDir()+count+"_xx_mp3.mp3";
+					}
+					sb.append(tempOutput);
+					
+					String command = sb.toString();
+					LOGGER.info("Execute {}",command);
+					execute(command);
+					
+					if (audio.getFadeIn() > 0 || audio.getFadeOut() > 0) {
+						StringBuilder sb2 = new StringBuilder("ffmpeg -y -i ");
+						sb2.append(tempOutput);
+						sb2.append(" -ss ");
+						sb2.append(audio.getEncodeStart());
+						sb2.append(" -t ");
+						sb2.append(audio.getEncodeEnde());
+						sb2.append(" -filter_complex \"");
+						if (audio.getFadeIn() > 0) {
+							sb2.append("afade=d=");
+							sb2.append(audio.getFadeIn());
+						}
+						if (audio.getFadeIn() > 0 && audio.getFadeOut()> 0) {
+							sb2.append(", ");
+						}
+						if (audio.getFadeOut() > 0) {
+							sb2.append("areverse, afade=d=");
+							sb2.append(audio.getFadeOut());
+							sb2.append(", areverse");
+						}
+						sb2.append("\" ");
+						sb2.append(output);
+						
+						String command2 = sb2.toString();
+						LOGGER.info("Execute {}",command2);
+						execute(command2);
+					}
+				} else {
+					StringBuilder sb = new StringBuilder("ffmpeg -y -i ");
+					sb.append(input);
+					sb.append(" -ss ");
+					sb.append(audio.getEncodeStart());
+					sb.append(" -t ");
+					sb.append(audio.getEncodeEnde());
+					sb.append(" ");
+					if (audio.getFadeIn() > 0 || audio.getFadeOut() > 0) {
+						sb.append("-filter_complex \"");
+						if (audio.getFadeIn() > 0) {
+							sb.append("afade=d=");
+							sb.append(audio.getFadeIn());
+						}
+						if (audio.getFadeIn() > 0 && audio.getFadeOut()> 0) {
+							sb.append(", ");
+						}
+						if (audio.getFadeOut() > 0) {
+							sb.append("areverse, afade=d=");
+							sb.append(audio.getFadeOut());
+							sb.append(", areverse");
+						}
+						sb.append("\" ");
+					}
+					sb.append(output);
+					
+					String command = sb.toString();
+					LOGGER.info("Execute {}",command);
+					execute(command);
+				}
 			}
 		}
 	}

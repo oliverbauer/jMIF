@@ -19,9 +19,18 @@ public class MIFAudioFile {
 	private int encodeEnde = -1;
 	private int fadeIn = 1;
 	private int fadeOut = 1;
+	private boolean normalize = true;
 	
 	private int bitrate = -1;
 	
+	public boolean isNormalize() {
+		return normalize;
+	}
+
+	public void setNormalize(boolean normalize) {
+		this.normalize = normalize;
+	}
+
 	public int getBitrate() {
 		return bitrate;
 	}
