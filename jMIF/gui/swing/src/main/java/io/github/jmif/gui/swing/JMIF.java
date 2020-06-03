@@ -35,11 +35,11 @@ import io.github.jmif.data.GraphWrapper;
 import io.github.jmif.data.listener.ProjectListener;
 import io.github.jmif.data.listener.ProjectListener.type;
 import io.github.jmif.entities.MIFFile;
-import io.github.jmif.splash.Splashscreen;
-import io.github.jmif.ui.graph.GraphView;
-import io.github.jmif.ui.logger.LogView;
-import io.github.jmif.ui.menu.MenuView;
-import io.github.jmif.ui.selection.SelectionView;
+import io.github.jmif.gui.swing.graph.GraphView;
+import io.github.jmif.gui.swing.logger.LogView;
+import io.github.jmif.gui.swing.menu.MenuView;
+import io.github.jmif.gui.swing.selection.SelectionView;
+import io.github.jmif.gui.swing.splash.Splashscreen;
 import io.github.jmif.util.TimeUtil;
 
 /**

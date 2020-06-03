@@ -1,4 +1,4 @@
-package io.github.jmif.ui.selection.video;
+package io.github.jmif.gui.swing.selection.video;
 
 import java.awt.Color;
 import java.awt.Dimension;

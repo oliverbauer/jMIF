@@ -1,4 +1,4 @@
-package io.github.jmif.ui.selection.image;
+package io.github.jmif.gui.swing.selection.image;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

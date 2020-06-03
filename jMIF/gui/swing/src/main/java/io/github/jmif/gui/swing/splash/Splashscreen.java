@@ -1,4 +1,4 @@
-package io.github.jmif.splash;
+package io.github.jmif.gui.swing.splash;
 
 import java.awt.Color;
 import java.awt.Dimension;

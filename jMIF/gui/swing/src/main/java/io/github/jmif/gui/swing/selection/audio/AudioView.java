@@ -1,4 +1,4 @@
-package io.github.jmif.ui.selection.audio;
+package io.github.jmif.gui.swing.selection.audio;
 
 import java.awt.Color;
 

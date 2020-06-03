@@ -1,4 +1,4 @@
-package io.github.jmif.ui.graph;
+package io.github.jmif.gui.swing.graph;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -23,7 +23,7 @@ import io.github.jmif.config.Configuration;
 import io.github.jmif.data.GraphWrapper;
 import io.github.jmif.entities.MIFAudioFile;
 import io.github.jmif.entities.MIFFile;
-import io.github.jmif.ui.selection.SelectionView;
+import io.github.jmif.gui.swing.selection.SelectionView;
 
 public class GraphView {
 	private JFrame frame;
