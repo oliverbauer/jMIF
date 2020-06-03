@@ -10,11 +10,10 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import io.github.jmif.builder.MIFProjectExecutor;
+import io.github.jmif.Service;
 import io.github.jmif.data.GraphWrapper;
 import io.github.jmif.entities.MIFAudioFile;
 import io.github.jmif.entities.MIFFile;
-import io.github.jmif.gui.swing.JMIF;
 
 public class DefaultProjectTests {
 	@Test
@@ -48,7 +47,7 @@ public class DefaultProjectTests {
 		project.save();
 		Assert.assertTrue(new File(tempDir+"defaultproject.xml").exists());
 		
-		new MIFProjectExecutor(pr).convert(false);
+		new Service().convert(pr, false);
 		
 		Assert.assertTrue(new File(tempDir+"output.avi").exists());
 		
@@ -88,7 +87,7 @@ public class DefaultProjectTests {
 		project.save();
 		Assert.assertTrue(new File(tempDir+"defaultproject4711.xml").exists());
 		
-		new MIFProjectExecutor(pr).convert(false);
+		new Service().convert(pr, false);
 		
 		Assert.assertTrue(new File(tempDir+"output4711.avi").exists());
 		
@@ -120,7 +119,7 @@ public class DefaultProjectTests {
 		project.save();
 		Assert.assertTrue(new File(tempDir+"defaultproject4711.xml").exists());
 		
-		new MIFProjectExecutor(pr).convert(false);
+		new Service().convert(pr, false);
 		// [consumer avformat] error with audio encode: -541478725 (frame 201) ?????
 		
 		Assert.assertTrue(new File(tempDir+"output4711.avi").exists());

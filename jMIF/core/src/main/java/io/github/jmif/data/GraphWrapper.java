@@ -31,7 +31,8 @@ import com.mxgraph.util.mxEvent;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxGraph;
 
-import io.github.jmif.builder.MIFProjectExecutor;
+import io.github.jmif.JMIFException;
+import io.github.jmif.Service;
 import io.github.jmif.config.Configuration;
 import io.github.jmif.data.listener.ProjectListener;
 import io.github.jmif.data.listener.ProjectListener.type;
@@ -469,14 +470,14 @@ public class GraphWrapper {
 	    		
 			// TODO Use temp dir...
 			var output = pr.getWorkingDir()+"frame-"+frame+".jpg";
-			new MIFProjectExecutor(pr).exportImage(output, frame);
+			new Service().exportImage(pr, output, frame);
 	    		
 			logger.info("Created image for frame {} in {}", frame, TimeUtil.getMessage(time));
 			
 			for (SingleFrameCreatedListener listener : listenerSingleFrameCreated ) {
 				listener.created(output);
 			}
-		} catch (IOException e) {
+		} catch (JMIFException e) {
 			logger.error("Unable to create single frame", e);
 		}
 	}
