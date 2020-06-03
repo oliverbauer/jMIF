@@ -5,6 +5,7 @@ import java.awt.Dimension;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -16,7 +17,6 @@ import io.github.jmif.config.Configuration;
 import io.github.jmif.data.GraphWrapper;
 import io.github.jmif.entities.MIFAudioFile;
 
-// TODO show bitrate etc. of audio
 public class AudioDetailsView {
 	private static final Logger logger = LoggerFactory.getLogger(AudioDetailsView.class);
 	
@@ -26,17 +26,21 @@ public class AudioDetailsView {
 	
 	private JLabel file = new JLabel();
 	private JLabel length = new JLabel();
+	private JLabel bitrate = new JLabel();
 	private JTextField encodeStart = new JTextField();
 	private JTextField encodeEnd = new JTextField();
 	private JLabel encodeLength = new JLabel();
+	private JCheckBox normalize = new JCheckBox();
 	private JTextField fadeIn = new JTextField();
 	private JTextField fadeOut = new JTextField();
 
 	private JLabel labelFile = new JLabel("File");
 	private JLabel labelLength = new JLabel("Length");
+	private JLabel labelBitrate = new JLabel("Bitrate");
 	private JLabel labelEncodeStart = new JLabel("Encode from");
 	private JLabel labelEncodeEnd = new JLabel("Encode to");
 	private JLabel labelEncodeLength = new JLabel("Encode length");
+	private JLabel labelNormalize = new JLabel("Normalize");
 	private JLabel labelFadeIn = new JLabel("FadeIn");
 	private JLabel labelFadeOut = new JLabel("FadeOut");
 
@@ -45,11 +49,15 @@ public class AudioDetailsView {
 		
 	    wrap(box, labelFile, file);
 	    wrap(box, labelLength, length);
+	    wrap(box, labelBitrate, bitrate);
 	    wrap(box, labelEncodeStart, encodeStart);
 	    wrap(box, labelEncodeEnd, encodeEnd);
-	    wrap(box, labelEncodeLength, encodeLength);   
+	    wrap(box, labelEncodeLength, encodeLength);
+	    wrap(box, labelNormalize, normalize);
 	    wrap(box, labelFadeIn, fadeIn);
 	    wrap(box, labelFadeOut, fadeOut);
+	    
+	    normalize.addActionListener(e -> audioFile.setNormalize(normalize.isSelected()));
 	    
 	    encodeStart.addActionListener(e -> {
 	    	String input = encodeEnd.getText();
@@ -84,10 +92,39 @@ public class AudioDetailsView {
 	    		logger.warn("Not allowed: ", t);
 	    	}
 	    });
+	    fadeIn.addActionListener(e -> {
+	    	String input = fadeIn.getText();
+	    	try {
+	    		int i = Integer.parseInt(input);
+	    		if (i<0) {
+	    			throw new IllegalArgumentException("Not allowed to be negative");
+	    		}
+	    		if (i>audioFile.getLengthOfInput()) {
+	    			throw new IllegalArgumentException("Not allowed to be longer than the input file");
+	    		}
+	    		audioFile.setFadeIn(i);
+	    	} catch (Exception t) {
+	    		logger.warn("Not allowed: ", t);
+	    	}
+	    });
+	    fadeOut.addActionListener(e -> {
+	    	String input = fadeOut.getText();
+	    	try {
+	    		int i = Integer.parseInt(input);
+	    		if (i<0) {
+	    			throw new IllegalArgumentException("Not allowed to be negative");
+	    		}
+	    		if (i>audioFile.getLengthOfInput()) {
+	    			throw new IllegalArgumentException("Not allowed to be longer than the input file");
+	    		}
+	    		audioFile.setFadeOut(i);
+	    	} catch (Exception t) {
+	    		logger.warn("Not allowed: ", t);
+	    	}
+	    });
 	    
 	    box.add(Box.createRigidArea(new Dimension(0,10)));
 		box.add(Box.createHorizontalGlue());
-//		box.add(Box.createRigidArea(new Dimension(0,10)));
 		
 		panel = Box.createHorizontalBox();
 		panel.add(box);
@@ -96,11 +133,6 @@ public class AudioDetailsView {
 		if (Configuration.useBorders) {
 			panel.setBorder(BorderFactory.createLineBorder(Color.RED, 2, true));
 		}
-//		
-//		Dimension dim = new Dimension(5200, 200);
-//		panel.setPreferredSize(dim);
-//		panel.setMinimumSize(dim);
-//		panel.setMaximumSize(dim);
 	}
 	
 	private void wrap(Box box, JComponent c1, JComponent c2) {
@@ -123,11 +155,13 @@ public class AudioDetailsView {
 		
 		file.setText(audioFile.getAudiofile());
 		length.setText(String.valueOf(audioFile.getLengthOfInput())+"sec.");
+		bitrate.setText(String.valueOf(audioFile.getBitrate()/1000)+" kb/s");
 		encodeStart.setText(String.valueOf(audioFile.getEncodeStart()));
 		encodeEnd.setText(String.valueOf(audioFile.getEncodeEnde()));
 		encodeLength.setText("TODO compute end-start");
 		fadeIn.setText(String.valueOf(audioFile.getFadeIn()));
 		fadeOut.setText(String.valueOf(audioFile.getFadeOut()));
+		normalize.setSelected(audioFile.isNormalize());
 		
 		panel.updateUI();
 	}

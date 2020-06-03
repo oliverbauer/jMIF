@@ -19,7 +19,26 @@ public class MIFAudioFile {
 	private int encodeEnde = -1;
 	private int fadeIn = 1;
 	private int fadeOut = 1;
+	private boolean normalize = true;
 	
+	private int bitrate = -1;
+	
+	public boolean isNormalize() {
+		return normalize;
+	}
+
+	public void setNormalize(boolean normalize) {
+		this.normalize = normalize;
+	}
+
+	public int getBitrate() {
+		return bitrate;
+	}
+
+	public void setBitrate(int bitrate) {
+		this.bitrate = bitrate;
+	}
+
 	public int getFadeIn() {
 		return fadeIn;
 	}
@@ -72,26 +91,24 @@ public class MIFAudioFile {
 	private void checkLengthInSeconds() {
 		Process process;
 		try {
-			String command = "ffprobe -i "+audiofile+" -show_entries format=duration -v quiet -of csv=\"p=0\"";
+			String command = "ffprobe -v error -select_streams a:0 -show_entries stream=duration,bit_rate -of default=noprint_wrappers=1:nokey=1 "+audiofile;
 			
 			process = new ProcessBuilder("bash", "-c", command)
 				.redirectErrorStream(true)
 				.start();
 			process.waitFor();
-			String output = null;
 
 			try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-				String line;
-				while ((line = reader.readLine()) != null) {
-					output = line;
-				}
+				String durationOutput = reader.readLine();
+				String bitrateOutput = reader.readLine();
+
+				setLengthOfInput(Integer.parseInt(durationOutput.substring(0, durationOutput.indexOf('.'))));
+				setBitrate(Integer.parseInt(bitrateOutput));
 			}
-			setLengthOfInput(Integer.parseInt(output.substring(0, output.indexOf('.'))));
 		} catch (IOException e) {
-			logger.error("Unable to check length of audio file", e);
+			logger.error("Unable to check duration/bitrate of audio file", e);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Unable to check duration/bitrate of audio file", e);
 		}
 	}
 }

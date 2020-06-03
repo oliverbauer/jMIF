@@ -8,6 +8,7 @@ import javax.swing.Box;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.jmif.config.Configuration;
@@ -15,6 +16,8 @@ import io.github.jmif.data.GraphWrapper;
 import io.github.jmif.entities.MIFFile;
 
 public class ImageDetailsView {
+	private static final Logger logger = LoggerFactory.getLogger(ImageDetailsView.class);
+	
 	private JLabel filename = new JLabel();
 	private JTextField displayName = new JTextField();
 	private JTextField framelengthToDisplay = new JTextField();
@@ -27,6 +30,9 @@ public class ImageDetailsView {
 	private JLabel labelDimension = new JLabel("Dimension (wxh)");
 	private JLabel labelOVerlay = new JLabel("Overlay");
 
+	private MIFFile meltFile;
+	private Box panel;
+	
 	public ImageDetailsView(GraphWrapper mifProject) {
 		Box box = Box.createVerticalBox();
 		
@@ -71,7 +77,7 @@ public class ImageDetailsView {
 	    		meltFile.setFramelength(i);
 	    		mifProject.redrawGraph();
 	    	} catch (Exception t) {
-	    		LoggerFactory.getLogger(getClass()).warn("Not allowed: ", t);
+	    		logger.warn("Not allowed: ", t);
 	    	}
 	    });
 	    
@@ -98,12 +104,15 @@ public class ImageDetailsView {
 	    		int i = Integer.parseInt(input);
 	    		
 	    		// TODO Image: Overlay: Check if prev. meltfile is longer:-)
-	    		// TODO Image: Overlay: Negative allowed?
+
+	    		if (i<0) {
+	    			throw new IllegalArgumentException("Overlay is not allowed to be negative");
+	    		}
 	    		
 	    		meltFile.setOverlayToPrevious(i);
 	    		mifProject.redrawGraph();
 	    	} catch (Exception t) {
-	    		LoggerFactory.getLogger(getClass()).warn("Not allowed: ", t.getMessage());
+	    		logger.warn("Not allowed: ", t);
 	    	}
 	    });
 	    
@@ -128,9 +137,8 @@ public class ImageDetailsView {
 		panel.setPreferredSize(dim);
 		panel.setMinimumSize(dim);
 		panel.setMaximumSize(dim);
-		
 	}
-	private Box panel;
+
 	public Box getBox() {
 		return panel;
 	}
@@ -152,7 +160,6 @@ public class ImageDetailsView {
 		panel.updateUI();
 	}
 
-	private MIFFile meltFile;
 	public void setDetails(MIFFile meltFile) {
 		this.meltFile = meltFile;
 		filename.setText(meltFile.getFile());
@@ -175,27 +182,4 @@ public class ImageDetailsView {
 		
 		panel.updateUI();
 	}
-//	
-//	public void setDetails(MIFAudioFile audioFile) {
-//		filename.setText(audioFile.getAudiofile());
-//		displayName.setText("");
-//		framelengthToDisplay.setText(String.valueOf(audioFile.getLengthOfInput()));
-//		overlay.setText("");
-//		dimensionLabel.setText("Encode from "+audioFile.getEncodeStart()+" to "+audioFile.getEncodeEnde());
-//
-//		
-//		filename.setVisible(true);
-//		displayName.setVisible(true);
-//		framelengthToDisplay.setVisible(true);
-//		overlay.setVisible(true);
-//		dimensionLabel.setVisible(true);
-//		
-//		labelFile.setVisible(true);
-//		labelDisplayname.setVisible(true);
-//		labelFrames.setVisible(true);
-//		labelDimension.setVisible(true);
-//		labelOVerlay.setVisible(true);
-//		
-//		panel.updateUI();
-//	}
 }
