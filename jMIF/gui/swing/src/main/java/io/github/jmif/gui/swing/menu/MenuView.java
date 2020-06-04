@@ -15,7 +15,7 @@ import javax.swing.SwingWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.jmif.builder.MIFProjectExecutor;
+import io.github.jmif.Service;
 import io.github.jmif.config.Configuration;
 import io.github.jmif.data.GraphWrapper;
 import io.github.jmif.data.listener.ProjectListener.type;
@@ -96,7 +96,7 @@ public class MenuView {
 				@Override
 			    public Void doInBackground() {
 		        	try {
-		        		new MIFProjectExecutor(mifProject.getPr()).convert(preview);
+		        		new Service().convert(mifProject.getPr(), preview);
 		        	} catch (Exception e1) {
 		        		e1.printStackTrace();
 		        	}
@@ -119,7 +119,7 @@ public class MenuView {
 				@Override
 			    public Void doInBackground() {
 		        	try {
-		        		new MIFProjectExecutor(mifProject.getPr()).convert(preview);
+		        		new Service().convert(mifProject.getPr(), preview);
 		        	} catch (Exception e1) {
 		        		e1.printStackTrace();
 		        	}
