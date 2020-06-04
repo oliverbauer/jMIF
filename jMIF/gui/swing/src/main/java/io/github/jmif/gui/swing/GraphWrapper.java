@@ -1,4 +1,4 @@
-package io.github.jmif.data;
+package io.github.jmif.gui.swing;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -31,17 +31,15 @@ import com.mxgraph.util.mxEvent;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxGraph;
 
-import io.github.jmif.JMIFException;
+import io.github.jmif.MIFException;
 import io.github.jmif.Service;
 import io.github.jmif.config.Configuration;
-import io.github.jmif.data.listener.ProjectListener;
-import io.github.jmif.data.listener.ProjectListener.type;
-import io.github.jmif.data.listener.SingleFrameCreatedListener;
 import io.github.jmif.entities.MIFAudioFile;
 import io.github.jmif.entities.MIFFile;
-import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFProject;
-import io.github.jmif.entities.MIFVideo;
+import io.github.jmif.gui.swing.listener.ProjectListener;
+import io.github.jmif.gui.swing.listener.ProjectListener.type;
+import io.github.jmif.gui.swing.listener.SingleFrameCreatedListener;
 import io.github.jmif.util.TimeUtil;
 
 public class GraphWrapper {
@@ -98,7 +96,7 @@ public class GraphWrapper {
 		}
 	}
 
-	public void load() throws InterruptedException, IOException {
+	public void load() throws MIFException, InterruptedException, IOException {
 		try {
 			long time = System.currentTimeMillis();
 			
@@ -113,7 +111,13 @@ public class GraphWrapper {
 			var executor = Executors.newWorkStealingPool();
 			for (MIFFile f : project.getMIFFiles()) {
 				MIFFile mifFile = createMIFFile(new File(f.getFile()));
-				executor.submit(mifFile.getBackgroundRunnable(project.getWorkingDir()));
+				executor.submit(() -> {
+					try {
+						new Service().createPreview(mifFile, project.getWorkingDir());
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				});
 			}
 			
 			redrawGraph();
@@ -132,36 +136,14 @@ public class GraphWrapper {
 		listenerProjectChanged.stream().forEach(c -> c.projectChanged(t));
 	}
 	
-	/**
-	 * cp's the file to 'orig' and calls {@link MIFFile#init}. 
-	 * 
-	 * @param file
-	 * @throws IOException 
-	 * @throws InterruptedException 
-	 */
-	private void initialize(MIFFile file) throws InterruptedException, IOException {
-		var target = pr.getWorkingDir()+"orig/"+file.getFilename();
-		var command = "cp "+file.getFile()+" "+target;
-		
-		// Copy to working dir... make sure each file has different name...
-		if (!new File(target).exists()) {
-			logger.info("Copy to {} ({})", file.getFilename(), command);
-			new ProcessBuilder("bash", "-c", command)
-				.directory(new File(pr.getWorkingDir()))
-				.redirectErrorStream(true)
-				.start()
-				.waitFor();
-		}
-		
-		file.init(pr.getWorkingDir(), pr.getFramerate());
-	}
-	
-	public MIFAudioFile createMIFAudioFile(File fileToAdd) {
+	public MIFAudioFile createMIFAudioFile(File fileToAdd) throws MIFException {
 		var file = fileToAdd.getAbsoluteFile().getAbsolutePath();
 		
 		if (file.endsWith("mp3") || file.endsWith("MP3")) {
 			var audioFile = new MIFAudioFile();
 			audioFile.setAudiofile(fileToAdd.getAbsolutePath());
+			// TODO refactor to caller
+			new Service().checkLengthInSeconds(audioFile);
 			audioFile.setEncodeStart(0);
 			audioFile.setEncodeEnde(audioFile.getLengthOfInput());
 			
@@ -178,7 +160,7 @@ public class GraphWrapper {
 		return null;
 	}
 	
-	public MIFFile createMIFFile(File fileToAdd) throws InterruptedException, IOException {
+	public MIFFile createMIFFile(File fileToAdd) throws MIFException, InterruptedException, IOException {
 		logger.info("Create node for {}", fileToAdd);
 		
 		var file = fileToAdd.getAbsoluteFile().getAbsolutePath();
@@ -186,8 +168,7 @@ public class GraphWrapper {
 		if (file.endsWith("JPG") || file.endsWith("jpg")) {
 			var display = file.substring(file.lastIndexOf('/') + 1);
 
-			var image = new MIFImage(file, display, 5*pr.getFramerate(), "-1x-1", pr.getFramerate());
-			initialize(image);
+			var image = new Service().initImage(file, display, 5*pr.getFramerate(), "-1x-1", pr.getFramerate(), pr.getWorkingDir(), pr.getFramerate());
 
 			if (!pr.getMIFFiles().isEmpty()) {
 				currentLength -= image.getOverlayToPrevious();
@@ -206,8 +187,7 @@ public class GraphWrapper {
 			return image;
 		} else if (file.endsWith("mp4") || file.endsWith("MP4")) {
 			var display = file.substring(file.lastIndexOf('/') + 1);
-			var video = new MIFVideo(file, display, -1, "1920x1080", pr.getFramerate());
-			initialize(video);
+			var video = new Service().initVideo(file, display, -1, "1920x1080", pr.getFramerate(), pr.getWorkingDir(), pr.getFramerate());
 
 			if (!pr.getMIFFiles().isEmpty()) {
 				currentLength -= video.getOverlayToPrevious();
@@ -476,7 +456,7 @@ public class GraphWrapper {
 			for (SingleFrameCreatedListener listener : listenerSingleFrameCreated ) {
 				listener.created(output);
 			}
-		} catch (JMIFException e) {
+		} catch (MIFException e) {
 			logger.error("Unable to create single frame", e);
 		}
 	}

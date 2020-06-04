@@ -7,11 +7,11 @@ package io.github.jmif;
  * @author thebrunner
  *
  */
-public class JMIFException extends Exception {
+public class MIFException extends Exception {
 
 	private static final long serialVersionUID = 1L;
 	
-	public JMIFException(Exception e) {
+	public MIFException(Exception e) {
 		super(e);
 	}
 

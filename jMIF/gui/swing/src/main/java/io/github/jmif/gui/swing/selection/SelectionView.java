@@ -15,11 +15,11 @@ import org.slf4j.LoggerFactory;
 import com.mxgraph.model.mxCell;
 
 import io.github.jmif.config.Configuration;
-import io.github.jmif.data.GraphWrapper;
 import io.github.jmif.entities.MIFAudioFile;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFVideo;
+import io.github.jmif.gui.swing.GraphWrapper;
 import io.github.jmif.gui.swing.selection.audio.AudioDetailsView;
 import io.github.jmif.gui.swing.selection.audio.AudioView;
 import io.github.jmif.gui.swing.selection.frame.FrameDetailsView;

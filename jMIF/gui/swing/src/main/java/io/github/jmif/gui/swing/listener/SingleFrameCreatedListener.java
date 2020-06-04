@@ -1,4 +1,4 @@
-package io.github.jmif.data.listener;
+package io.github.jmif.gui.swing.listener;
 
 public interface SingleFrameCreatedListener {
 	public void created(String file);

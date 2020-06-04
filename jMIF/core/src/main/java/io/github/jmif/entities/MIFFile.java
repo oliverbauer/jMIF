@@ -1,7 +1,5 @@
 package io.github.jmif.entities;
 
-import java.io.File;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -74,8 +72,6 @@ public abstract class MIFFile {
 
 	public void setFile(String file) {
 		this.file = file;
-		this.fileExists = new File(file).exists();
-		this.filename = getFile().substring(getFile().lastIndexOf('/')+1);
 	}
 
 	public String getFile() {
@@ -98,20 +94,11 @@ public abstract class MIFFile {
 		return width;
 	}
 
-	/**
-	 *  - width/height of image
-	 *  
-	 *  or
-	 *  
-	 *  -framelength of video
-	 *  
-	 * @param workingDir
-	 */
-	public abstract void init(String workingDir, int framelength);
-	
-	public abstract Runnable getBackgroundRunnable(String workingDir); 
-	
 	public boolean isPicture() {
 		return getClass() == MIFImage.class;
+	}
+
+	public void setFileExists(boolean fileExists) {
+		this.fileExists = fileExists;
 	}
 }

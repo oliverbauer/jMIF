@@ -8,7 +8,7 @@ import javax.swing.JScrollPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.jmif.data.listener.SingleFrameCreatedListener;
+import io.github.jmif.gui.swing.listener.SingleFrameCreatedListener;
 
 public class FrameView implements SingleFrameCreatedListener {
 	private static final Logger logger = LoggerFactory.getLogger(FrameView.class);

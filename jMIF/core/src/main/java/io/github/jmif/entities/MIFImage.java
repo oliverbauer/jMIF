@@ -3,8 +3,6 @@ package io.github.jmif.entities;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import io.github.jmif.Service;
-
 @XmlRootElement(name = "picture")
 public class MIFImage extends MIFFile {
 
@@ -53,9 +51,6 @@ public class MIFImage extends MIFFile {
 
 	public void setManualStyleCommand(String manualStyleCommand) {
 		this.manualStyleCommand = manualStyleCommand;
-		this.style = "MANUAL";
-		// TODO refactor to caller
-		new Service().createPreview(this);
 	}
 
 	public String getStyle() {
@@ -120,24 +115,6 @@ public class MIFImage extends MIFFile {
 	
 	public void setPreviewFillWColor(String previewFillWColor) {
 		this.previewFillWColor = previewFillWColor;
-	}
-
-	@Override
-	public void init(String workingDir, int framelength) {
-		// TODO refactor to caller
-		new Service().init(this, workingDir, framelength);
-	}
-
-	@Override
-	public Runnable getBackgroundRunnable(String workingDir) {
-		return  () -> {
-			try {
-				// TODO refactor to caller
-				new Service().createPreview(this, workingDir);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		};
 	}
 
 }

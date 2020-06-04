@@ -15,10 +15,11 @@ import javax.swing.SwingWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.github.jmif.MIFException;
 import io.github.jmif.Service;
 import io.github.jmif.config.Configuration;
-import io.github.jmif.data.GraphWrapper;
-import io.github.jmif.data.listener.ProjectListener.type;
+import io.github.jmif.gui.swing.GraphWrapper;
+import io.github.jmif.gui.swing.listener.ProjectListener.type;
 import io.github.jmif.gui.swing.menu.util.ButtonFactory;
 
 public class MenuView {
@@ -66,7 +67,7 @@ public class MenuView {
 				mifProject.getPr().setFileOfProject(project.getAbsolutePath());
 				try {
 					mifProject.load();
-				} catch (IOException | InterruptedException e1) {
+				} catch (MIFException | IOException | InterruptedException e1) {
 					logger.error("Unable to load project", e1);
 				}
 			}

@@ -11,7 +11,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import io.github.jmif.Service;
-import io.github.jmif.data.GraphWrapper;
 import io.github.jmif.entities.MIFAudioFile;
 import io.github.jmif.entities.MIFFile;
 
@@ -30,6 +29,7 @@ public class DefaultProjectTests {
 		var project = new GraphWrapper();
 		var pr = project.getPr();
 		pr.setWorkingDir(tempDir);
+		new Service().createWorkingDirs(pr);
 		pr.setFileOfProject(tempDir + "defaultproject.xml");
 		pr.setOutputVideo(tempDir+"output.avi");
 		MIFFile f1 = project.createMIFFile(new File(tempDir + "1.JPG"));
@@ -69,6 +69,7 @@ public class DefaultProjectTests {
 		var project = new GraphWrapper();
 		var pr = project.getPr();
 		pr.setWorkingDir(tempDir);
+		new Service().createWorkingDirs(pr);
 		pr.setFileOfProject(tempDir + "defaultproject4711.xml");
 		pr.setOutputVideo(tempDir+"output4711.avi");
 		MIFFile f1 = project.createMIFFile(new File(tempDir + "1.JPG"));
@@ -107,6 +108,7 @@ public class DefaultProjectTests {
 		var project = new GraphWrapper();
 		var pr = project.getPr();
 		pr.setWorkingDir(tempDir);
+		new Service().createWorkingDirs(pr);
 		pr.setFileOfProject(tempDir + "defaultproject4711.xml");
 		pr.setOutputVideo(tempDir+"output4711.avi");
 		MIFFile f1 = project.createMIFFile(new File(tempDir + "1.JPG"));

@@ -10,8 +10,6 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import io.github.jmif.Service;
-
 @XmlRootElement(name = "mifProject")
 public class MIFProject {
 	
@@ -69,8 +67,6 @@ public class MIFProject {
 	@XmlAttribute
 	public void setProfile(String profile) {
 		this.profile = profile;
-		// TODO refactor to caller
-		new Service().updateFramerate(this);
 	}
 
 	public int getFramerate() {
@@ -83,8 +79,6 @@ public class MIFProject {
 	
 	public void setWorkingDir(String workingDir) {
 		this.workingDir = workingDir;
-		// TODO refactor to caller
-		new Service().createWorkingDirs(this);
 	}
 
 	public String getFileOfProject() {
