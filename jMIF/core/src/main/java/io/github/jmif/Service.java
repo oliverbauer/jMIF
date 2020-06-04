@@ -120,6 +120,13 @@ public class Service {
 			previewImages[i - 1] = workingDir+"/preview/"+"_low_"+filename+"_"+i+".png";
 		}
 		video.setPreviewImages(previewImages);
+
+		// TODO parse ffprobe -v error -show_format -show_streams
+		// TODO ffprobe -v 0 -of csv=p=0 -select_streams v:0 -show_entries stream=r_frame_rate 2.MP4
+		video.setFps(-1); 
+		video.setAudioBitrate(-1);
+		video.setAudioCodec("not yet extracted");
+		video.setVideoCodec("not yet extracted");
 	}
 	
 	public void createPreview(MIFVideo videoO, String workingDir) throws IOException, InterruptedException {

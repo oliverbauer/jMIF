@@ -5,6 +5,7 @@ import java.awt.Dimension;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
@@ -13,23 +14,31 @@ import org.slf4j.LoggerFactory;
 
 import io.github.jmif.config.Configuration;
 import io.github.jmif.data.GraphWrapper;
-import io.github.jmif.entities.MIFFile;
+import io.github.jmif.entities.MIFVideo;
 
 public class VideoDetailsView {
 	private static final Logger logger = LoggerFactory.getLogger(VideoDetailsView.class);
 	
 	private Box panel;
-	private MIFFile meltFile;
+	private MIFVideo mifVideo;
 	
 	private JLabel filename = new JLabel();
 	private JTextField displayName = new JTextField();
 	private JTextField framelengthToDisplay = new JTextField();
+	private JLabel fps = new JLabel();
+	private JLabel videoCodec = new JLabel();
+	private JLabel audioCodec = new JLabel();
+	private JLabel audioBitrate = new JLabel();
 	private JTextField overlay = new JTextField();
 	private JLabel dimensionLabel = new JLabel();
 
 	private JLabel labelFile = new JLabel("File");
 	private JLabel labelDisplayname = new JLabel("Displayname");
 	private JLabel labelFrames = new JLabel("Frames");
+	private JLabel labelFPS = new JLabel("Fps");
+	private JLabel labelVideoCodec = new JLabel("Videocodec");
+	private JLabel labelAudioCodec = new JLabel("Audiocodec");
+	private JLabel labelAudioBitrate = new JLabel("Audiobitrate");
 	private JLabel labelDimension = new JLabel("Dimension (wxh)");
 	private JLabel labelOVerlay = new JLabel("Overlay");
 
@@ -38,32 +47,16 @@ public class VideoDetailsView {
 	public VideoDetailsView(GraphWrapper mifProject) {
 		Box box = Box.createVerticalBox();
 		
-	    Box boxFilename = Box.createHorizontalBox();
-	    boxFilename.add(Box.createRigidArea(new Dimension(10, 0)));
-	    labelFile.setPreferredSize(new Dimension(140, 20));
-	    boxFilename.add(labelFile);
-	    boxFilename.add(Box.createRigidArea(new Dimension(10, 0)));
-	    boxFilename.add(filename);
-	    boxFilename.add(Box.createHorizontalGlue());
-	    box.add(boxFilename);
-
-	    Box boxDisplayname = Box.createHorizontalBox();
-	    boxDisplayname.add(Box.createRigidArea(new Dimension(10, 0)));
-	    labelDisplayname.setPreferredSize(new Dimension(140, 20));
-	    boxDisplayname.add(labelDisplayname);
-	    boxDisplayname.add(Box.createRigidArea(new Dimension(10, 0)));
-	    boxDisplayname.add(displayName);
-	    boxDisplayname.add(Box.createHorizontalGlue());
-	    box.add(boxDisplayname);
-		
-	    Box boxFramelength = Box.createHorizontalBox();
-	    boxFramelength.add(Box.createRigidArea(new Dimension(10, 0)));
-	    labelFrames.setPreferredSize(new Dimension(140, 20));
-	    boxFramelength.add(labelFrames);
-	    boxFramelength.add(Box.createRigidArea(new Dimension(10, 0)));
-	    boxFramelength.add(framelengthToDisplay);
-	    boxFramelength.add(Box.createHorizontalGlue());
-	    box.add(boxFramelength);
+	    wrap(box, labelFile, filename);
+	    wrap(box, labelDisplayname, displayName);
+	    wrap(box, labelFrames, framelengthToDisplay);
+	    wrap(box, labelFPS, fps);
+	    wrap(box, labelVideoCodec, videoCodec);
+	    wrap(box, labelAudioCodec, audioCodec);
+	    wrap(box, labelAudioBitrate, audioBitrate);
+	    wrap(box, labelDimension, dimensionLabel);
+	    wrap(box, labelOVerlay, overlay);
+	    
 	    framelengthToDisplay.addActionListener(e -> {
 	    	String input = framelengthToDisplay.getText();
 	    	try {
@@ -76,30 +69,14 @@ public class VideoDetailsView {
 	    			throw new IllegalArgumentException("Must be <= 250 frames");
 	    		}
 	    		
-	    		meltFile.setFramelength(i);
+	    		mifVideo.setFramelength(i);
 	    		mifProject.redrawGraph();
 	    	} catch (Exception t) {
 	    		logger.warn("Not allowed: ", t);
 	    	}
 	    });
 	    
-	    Box boxDimension = Box.createHorizontalBox();
-	    boxDimension.add(Box.createRigidArea(new Dimension(10, 0)));
-	    labelDimension.setPreferredSize(new Dimension(140, 20));
-	    boxDimension.add(labelDimension);
-	    boxDimension.add(Box.createRigidArea(new Dimension(10, 0)));
-	    boxDimension.add(dimensionLabel);
-	    boxDimension.add(Box.createHorizontalGlue());
-	    box.add(boxDimension);
-	    
-	    Box boxOverlay = Box.createHorizontalBox();
-	    boxOverlay.add(Box.createRigidArea(new Dimension(10, 0)));
-	    labelOVerlay.setPreferredSize(new Dimension(140, 20));
-	    boxOverlay.add(labelOVerlay);
-	    boxOverlay.add(Box.createRigidArea(new Dimension(10, 0)));
-	    boxOverlay.add(overlay);
-	    boxOverlay.add(Box.createHorizontalGlue());
-	    box.add(boxOverlay);
+
 	    overlay.addActionListener(e -> {
 	    	String input = overlay.getText();
 	    	try {
@@ -110,19 +87,14 @@ public class VideoDetailsView {
 	    			throw new IllegalArgumentException("Overlay must be positive");
 	    		}
 	    		
-	    		meltFile.setOverlayToPrevious(i);
+	    		mifVideo.setOverlayToPrevious(i);
 	    		mifProject.redrawGraph();
 	    	} catch (Exception t) {
 	    		logger.warn("Not allowed: ", t);
 	    	}
 	    });
 	    
-	    box.add(Box.createRigidArea(new Dimension(0,10)));
-		Box boxUpdate = Box.createHorizontalBox();
-		boxUpdate.add(Box.createHorizontalGlue());
-		box.add(boxUpdate);
-		
-		box.add(Box.createRigidArea(new Dimension(0,10)));
+		box.add(Box.createRigidArea(new Dimension(0, 10)));
 		
 		panel = Box.createHorizontalBox();
 		panel.add(box);
@@ -132,23 +104,39 @@ public class VideoDetailsView {
 			panel.setBorder(BorderFactory.createLineBorder(Color.RED, 2, true));
 		}
 		
-		Dimension dim = new Dimension(5200, 100);
+		Dimension dim = new Dimension(5200, 200);
 		panel.setPreferredSize(dim);
 		panel.setMinimumSize(dim);
 		panel.setMaximumSize(dim);
-		
 	}
+	
+	private void wrap(Box box, JComponent c1, JComponent c2) {
+	    Box boxFilename = Box.createHorizontalBox();
+	    boxFilename.add(Box.createRigidArea(new Dimension(10, 0)));
+	    c1.setPreferredSize(new Dimension(140, 20));
+	    boxFilename.add(c1);
+	    boxFilename.add(Box.createRigidArea(new Dimension(10, 0)));
+	    boxFilename.add(c2);
+	    boxFilename.add(Box.createHorizontalGlue());
+	    
+	    box.add(boxFilename);
+	}
+	
 	public Box getBox() {
 		return panel;
 	}
 	
-	public void setDetails(MIFFile meltFile) {
-		this.meltFile = meltFile;
-		filename.setText(meltFile.getFile());
-		displayName.setText(meltFile.getDisplayName());
-		framelengthToDisplay.setText(String.valueOf(meltFile.getFramelength()));
-		overlay.setText(String.valueOf(meltFile.getOverlayToPrevious()));
-		dimensionLabel.setText(meltFile.getWidth()+"x"+meltFile.getHeight());
-		panel.updateUI();
+	public void setDetails(MIFVideo mifVideo) {
+		this.mifVideo = mifVideo;
+		this.filename.setText(mifVideo.getFile());
+		this.displayName.setText(mifVideo.getDisplayName());
+		this.framelengthToDisplay.setText(String.valueOf(mifVideo.getFramelength()));
+		this.fps.setText(String.valueOf(mifVideo.getFps()));
+		this.videoCodec.setText(mifVideo.getVideoCodec());
+		this.audioBitrate.setText(String.valueOf(mifVideo.getAudioBitrate()));
+		this.audioCodec.setText(mifVideo.getAudioCodec());
+		this.overlay.setText(String.valueOf(mifVideo.getOverlayToPrevious()));
+		this.dimensionLabel.setText(mifVideo.getWidth()+"x"+mifVideo.getHeight());
+		this.panel.updateUI();
 	}
 }

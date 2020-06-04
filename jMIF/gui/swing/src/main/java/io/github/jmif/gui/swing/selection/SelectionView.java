@@ -192,7 +192,7 @@ public class SelectionView {
 			
 			String[] previewImages = ((MIFVideo)meltFile).getPreviewImages();
 			videoView.setIcons(previewImages);
-			videoDetailsView.setDetails(meltFile);
+			videoDetailsView.setDetails( ((MIFVideo)meltFile));
 		}
 
 		panel.validate();
