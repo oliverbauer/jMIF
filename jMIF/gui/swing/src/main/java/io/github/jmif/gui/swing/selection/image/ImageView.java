@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import com.mxgraph.model.mxCell;
 
+import io.github.jmif.JMIFException;
 import io.github.jmif.config.Configuration;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
@@ -136,7 +137,7 @@ public class ImageView {
 		dropDownBoxesBox.setPreferredSize(dim);
 		dropDownBoxesBox.setMaximumSize(dim);
 		
-		// TODO Image: Use Filter JCombobox with at least NONE,GRAYSCALE as an example
+		// TODO Image: Use Filter JCombobox with at least NONE,GRAYSCALE as an example: https://github.com/oliverbauer/jMIF/issues/3
 		
 		return dropDownBoxesBox;
 	}
@@ -151,6 +152,7 @@ public class ImageView {
 
 		String selectedItem = ((MIFImage) meltFile).getStyle();
 		resizeStyle.setSelectedItem(selectedItem);
+		// TODO Image: Enum for style
 		if (selectedItem.equals("CROP")) {
 			setSelectedPicture(((MIFImage) meltFile).getPreviewCrop());
 		} else if (selectedItem.contentEquals("FILL")) {
@@ -192,6 +194,13 @@ public class ImageView {
 					resizeStyleDetails.setVisible(false);
 					resizeStyleDetailsLabel.setVisible(false);
 					break;
+				default:
+					logger.error("Unknown style '{}' for image. Using 'CROP", item);
+					
+					imgPicture[1].setIcon(new ImageIcon(((MIFImage) selectedMeltFile).getPreviewCrop()));
+					resizeStyleDetails.setVisible(true);
+					resizeStyleDetailsLabel.setVisible(true);
+					resizeStyleDetailsLabel.setText("Crop from where: ");
 				}
 				
 				box.updateUI();

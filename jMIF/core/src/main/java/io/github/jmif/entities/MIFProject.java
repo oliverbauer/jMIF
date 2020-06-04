@@ -25,6 +25,7 @@ public class MIFProject {
 	private String profile;
 	private int framerate;
 	
+	// TODO Consider removing this field
 	private String fileOfProject;
 	private String outputVideo;
 	private String workingDir = null;

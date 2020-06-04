@@ -94,9 +94,8 @@ public class GraphWrapper {
 
 			logger.info("Successfully saved project {} in {}", pr.getFileOfProject(), TimeUtil.getMessage(time));
 		} catch (JAXBException ex) {
-			ex.printStackTrace();
+			logger.error("Unable to save project", ex);
 		}
-
 	}
 
 	public void load() throws InterruptedException, IOException {

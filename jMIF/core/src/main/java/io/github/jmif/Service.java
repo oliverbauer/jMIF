@@ -82,7 +82,7 @@ public class Service {
 	}
 	
 	public void init(MIFVideo video, String workingDir, int profileFramelength) {
-		var path = video.getFile().substring(0, video.getFile().lastIndexOf("/"));
+		var path = video.getFile().substring(0, video.getFile().lastIndexOf('/'));
 		var filename = video.getFilename();
 		
 		if (video.getFramelength() == -1) {
@@ -103,17 +103,16 @@ public class Service {
 					}
 				}
 				
-				int index = output.indexOf(".");
+				int index = output.indexOf('.');
 				output = output.substring(0, index + 2);
 				video.setFramelength(Float.parseFloat(output) * profileFramelength);
+				logger.info("Init: Extract Framelength of "+filename+"=> "+video.getFramelength());
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error("Unable to get length of video", e);
 			}
-			logger.info("Init: Extract Framelength of "+filename+"=> "+video.getFramelength());
 		} else {
 			logger.debug("Init: Framelength already known");
 		}
-
 		
 		// set images...
 		var previewImages = new String[10];
@@ -236,7 +235,7 @@ public class Service {
 				image.setWidth(Integer.valueOf(output.substring(0, output.indexOf('x'))));
 				image.setHeight(Integer.valueOf(output.substring(output.indexOf('x') + 1)));
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error("Unable to get image dimension", e);
 			}
 		} else {
 			logger.debug("Init: Check Width/Height of '{}' already available", copy);

@@ -14,6 +14,9 @@ public abstract class MIFFile {
 	private String filename;
 	protected String displayName;
 
+	// TODO Overlay: Depends on #9 Configuration: Create properties-file
+	// TODO Overlay: Depends on Project-framerate
+	// TODO Overlay: Refactor to use seconds
 	protected int overlayToPrevious = 25; // 1 Second
 	protected int height = -1;
 	protected int width = -1;

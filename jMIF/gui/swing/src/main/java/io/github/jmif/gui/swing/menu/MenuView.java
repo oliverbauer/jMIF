@@ -67,7 +67,7 @@ public class MenuView {
 				try {
 					mifProject.load();
 				} catch (IOException | InterruptedException e1) {
-					e1.printStackTrace();
+					logger.error("Unable to load project", e1);
 				}
 			}
 		});
@@ -98,7 +98,7 @@ public class MenuView {
 		        	try {
 		        		new Service().convert(mifProject.getPr(), preview);
 		        	} catch (Exception e1) {
-		        		e1.printStackTrace();
+		        		logger.error("Unable to create preview video", e1);
 		        	}
 			    	
 					return null;
@@ -121,7 +121,7 @@ public class MenuView {
 		        	try {
 		        		new Service().convert(mifProject.getPr(), preview);
 		        	} catch (Exception e1) {
-		        		e1.printStackTrace();
+		        		logger.error("Unable to render project", e1);
 		        	}
 			    	
 					return null;

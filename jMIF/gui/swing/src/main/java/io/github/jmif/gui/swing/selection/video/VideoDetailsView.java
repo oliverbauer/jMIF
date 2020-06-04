@@ -70,16 +70,16 @@ public class VideoDetailsView {
 	    		int i = Integer.parseInt(input);
 	    		
 	    		if (i<25) {
-	    			throw new IllegalArgumentException("Muss >= 25 Frames sein");
+	    			throw new IllegalArgumentException("Must be >= 25 frames");
 	    		}
 	    		if (i>250) {
-	    			throw new IllegalArgumentException("Muss <= 250 Frames sein");
+	    			throw new IllegalArgumentException("Must be <= 250 frames");
 	    		}
 	    		
 	    		meltFile.setFramelength(i);
 	    		mifProject.redrawGraph();
 	    	} catch (Exception t) {
-	    		logger.warn("Not allowed: ", t.getMessage());
+	    		logger.warn("Not allowed: ", t);
 	    	}
 	    });
 	    

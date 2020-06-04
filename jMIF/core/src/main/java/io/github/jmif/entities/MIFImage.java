@@ -9,6 +9,7 @@ import io.github.jmif.Service;
 public class MIFImage extends MIFFile {
 
 	// CROP, HARD, FILL, MANUAL
+	// TODO Image: Use enum for style: CROP, HARD, FILL, MANUAL
 	private String style = "CROP";
 	private String manualStyleCommand = null;
 	

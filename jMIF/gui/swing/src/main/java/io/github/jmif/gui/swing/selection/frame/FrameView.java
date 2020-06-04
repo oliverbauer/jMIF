@@ -17,7 +17,7 @@ public class FrameView implements SingleFrameCreatedListener {
 	
 	public FrameView() {
 		box = Box.createVerticalBox();
-		picture = new JLabel("TODO");
+		picture = new JLabel("Please drag and drop the slider");
 		JScrollPane scrollPane = new JScrollPane(picture);
 		box.add(scrollPane);
 	}
@@ -26,6 +26,7 @@ public class FrameView implements SingleFrameCreatedListener {
 		return box;
 	}
 
+	// TODO Use 'initial' image for 'initial' position (only works after first drag and drop)
 	@Override
 	public void created(String file) {
 		logger.info("Updating icon to {}", file);

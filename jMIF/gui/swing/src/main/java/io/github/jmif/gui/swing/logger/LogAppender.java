@@ -17,7 +17,7 @@ public class LogAppender implements Appender<LoggingEvent> {
 	
 	@Override
 	public void doAppend(LoggingEvent event) {
-		
+		// TODO LogAppender how to display exceptions?
 	    EventQueue.invokeLater(() -> {
 	    	String loggername = event.getLoggerName();
 	    	String formattedMessage = event.getFormattedMessage();

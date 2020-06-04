@@ -128,11 +128,11 @@ public class Splashscreen {
          	
          	for (String line : getProcessOutput("cat /etc/*release")) {
          		if (line.startsWith("DISTRIB_DESCRIPTION=")) {
-         			description = line.substring(line.indexOf("=")+1);
+         			description = line.substring(line.indexOf('=')+1);
          		} else if (line.startsWith("NAME=")) {
-         			name = line.substring(line.indexOf("=")+1);
+         			name = line.substring(line.indexOf('=')+1);
          		} else if (line.startsWith("VERSION=")) {
-         			version = line.substring(line.indexOf("=")+1);
+         			version = line.substring(line.indexOf('=')+1);
          		}                		
          	}
  			
@@ -170,7 +170,7 @@ public class Splashscreen {
         String imageMagickVersion = null;
     	for (String line : getProcessOutput("convert -version")) {
     		if (line.startsWith("Version: ")) {
-    			imageMagickVersion = line.substring("Version: ImageMagick ".length(), line.indexOf(" ", "Version: ImageMagick ".length()));
+    			imageMagickVersion = line.substring("Version: ImageMagick ".length(), line.indexOf(' ', "Version: ImageMagick ".length()));
     		}
     	}
         if (imageMagickVersion == null) {
@@ -181,8 +181,8 @@ public class Splashscreen {
         	// Newest version 7.0.10-14 (checked 2020.05.24)
         	boolean newestVersion = true;
         	
-        	String prefix = imageMagickVersion.contains("-") ? imageMagickVersion.substring(0, imageMagickVersion.indexOf("-")) : imageMagickVersion;
-        	String version[] = prefix.split("\\.");
+        	String prefix = imageMagickVersion.contains("-") ? imageMagickVersion.substring(0, imageMagickVersion.indexOf('-')) : imageMagickVersion;
+        	String[] version = prefix.split("\\.");
         	String v = version[0]+version[1]+version[2];
         	if (Integer.parseInt(v) < 7010) {
         		newestVersion = false;
@@ -192,10 +192,9 @@ public class Splashscreen {
         		fldImageMagick.setText(imageMagickVersion);
         		fldImageMagick.setBackground(myGreen);
         	} else {
-        		fldImageMagick.setText(imageMagickVersion+" (OK, consider upgrading to 7.0.10-14)");
+        		fldImageMagick.setText(imageMagickVersion+" (OK, consider upgrading to 7.0.10-14 - or newer if exists)");
         		fldImageMagick.setBackground(myOrange);
         	}
-
         }
     }
     
@@ -210,8 +209,8 @@ public class Splashscreen {
         	// Newest version 4.2.3  (checked 2020.05.24)
         	boolean newestVersion = true;
         	
-        	String prefix = ffmpegVersion.contains("-") ? ffmpegVersion.substring(0, ffmpegVersion.indexOf("-")) : ffmpegVersion;
-        	String version[] = prefix.split("\\.");
+        	String prefix = ffmpegVersion.contains("-") ? ffmpegVersion.substring(0, ffmpegVersion.indexOf('-')) : ffmpegVersion;
+        	String[] version = prefix.split("\\.");
         	String v = version[0]+version[1]+version[2];
         	if (Integer.parseInt(v) < 423) {
         		newestVersion = false;
@@ -221,7 +220,7 @@ public class Splashscreen {
         		fldFFmpeg.setText(ffmpegVersion);
             	fldFFmpeg.setBackground(myGreen);
         	} else {
-        		fldFFmpeg.setText(ffmpegVersion+" (OK, consider upgrading to 4.2.3)");
+        		fldFFmpeg.setText(ffmpegVersion+" (OK, consider upgrading to 4.2.3 - or newer if exists)");
             	fldFFmpeg.setBackground(myOrange);
         	}
         } else {
@@ -241,7 +240,7 @@ public class Splashscreen {
         if (mltVersion != null) {
         	// Newest version 6.20.0  (checked 2020.05.24)
         	boolean newestVersion = true;
-        	String version[] = mltVersion.split("\\.");
+        	String[] version = mltVersion.split("\\.");
         	String v = version[0]+version[1]+version[2];
         	if (Integer.parseInt(v) < 6200) {
         		newestVersion = false;
@@ -251,7 +250,7 @@ public class Splashscreen {
             	fldMLT.setText(mltVersion);
         		fldMLT.setBackground(myGreen);
         	} else {
-            	fldMLT.setText(mltVersion+" (OK, consider upgrading to 6.20.0)");
+            	fldMLT.setText(mltVersion+" (OK, consider upgrading to 6.20.0 - or newer if exists)");
         		fldMLT.setBackground(myOrange);
         	}
         } else {
@@ -275,7 +274,7 @@ public class Splashscreen {
 				output.add(line);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Unable to get process output", e);
 		}
 		return output;
     }

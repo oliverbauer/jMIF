@@ -17,6 +17,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.mxgraph.model.mxCell;
 
 import io.github.jmif.config.Configuration;
@@ -26,6 +29,8 @@ import io.github.jmif.entities.MIFFile;
 import io.github.jmif.gui.swing.selection.SelectionView;
 
 public class GraphView {
+	private static final Logger logger = LoggerFactory.getLogger(GraphView.class);
+	
 	private JFrame frame;
 	private GraphWrapper mifProject;
 	private SelectionView mifPanel;
@@ -131,7 +136,7 @@ public class GraphView {
 							f = mifProject.createMIFFile(fileToAdd);
 							added.add(f);
 						} catch (IOException | InterruptedException e1) {
-							e1.printStackTrace();
+							logger.error("Unable to create file", e1);
 						}
 					}
 					mifProject.redrawGraph();

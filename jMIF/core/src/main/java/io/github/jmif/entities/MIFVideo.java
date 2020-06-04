@@ -9,7 +9,7 @@ import io.github.jmif.Service;
 public class MIFVideo extends MIFFile {
 
 	@XmlTransient
-	private String previewImages[];
+	private String[] previewImages;
 
 	public MIFVideo() {
 

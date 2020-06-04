@@ -37,7 +37,7 @@ public class VideoView {
 		videoPanel.updateUI();
 	}
 	
-	public void setIcons(String p[]) {
+	public void setIcons(String[] p) {
 		for (int i=0; i<=9; i++) {
 			if (!new File(p[i]).exists()) {
 				logger.warn("File {} does not exists", p[i]);

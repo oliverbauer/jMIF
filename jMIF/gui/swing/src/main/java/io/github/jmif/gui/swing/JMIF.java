@@ -64,14 +64,14 @@ import io.github.jmif.util.TimeUtil;
  * 
  * TODO Config: Allow in-memory-preview (byte-arrays of pictures - needs more RAM) or hd-preview (copy files - needs more HD/Time for IO) 
  * 
- * TODO Audio: "audiowaveform -i 001.mp3 -o test.png -w 1000 -h 200 -s 0 -e ${seconds} --no-axis-labels".. needs optional check in SplashScreen 
+ * TODO Audio: "audiowaveform -i 001.mp3 -o test.png -w 1000 -h 200 -s 0 -e ${seconds} --no-axis-labels" (or (better?) use Sox).. needs optional check in SplashScreen 
  * 	$ sudo add-apt-repository ppa:chris-needham/ppa
  *	$ sudo apt-get update
  *	$ sudo apt-get install audiowaveform
  *
  * TODO MLT: Checkout  https://gl-transitions.com/
  * 
- * TODO Allow multile files with same name
+ * TODO Allow multiple files with same name
  */
 public class JMIF {
 	private static final Logger LOGGER = LoggerFactory.getLogger(JMIF.class);
