@@ -26,6 +26,7 @@ import io.github.jmif.gui.swing.selection.frame.FrameDetailsView;
 import io.github.jmif.gui.swing.selection.frame.FrameView;
 import io.github.jmif.gui.swing.selection.image.ImageDetailsView;
 import io.github.jmif.gui.swing.selection.image.ImageView;
+import io.github.jmif.gui.swing.selection.imageLibrary.ImageLibraryView;
 import io.github.jmif.gui.swing.selection.video.VideoDetailsView;
 import io.github.jmif.gui.swing.selection.video.VideoView;
 
@@ -104,6 +105,7 @@ public class SelectionView {
 		tabPane.addTab("VideoView", wrap(videoDetailsView.getBox(), videoPanel));
 		tabPane.addTab("AudioView", wrap(audioDetailsView.getBox(), null));
 		tabPane.addTab("FrameView", wrap(frameDetailsView.getBox(), singleFrameBox));
+		tabPane.addTab("ImageLibrary", wrap(new ImageLibraryView(mifProject).getBox(), null));
 		
 		panel.add(tabPane);
 		
