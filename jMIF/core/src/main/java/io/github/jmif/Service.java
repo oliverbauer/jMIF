@@ -84,7 +84,7 @@ public class Service {
 		}
 	}
 
-	public MIFVideo initVideo(String file, String display, float frames, String dim, int overlay, String workingDir, int profileFramelength) throws MIFException {
+	public MIFVideo createVideo(String file, String display, float frames, String dim, int overlay, String workingDir, int profileFramelength) throws MIFException {
 		var video = new MIFVideo(file, display, frames, dim, overlay);
 		updateFile(video);
 		copy(video, workingDir);
@@ -244,7 +244,7 @@ public class Service {
 		}
 	}
 
-	public MIFImage initImage(String file, String display, float frames, String dim, int overlay, String workingDir, int framelength) throws MIFException {
+	public MIFImage createImage(String file, String display, float frames, String dim, int overlay, String workingDir, int framelength) throws MIFException {
 		var image = new MIFImage(file, display, frames, dim, overlay);
 		updateFile(image);
 		copy(image, workingDir);
@@ -435,7 +435,16 @@ public class Service {
 		// TODO manual preview if exists
 	}
 
-	public void checkLengthInSeconds(MIFAudioFile audio) throws MIFException {
+	public MIFAudioFile createAudio(String path) throws MIFException {
+		var audioFile = new MIFAudioFile();
+		audioFile.setAudiofile(path);
+		checkLengthInSeconds(audioFile);
+		audioFile.setEncodeStart(0);
+		audioFile.setEncodeEnde(audioFile.getLengthOfInput());
+		return audioFile;
+	}
+	
+	private void checkLengthInSeconds(MIFAudioFile audio) throws MIFException {
 		Process process;
 		try {
 			String command = "ffprobe -v error -select_streams a:0 -show_entries stream=duration,bit_rate -of default=noprint_wrappers=1:nokey=1 "+audio.getAudiofile();

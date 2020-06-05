@@ -140,12 +140,8 @@ public class GraphWrapper {
 		var file = fileToAdd.getAbsoluteFile().getAbsolutePath();
 		
 		if (file.endsWith("mp3") || file.endsWith("MP3")) {
-			var audioFile = new MIFAudioFile();
-			audioFile.setAudiofile(fileToAdd.getAbsolutePath());
-			// TODO refactor to caller
-			new Service().checkLengthInSeconds(audioFile);
-			audioFile.setEncodeStart(0);
-			audioFile.setEncodeEnde(audioFile.getLengthOfInput());
+			// TODO
+			var audioFile = new Service().createAudio(fileToAdd.getAbsolutePath());
 			
 			var v1 = insertVertex(
 				"mp3",
@@ -168,7 +164,7 @@ public class GraphWrapper {
 		if (file.endsWith("JPG") || file.endsWith("jpg")) {
 			var display = file.substring(file.lastIndexOf('/') + 1);
 
-			var image = new Service().initImage(file, display, 5*pr.getFramerate(), "-1x-1", pr.getFramerate(), pr.getWorkingDir(), pr.getFramerate());
+			var image = new Service().createImage(file, display, 5*pr.getFramerate(), "-1x-1", pr.getFramerate(), pr.getWorkingDir(), pr.getFramerate());
 
 			if (!pr.getMIFFiles().isEmpty()) {
 				currentLength -= image.getOverlayToPrevious();
@@ -187,7 +183,7 @@ public class GraphWrapper {
 			return image;
 		} else if (file.endsWith("mp4") || file.endsWith("MP4")) {
 			var display = file.substring(file.lastIndexOf('/') + 1);
-			var video = new Service().initVideo(file, display, -1, "1920x1080", pr.getFramerate(), pr.getWorkingDir(), pr.getFramerate());
+			var video = new Service().createVideo(file, display, -1, "1920x1080", pr.getFramerate(), pr.getWorkingDir(), pr.getFramerate());
 
 			if (!pr.getMIFFiles().isEmpty()) {
 				currentLength -= video.getOverlayToPrevious();
