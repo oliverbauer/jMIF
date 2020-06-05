@@ -1,22 +1,17 @@
 package io.github.jmif.gui.swing.selection.imageLibrary;
 
 import java.awt.Dimension;
-import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import javax.imageio.ImageIO;
 import javax.swing.Box;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -26,16 +21,13 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingWorker;
 
 import org.imgscalr.AsyncScalr;
-import org.imgscalr.Scalr;
 import org.imgscalr.Scalr.Mode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.jmif.MIFException;
 import io.github.jmif.Service;
 import io.github.jmif.config.Configuration;
 import io.github.jmif.gui.swing.GraphWrapper;
-import io.github.jmif.gui.swing.selection.image.ImageView;
 
 public class ImageLibraryView {
 	private static final Logger logger = LoggerFactory.getLogger(ImageLibraryView.class);
@@ -70,11 +62,7 @@ public class ImageLibraryView {
 					}
 				}
 				
-				try {
-					createImageList(images);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				createImageList(images);
 			}
 		});
 		newBox = Box.createVerticalBox();
@@ -91,7 +79,7 @@ public class ImageLibraryView {
 		box.add(scrollPane);
 	}
 	
-	private void createImageList(List<File> images) throws IOException, InterruptedException, ExecutionException {
+	private void createImageList(List<File> images) {
 		logger.info("Create Library for {} images", images.size());
 		
 		newBox.removeAll();
@@ -114,25 +102,18 @@ public class ImageLibraryView {
 			};
 			worker.execute();
 			
-			
 			imageLabel.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					try {
-						var file1 = mifProject.createMIFFile(f);
-						
-						var executor = Executors.newWorkStealingPool();
-						executor.submit(() -> {
-							try {
-								new Service().createPreview(file1, mifProject.getPr().getWorkingDir());
-							} catch (Exception ex) {
-								logger.error("", ex);
-							}
-						});
-						
-					} catch (MIFException | InterruptedException | IOException e1) {
-						e1.printStackTrace();
-					}
+					var executor = Executors.newWorkStealingPool();
+					executor.submit(() -> {
+						try {
+							var file1 = mifProject.createMIFFile(f);
+							new Service().createPreview(file1, mifProject.getPr().getWorkingDir());
+						} catch (Exception ex) {
+							logger.error("", ex);
+						}
+					});
 				}
 			});
 			
