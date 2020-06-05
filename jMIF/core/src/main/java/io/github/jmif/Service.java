@@ -91,33 +91,67 @@ public class Service {
 		var path = video.getFile().substring(0, video.getFile().lastIndexOf('/'));
 		var filename = video.getFilename();
 
-		if (video.getFramelength() == -1) {
-			String command = "ffprobe -v quiet -of csv=p=0 -show_entries format=duration " + video.getFile();
-			logger.info("Init: Extract Framelength of {}", filename);
-			Process process;
-			try {
-				process = new ProcessBuilder("bash", "-c", command)
-						.directory(new File(path))
-						.redirectErrorStream(true)
-						.start();
-				String output = null;
-
-				try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-					String line;
-					while ((line = reader.readLine()) != null) {
-						output = line;
+		logger.info("Init: Video {}", filename);
+		Process process;
+		String command;
+		try {
+			// Audio Stream
+			// codec_long_name=AAC (Advanced Audio Coding)
+			// bit_rate=128771 => 128 kbps
+			command = "ffprobe -v error -select_streams a:0 -show_entries stream=bit_rate,codec_long_name -of default=noprint_wrappers=1 " + video.getFile();
+			process = new ProcessBuilder("bash", "-c", command)
+					.directory(new File(path))
+					.redirectErrorStream(true)
+					.start();
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+				String line;
+				while ((line = reader.readLine()) != null) {
+					if (line.startsWith("codec_long_name")) {
+						video.setAudioCodec(line.substring(line.indexOf('=')+1));
+					} else if (line.startsWith("bit_rate")) {
+						String value = line.substring(line.indexOf('=')+1);
+						video.setAudioBitrate(Integer.valueOf(value) / 1000);
 					}
 				}
-
-				int index = output.indexOf('.');
-				output = output.substring(0, index + 2);
-				video.setFramelength(Float.parseFloat(output) * profileFramelength);
-				logger.info("Init: Extract Framelength of "+filename+"=> "+video.getFramelength());
-			} catch (IOException e) {
-				logger.error("Unable to get length of video", e);
 			}
-		} else {
-			logger.debug("Init: Framelength already known");
+			// Video Stream
+			// codec_long_name=H.265 / HEVC (High Efficiency Video Coding)
+			// width=1920
+			// height=1080
+			// display_aspect_ratio=16:9
+			// duration=7.000000
+			// bit_rate=2504857  => 2504 kbps
+			command = "ffprobe -v error -select_streams v:0 -show_entries stream=width,height,duration,bit_rate,codec_long_name,display_aspect_ratio,r_frame_rate -of default=noprint_wrappers=1 " + video.getFile();
+			process = new ProcessBuilder("bash", "-c", command)
+					.directory(new File(path))
+					.redirectErrorStream(true)
+					.start();
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+				String line;
+				while ((line = reader.readLine()) != null) {
+					
+					if (line.startsWith("width")) {
+						video.setWidth(Integer.parseInt(line.substring(line.indexOf('=')+1)));
+					} else if (line.startsWith("height")) {
+						video.setHeight(Integer.parseInt(line.substring(line.indexOf('=')+1)));
+					} else if (line.startsWith("duration")) {
+						line = line.substring(line.indexOf('=')+1);
+						String s = line.substring(0, line.indexOf('.') + 2);
+						video.setFramelength(Float.parseFloat(s) * profileFramelength);
+					} else if (line.startsWith("bit_rate")) {
+						video.setVideoBitrate(Integer.parseInt(line.substring(line.indexOf('=')+1)) / 1000);
+					} else if (line.startsWith("codec_long_name")) {
+						video.setVideoCodec(line.substring(line.indexOf('=')+1));
+					} else if (line.startsWith("display_aspect_ratio")) {
+						video.setAr(line.substring(line.indexOf('=')+1));
+					} else if (line.startsWith("r_frame_rate")) {
+						String s = line.substring(line.indexOf('=')+1, line.indexOf('/'));
+						video.setFps(Integer.parseInt(s));
+					}
+				}
+			}				
+		} catch (IOException e) {
+			logger.error("Unable to get video details", e);
 		}
 
 		// set images...
@@ -127,12 +161,6 @@ public class Service {
 		}
 		video.setPreviewImages(previewImages);
 
-		// TODO parse ffprobe -v error -show_format -show_streams
-		// TODO ffprobe -v 0 -of csv=p=0 -select_streams v:0 -show_entries stream=r_frame_rate 2.MP4
-		video.setFps(-1); 
-		video.setAudioBitrate(-1);
-		video.setAudioCodec("not yet extracted");
-		video.setVideoCodec("not yet extracted");
 		return video;
 	}
 

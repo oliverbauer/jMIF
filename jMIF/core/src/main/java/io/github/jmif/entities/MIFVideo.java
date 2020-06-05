@@ -12,7 +12,9 @@ public class MIFVideo extends MIFFile {
 	private int fps;
 	private String videoCodec;
 	private int audioBitrate;
+	private int videoBitrate;
 	private String audioCodec;
+	private String ar;
 
 	public MIFVideo() {
 
@@ -35,6 +37,22 @@ public class MIFVideo extends MIFFile {
 		this.previewImages = previewImages;
 	}
 	
+	public String getAr() {
+		return ar;
+	}
+
+	public void setAr(String ar) {
+		this.ar = ar;
+	}
+
+	public int getVideoBitrate() {
+		return videoBitrate;
+	}
+
+	public void setVideoBitrate(int videoBitrate) {
+		this.videoBitrate = videoBitrate;
+	}
+
 	public int getFps() {
 		return fps;
 	}

@@ -5,6 +5,7 @@ import java.awt.Dimension;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
@@ -36,32 +37,12 @@ public class ImageDetailsView {
 	public ImageDetailsView(GraphWrapper mifProject) {
 		Box box = Box.createVerticalBox();
 		
-	    Box boxFilename = Box.createHorizontalBox();
-	    boxFilename.add(Box.createRigidArea(new Dimension(10, 0)));
-	    labelFile.setPreferredSize(new Dimension(140, 20));
-	    boxFilename.add(labelFile);
-	    boxFilename.add(Box.createRigidArea(new Dimension(10, 0)));
-	    boxFilename.add(filename);
-	    boxFilename.add(Box.createHorizontalGlue());
-	    box.add(boxFilename);
-
-	    Box boxDisplayname = Box.createHorizontalBox();
-	    boxDisplayname.add(Box.createRigidArea(new Dimension(10, 0)));
-	    labelDisplayname.setPreferredSize(new Dimension(140, 20));
-	    boxDisplayname.add(labelDisplayname);
-	    boxDisplayname.add(Box.createRigidArea(new Dimension(10, 0)));
-	    boxDisplayname.add(displayName);
-	    boxDisplayname.add(Box.createHorizontalGlue());
-	    box.add(boxDisplayname);
-		
-	    Box boxFramelength = Box.createHorizontalBox();
-	    boxFramelength.add(Box.createRigidArea(new Dimension(10, 0)));
-	    labelFrames.setPreferredSize(new Dimension(140, 20));
-	    boxFramelength.add(labelFrames);
-	    boxFramelength.add(Box.createRigidArea(new Dimension(10, 0)));
-	    boxFramelength.add(framelengthToDisplay);
-	    boxFramelength.add(Box.createHorizontalGlue());
-	    box.add(boxFramelength);
+	    wrap(box, labelFile, filename);
+	    wrap(box, labelDisplayname, displayName);
+	    wrap(box, labelFrames, framelengthToDisplay);
+	    wrap(box, labelDimension, dimensionLabel);
+	    wrap(box, labelOVerlay, overlay);
+	    
 	    framelengthToDisplay.addActionListener(e -> {
 	    	String input = framelengthToDisplay.getText();
 	    	try {
@@ -81,23 +62,7 @@ public class ImageDetailsView {
 	    	}
 	    });
 	    
-	    Box boxDimension = Box.createHorizontalBox();
-	    boxDimension.add(Box.createRigidArea(new Dimension(10, 0)));
-	    labelDimension.setPreferredSize(new Dimension(140, 20));
-	    boxDimension.add(labelDimension);
-	    boxDimension.add(Box.createRigidArea(new Dimension(10, 0)));
-	    boxDimension.add(dimensionLabel);
-	    boxDimension.add(Box.createHorizontalGlue());
-	    box.add(boxDimension);
-	    
-	    Box boxOverlay = Box.createHorizontalBox();
-	    boxOverlay.add(Box.createRigidArea(new Dimension(10, 0)));
-	    labelOVerlay.setPreferredSize(new Dimension(140, 20));
-	    boxOverlay.add(labelOVerlay);
-	    boxOverlay.add(Box.createRigidArea(new Dimension(10, 0)));
-	    boxOverlay.add(overlay);
-	    boxOverlay.add(Box.createHorizontalGlue());
-	    box.add(boxOverlay);
+
 	    overlay.addActionListener(e -> {
 	    	String input = overlay.getText();
 	    	try {
@@ -139,6 +104,20 @@ public class ImageDetailsView {
 		panel.setMaximumSize(dim);
 	}
 
+	private void wrap(Box box, JComponent c1, JComponent c2) {
+	    Box boxFilename = Box.createHorizontalBox();
+	    boxFilename.add(Box.createRigidArea(new Dimension(10, 0)));
+	    c1.setMinimumSize(new Dimension(140, 20));
+	    c1.setPreferredSize(new Dimension(140, 20));
+	    boxFilename.add(c1);
+	    boxFilename.add(Box.createRigidArea(new Dimension(10, 0)));
+	    boxFilename.add(c2);
+	    c2.setPreferredSize(new Dimension(5000, 20));
+	    c2.setMaximumSize(new Dimension(5000, 20));
+	    boxFilename.add(Box.createHorizontalGlue());
+	    box.add(boxFilename);
+	}
+	
 	public Box getBox() {
 		return panel;
 	}

@@ -25,37 +25,44 @@ public class VideoDetailsView {
 	private JLabel filename = new JLabel();
 	private JTextField displayName = new JTextField();
 	private JTextField framelengthToDisplay = new JTextField();
-	private JLabel fps = new JLabel();
-	private JLabel videoCodec = new JLabel();
-	private JLabel audioCodec = new JLabel();
-	private JLabel audioBitrate = new JLabel();
 	private JTextField overlay = new JTextField();
-	private JLabel dimensionLabel = new JLabel();
+
+	private JLabel vCodec = new JLabel();
+	private JLabel vBitrate = new JLabel();
+	private JLabel vDimension = new JLabel();
+	private JLabel vFps = new JLabel();
+	private JLabel vAspectRatio = new JLabel();
+	private JLabel aCodec = new JLabel();
+	private JLabel aBitrate = new JLabel();
 
 	private JLabel labelFile = new JLabel("File");
 	private JLabel labelDisplayname = new JLabel("Displayname");
 	private JLabel labelFrames = new JLabel("Frames");
-	private JLabel labelFPS = new JLabel("Fps");
-	private JLabel labelVideoCodec = new JLabel("Videocodec");
-	private JLabel labelAudioCodec = new JLabel("Audiocodec");
-	private JLabel labelAudioBitrate = new JLabel("Audiobitrate");
-	private JLabel labelDimension = new JLabel("Dimension (wxh)");
 	private JLabel labelOVerlay = new JLabel("Overlay");
+	private JLabel labelFPS = new JLabel("V.fps");
+	private JLabel labelVideoCodec = new JLabel("V.codec");
+	private JLabel labelVideoAR = new JLabel("V.aspect ratio");
+	private JLabel labelVideoBitrate = new JLabel("V.bitrate");
+	private JLabel labelDimension = new JLabel("V.dimension (wxh)");
+	private JLabel labelAudioCodec = new JLabel("A.codec");
+	private JLabel labelAudioBitrate = new JLabel("A.bitrate");
 
-	// TODO Video: Show FPS of originalvideo
-	// TODO Video: Show informations about audiotrack
 	public VideoDetailsView(GraphWrapper mifProject) {
 		Box box = Box.createVerticalBox();
 		
 	    wrap(box, labelFile, filename);
 	    wrap(box, labelDisplayname, displayName);
 	    wrap(box, labelFrames, framelengthToDisplay);
-	    wrap(box, labelFPS, fps);
-	    wrap(box, labelVideoCodec, videoCodec);
-	    wrap(box, labelAudioCodec, audioCodec);
-	    wrap(box, labelAudioBitrate, audioBitrate);
-	    wrap(box, labelDimension, dimensionLabel);
 	    wrap(box, labelOVerlay, overlay);
+
+	    wrap(box, labelVideoCodec, vCodec);
+	    wrap(box, labelVideoBitrate, vBitrate);
+	    wrap(box, labelDimension, vDimension);
+	    wrap(box, labelVideoAR, vAspectRatio);
+	    wrap(box, labelFPS, vFps);
+
+	    wrap(box, labelAudioCodec, aCodec);
+	    wrap(box, labelAudioBitrate, aBitrate);
 	    
 	    framelengthToDisplay.addActionListener(e -> {
 	    	String input = framelengthToDisplay.getText();
@@ -113,6 +120,7 @@ public class VideoDetailsView {
 	private void wrap(Box box, JComponent c1, JComponent c2) {
 	    Box boxFilename = Box.createHorizontalBox();
 	    boxFilename.add(Box.createRigidArea(new Dimension(10, 0)));
+	    c1.setMinimumSize(new Dimension(140, 20));
 	    c1.setPreferredSize(new Dimension(140, 20));
 	    boxFilename.add(c1);
 	    boxFilename.add(Box.createRigidArea(new Dimension(10, 0)));
@@ -131,12 +139,14 @@ public class VideoDetailsView {
 		this.filename.setText(mifVideo.getFile());
 		this.displayName.setText(mifVideo.getDisplayName());
 		this.framelengthToDisplay.setText(String.valueOf(mifVideo.getFramelength()));
-		this.fps.setText(String.valueOf(mifVideo.getFps()));
-		this.videoCodec.setText(mifVideo.getVideoCodec());
-		this.audioBitrate.setText(String.valueOf(mifVideo.getAudioBitrate()));
-		this.audioCodec.setText(mifVideo.getAudioCodec());
+		this.vFps.setText(String.valueOf(mifVideo.getFps()));
+		this.vCodec.setText(mifVideo.getVideoCodec());
+		this.aBitrate.setText(String.valueOf(mifVideo.getAudioBitrate())+" kbps");
+		this.aCodec.setText(mifVideo.getAudioCodec());
 		this.overlay.setText(String.valueOf(mifVideo.getOverlayToPrevious()));
-		this.dimensionLabel.setText(mifVideo.getWidth()+"x"+mifVideo.getHeight());
+		this.vAspectRatio.setText(mifVideo.getAr());
+		this.vBitrate.setText(String.valueOf(mifVideo.getVideoBitrate())+" kbps");
+		this.vDimension.setText(mifVideo.getWidth()+"x"+mifVideo.getHeight());
 		this.panel.updateUI();
 	}
 }
