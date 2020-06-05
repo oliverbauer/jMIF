@@ -12,8 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.jmif.config.Configuration;
-import io.github.jmif.data.GraphWrapper;
 import io.github.jmif.entities.MIFFile;
+import io.github.jmif.gui.swing.GraphWrapper;
 
 public class ImageDetailsView {
 	private static final Logger logger = LoggerFactory.getLogger(ImageDetailsView.class);

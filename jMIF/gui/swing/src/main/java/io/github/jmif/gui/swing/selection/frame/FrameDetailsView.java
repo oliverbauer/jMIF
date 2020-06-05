@@ -9,7 +9,7 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import io.github.jmif.config.Configuration;
-import io.github.jmif.data.GraphWrapper;
+import io.github.jmif.gui.swing.GraphWrapper;
 
 public class FrameDetailsView {
 	private JLabel filename = new JLabel();

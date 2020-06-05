@@ -29,6 +29,8 @@ import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 
+import io.github.jmif.MIFException;
+import io.github.jmif.Service;
 import io.github.jmif.entities.MIFImage;
 
 public class ManualSize {
@@ -157,9 +159,15 @@ public class ManualSize {
 		JButton ok = new JButton("OK");
 		JButton cancel = new JButton("Cancel");
 		ok.addActionListener((event) -> {
-			mifImage.setManualStyleCommand(command);
-			resizeStyle.setSelectedItem("MANUAL");
-			frame.dispose();
+			try {
+				mifImage.setManualStyleCommand(command);
+				// TODO
+				new Service().createManualPreview(mifImage);
+				resizeStyle.setSelectedItem("MANUAL");
+				frame.dispose();
+			} catch (MIFException e) {
+				e.printStackTrace();
+			}
 		});
 		cancel.addActionListener((event) -> {
 			frame.dispose();

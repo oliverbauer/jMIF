@@ -2,12 +2,9 @@ package io.github.jmif.gui.swing;
 
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,12 +27,13 @@ import com.mxgraph.model.mxCell;
 import com.mxgraph.util.mxEvent;
 import com.mxgraph.view.mxGraphSelectionModel;
 
+import io.github.jmif.MIFException;
+import io.github.jmif.Service;
 import io.github.jmif.config.Configuration;
-import io.github.jmif.data.GraphWrapper;
-import io.github.jmif.data.listener.ProjectListener;
-import io.github.jmif.data.listener.ProjectListener.type;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.gui.swing.graph.GraphView;
+import io.github.jmif.gui.swing.listener.ProjectListener;
+import io.github.jmif.gui.swing.listener.ProjectListener.type;
 import io.github.jmif.gui.swing.logger.LogView;
 import io.github.jmif.gui.swing.menu.MenuView;
 import io.github.jmif.gui.swing.selection.SelectionView;
@@ -95,13 +93,13 @@ public class JMIF {
 			try {
 				JMIF u = new JMIF();
 				u.showFrame();
-			} catch (IOException | InterruptedException e) {
+			} catch (MIFException | IOException | InterruptedException e) {
 				LOGGER.error("", e);
 			}
 		});
 	}
 
-	public void showFrame() throws IOException, InterruptedException {
+	public void showFrame() throws MIFException,  IOException, InterruptedException {
 		long time = System.currentTimeMillis();
 
 		var frame = new JFrame();
@@ -134,28 +132,21 @@ public class JMIF {
 		horizontalBox.add(output);
 		horizontalBox.add(Box.createHorizontalGlue());
 		
-		List<String> profiles = new ArrayList<>();
-		Process process = new ProcessBuilder("bash", "-c", "melt -query \"profiles\"")
-			.start();
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-			String line;
-			while ((line = reader.readLine()) != null) {
-				if (line.contains("_")) {
-					line = line.replace(" ", "");
-					line = line.replace("-", "");
-					line = line.trim();
-					profiles.add(line);
-				}
-			}
-		}
+		List<String> profiles = new Service().getProfiles();
 		
 		JComboBox<String> profilesCombobox = new JComboBox<>(profiles.toArray(new String[profiles.size()]));
 		profilesCombobox.setSelectedItem(graphWrapper.getPr().getProfile());
 		profilesCombobox.addItemListener((itemEvent) -> {
-			String item = (String)profilesCombobox.getSelectedItem();
-			graphWrapper.getPr().setProfile(item);
-			// TODO Profile-Change: Needs full refresh of all nodes, timeline etc. pp
-			// TODO Profile-Change: Change overlay
+			try {
+				String item = (String)profilesCombobox.getSelectedItem();
+				graphWrapper.getPr().setProfile(item);
+				// TODO 
+				new Service().updateFramerate(graphWrapper.getPr());
+				// TODO Profile-Change: Needs full refresh of all nodes, timeline etc. pp
+				// TODO Profile-Change: Change overlay
+			} catch (MIFException e) {
+				LOGGER.error("", e);
+			}
 		});
 		profilesCombobox.setMaximumSize(new Dimension(300,30));
 
@@ -192,12 +183,16 @@ public class JMIF {
 		LOGGER.info("Initialized jMIF in {}", TimeUtil.getMessage(time));
 	}
 
-	private GraphWrapper createMIFProject(String profile) throws IOException, InterruptedException {
+	private GraphWrapper createMIFProject(String profile) throws MIFException, IOException, InterruptedException {
 		var tempDir = Files.createTempDirectory("jMIF").toFile();
 
 		var project = new GraphWrapper();
 		project.getPr().setProfile(profile);
+		// TODO 
+		new Service().updateFramerate(project.getPr());
 		project.getPr().setWorkingDir(tempDir.getAbsolutePath());
+		// TODO
+		new Service().createWorkingDirs(project.getPr());
 		project.getPr().setFileOfProject(project.getPr().getWorkingDir() + "defaultproject.xml");
 		project.getPr().setOutputVideo(project.getPr().getWorkingDir()+"output.avi");
 		FileUtils.copyInputStreamToFile(JMIF.class.getClassLoader().getResourceAsStream("defaultproject/1.JPG"),
@@ -226,11 +221,44 @@ public class JMIF {
 		audio2.setEncodeEnde(14);
 		
 		var executor = Executors.newWorkStealingPool();
-		executor.submit(file1.getBackgroundRunnable(project.getPr().getWorkingDir()));
-		executor.submit(file2.getBackgroundRunnable(project.getPr().getWorkingDir()));
-		executor.submit(file3.getBackgroundRunnable(project.getPr().getWorkingDir()));
-		executor.submit(file4.getBackgroundRunnable(project.getPr().getWorkingDir()));
-		executor.submit(file5.getBackgroundRunnable(project.getPr().getWorkingDir()));
+		executor.submit(() -> {
+			try {
+				new Service().createPreview(file1, project.getPr().getWorkingDir());
+			} catch (Exception e) {
+				LOGGER.error("", e);
+			}
+		});
+		executor.submit(
+				() -> {
+					try {
+						new Service().createPreview(file2, project.getPr().getWorkingDir());
+					} catch (Exception e) {
+						LOGGER.error("", e);
+					}
+				});
+		executor.submit(
+				() -> {
+					try {
+						new Service().createPreview(file3, project.getPr().getWorkingDir());
+					} catch (Exception e) {
+						LOGGER.error("", e);
+					}
+				}
+				);
+		executor.submit(() -> {
+			try {
+				new Service().createPreview(file4, project.getPr().getWorkingDir());
+			} catch (Exception e) {
+				LOGGER.error("", e);
+			}
+		});
+		executor.submit(() -> {
+			try {
+				new Service().createPreview(file5, project.getPr().getWorkingDir());
+			} catch (Exception e) {
+				LOGGER.error("", e);
+			}
+		});
 
 		project.redrawGraph();
 		project.createFramePreview();
@@ -249,12 +277,17 @@ public class JMIF {
 					// Exec background threads...
 					ExecutorService executor = Executors.newWorkStealingPool();
 					for (MIFFile f : graphWrapper.getPr().getMIFFiles()) {
-						Runnable r = f.getBackgroundRunnable(graphWrapper.getPr().getWorkingDir());
-						executor.submit(r);
+						executor.submit(() -> {
+							try {
+								new Service().createPreview(f, graphWrapper.getPr().getWorkingDir());
+							} catch (Exception e) {
+								LOGGER.error("", e);
+							}
+						});
 					}
 
 				} catch (Exception e) {
-					e.printStackTrace();
+					LOGGER.error("", e);
 				}
 			} else if (t == type.NEW_PROJECT) {
 				// Remove all cells

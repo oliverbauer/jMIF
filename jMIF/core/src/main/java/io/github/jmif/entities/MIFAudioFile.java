@@ -2,8 +2,6 @@ package io.github.jmif.entities;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import io.github.jmif.Service;
-
 @XmlRootElement(name = "audiofile")
 public class MIFAudioFile {
 	
@@ -55,8 +53,6 @@ public class MIFAudioFile {
 
 	public void setAudiofile(String audiofile) {
 		this.audiofile = audiofile;
-		// TODO refactor to caller
-		new Service().checkLengthInSeconds(this);
 	}
 
 	public int getLengthOfInput() {

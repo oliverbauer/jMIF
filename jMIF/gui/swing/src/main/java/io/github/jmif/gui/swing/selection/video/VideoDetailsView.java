@@ -13,8 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.jmif.config.Configuration;
-import io.github.jmif.data.GraphWrapper;
 import io.github.jmif.entities.MIFVideo;
+import io.github.jmif.gui.swing.GraphWrapper;
 
 public class VideoDetailsView {
 	private static final Logger logger = LoggerFactory.getLogger(VideoDetailsView.class);

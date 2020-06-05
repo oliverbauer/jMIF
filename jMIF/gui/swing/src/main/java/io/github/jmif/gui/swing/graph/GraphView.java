@@ -2,6 +2,7 @@ package io.github.jmif.gui.swing.graph;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.HeadlessException;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -22,10 +23,12 @@ import org.slf4j.LoggerFactory;
 
 import com.mxgraph.model.mxCell;
 
+import io.github.jmif.MIFException;
+import io.github.jmif.Service;
 import io.github.jmif.config.Configuration;
-import io.github.jmif.data.GraphWrapper;
 import io.github.jmif.entities.MIFAudioFile;
 import io.github.jmif.entities.MIFFile;
+import io.github.jmif.gui.swing.GraphWrapper;
 import io.github.jmif.gui.swing.selection.SelectionView;
 
 public class GraphView {
@@ -90,12 +93,16 @@ public class GraphView {
 		appendAudio.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				JFileChooser c = new JFileChooser();
-				
-				int returnVal = c.showOpenDialog(frame);
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					mifProject.createMIFAudioFile(c.getSelectedFile());
-					mifProject.redrawGraph();
+				try {
+					JFileChooser c = new JFileChooser();
+					
+					int returnVal = c.showOpenDialog(frame);
+					if (returnVal == JFileChooser.APPROVE_OPTION) {
+						mifProject.createMIFAudioFile(c.getSelectedFile());
+						mifProject.redrawGraph();
+					}
+				} catch (HeadlessException | MIFException e1) {
+					e1.printStackTrace();
 				}
 			}
 		});
@@ -135,7 +142,7 @@ public class GraphView {
 						try {
 							f = mifProject.createMIFFile(fileToAdd);
 							added.add(f);
-						} catch (IOException | InterruptedException e1) {
+						} catch (MIFException | IOException | InterruptedException e1) {
 							logger.error("Unable to create file", e1);
 						}
 					}
@@ -144,8 +151,13 @@ public class GraphView {
 					// Exec background threads...
 					ExecutorService executor = Executors.newWorkStealingPool();
 					for (MIFFile f : added) {
-						Runnable r = f.getBackgroundRunnable(mifProject.getPr().getWorkingDir());
-						executor.submit(r);
+						executor.submit(() -> {
+							try {
+								new Service().createPreview(f, mifProject.getPr().getWorkingDir());
+							} catch (Exception ex) {
+								logger.error("", e);
+							}
+						});
 					}
 				}
 			}
