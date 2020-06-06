@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,9 +32,11 @@ import com.mxgraph.model.mxCell;
 
 import io.github.jmif.MIFException;
 import io.github.jmif.Service;
+import io.github.jmif.builder.MIFProjectExecutor;
 import io.github.jmif.config.Configuration;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
+import io.github.jmif.entities.MIFProject;
 import io.github.jmif.entities.MeltFilter;
 
 public class ImageView {
@@ -49,6 +52,7 @@ public class ImageView {
 	private JLabel lblCurrentlyAppliedFilters;
 	private JComboBox<String> selectedFilter;
 	private JButton addFilter;
+	private JButton previewFilter;
 	
 	private JPanel panel;
 
@@ -178,8 +182,10 @@ public class ImageView {
 	private void updateCurrentlyAppliedFilters() {
 		// TODO Filter: After each filter there should be a small remove-icon
 		// TODO Filter: Each filter should be clickable: select from dropdown and set values as selected
-		lblCurrentlyAppliedFilters.setText("Currently applied filters: "+
+		if (selectedMeltFile != null) {
+			lblCurrentlyAppliedFilters.setText("Currently applied filters: "+
 				selectedMeltFile.getFilters().stream().map(MeltFilter::getFiltername).collect(Collectors.joining(", ")));
+		}
 	}
 	
 	private MeltFilter currentlySelectedFilter = null;
@@ -204,6 +210,15 @@ public class ImageView {
 			}
 			
 			String filter = (String)selectedFilter.getSelectedItem();
+
+			if (selectedMeltFile != null) {
+				// do not add a filter twice
+				if (selectedMeltFile.getFilters().stream().map(MeltFilter::getFiltername).collect(Collectors.toSet()).contains(filter)) {
+					addFilter.setEnabled(false);
+				} else {
+					addFilter.setEnabled(true);
+				}
+			}
 			
 			try {
 				List<String> details = new Service().getFilterDetails(filter);
@@ -255,8 +270,51 @@ public class ImageView {
 			selectedMeltFile.addFilter(currentlySelectedFilter);
 			// TODO Filter: The image should be updated! Needs new creation and execution of melt file!
 			updateCurrentlyAppliedFilters();
+			
+			addFilter.setEnabled(false); // since now added... do not add twice...
 		});
+		previewFilter = new JButton("preview");
+		previewFilter.addActionListener(e -> {
+
+			
+			StringBuilder sb  = new StringBuilder();
+			sb.append("melt ")
+				.append(selectedMeltFile.getFile())
+				.append(" out=50 ");
+			for (MeltFilter currentlyAddedFilters : selectedMeltFile.getFilters()) {
+				sb.append(" -attach-cut ");
+				sb.append(currentlyAddedFilters.getFiltername());
+				Map<String, String> filterUsage = currentlyAddedFilters.getFilterUsage();
+				for (String v : filterUsage.keySet()) {
+					sb.append(v).append("=").append(filterUsage.get(v)).append(" ");
+				}				
+			}
+			sb.append(" -attach-cut ");
+			sb.append(currentlySelectedFilter.getFiltername())
+				.append(" ");
+			Map<String, String> filterUsage = currentlySelectedFilter.getFilterUsage();
+			for (String v : filterUsage.keySet()) {
+				sb.append(v).append("=").append(filterUsage.get(v)).append(" ");
+			}
+			// TODO 
+			sb.append(" -consumer sdl2 terminate_on_pause=1");
+			try {
+				String command = sb.toString();
+				
+				MIFProject temp = new MIFProject();
+				temp.setWorkingDir("/tmp/");
+				new MIFProjectExecutor(temp).execute(command);
+				
+				System.err.println(command);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}			
+		});
+		
+		
 		dropDownBoxesBox.add(addFilter);
+		dropDownBoxesBox.add(previewFilter);
 		dropDownBoxesBox.add(Box.createHorizontalGlue());
 		
 		Dimension dim = new Dimension(2500, 25); // max height = 25
@@ -286,7 +344,7 @@ public class ImageView {
 			horizontal.add(Box.createHorizontalStrut(10));
 			JTextField textField = new JTextField(keyValue.get("default"));
 			textField.addActionListener(e -> {
-				String enteredText = textField.getSelectedText();
+				String enteredText = textField.getText();
 				// TODO Filter: validate input?
 				meltFilter.getFilterUsage().put(param, enteredText);
 				
@@ -348,6 +406,8 @@ public class ImageView {
 		} else if (selectedItem.equals("MANUAL")) {
 			setSelectedPicture(((MIFImage) meltFile).getPreviewManual());
 		}
+		
+		updateCurrentlyAppliedFilters();
 	}
 
 	private ItemListener getItemListener() {
@@ -412,6 +472,7 @@ public class ImageView {
 
 		selectedFilter.setVisible(false);
 		addFilter.setVisible(false);
+		previewFilter.setVisible(false);
 		lblCurrentlyAppliedFilters.setVisible(false);
 		filterConfigurationContent.setVisible(false);
 		scrollPane.setVisible(false);
@@ -440,9 +501,14 @@ public class ImageView {
 		
 		selectedFilter.setVisible(true);
 		addFilter.setVisible(true);
+		previewFilter.setVisible(true);
 		lblCurrentlyAppliedFilters.setVisible(true);
 		filterConfigurationContent.setVisible(true);
 		scrollPane.setVisible(true);
+		
+		addFilter.setEnabled(true);
+		
+		updateCurrentlyAppliedFilters();
 		
 		panel.updateUI();
 	}

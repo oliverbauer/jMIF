@@ -40,7 +40,7 @@ public class Service {
 		}
 	}
 
-	public void updateFramerate(MIFProject project) throws MIFException {
+	public void updateFramerate(MIFProject project) {
 		var framerate = project.getFramerate();
 		try {
 			Process process = new ProcessBuilder("bash", "-c", "melt -query \"profile\"="+project.getProfile()).start();

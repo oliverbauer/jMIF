@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
@@ -17,6 +18,7 @@ import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFProject;
 import io.github.jmif.entities.MIFVideo;
+import io.github.jmif.entities.MeltFilter;
 import io.github.jmif.util.TimeUtil;
 
 public class MIFProjectExecutor { 
@@ -192,6 +194,16 @@ public class MIFProjectExecutor {
 				
 				if (input.endsWith("jpg") || input.endsWith("JPG")) {
 					sb.append("   ").append(input).append(" in=0 out=").append(meltfile.getFramelength()-1);
+					
+					for (MeltFilter currentlyAddedFilters : meltfile.getFilters()) {
+						sb.append(" -attach-cut ");
+						sb.append(currentlyAddedFilters.getFiltername());
+						Map<String, String> filterUsage = currentlyAddedFilters.getFilterUsage();
+						for (String v : filterUsage.keySet()) {
+							sb.append(v).append("=").append(filterUsage.get(v)).append(" ");
+						}				
+					}
+					
 				} else if (input.endsWith("mp4") || input.endsWith("MP4")) {
 					sb.append("   ").append(input).append(" in=0 out=").append(meltfile.getFramelength()-1);
 				}
@@ -260,7 +272,7 @@ public class MIFProjectExecutor {
 		}
 	}
 	
-	private void execute(String command) throws IOException {
+	public void execute(String command) throws IOException {
 		execute(command, true);
 	}
 	

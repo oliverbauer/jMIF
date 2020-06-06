@@ -132,16 +132,12 @@ public class JMIF {
 		JComboBox<String> profilesCombobox = new JComboBox<>(profiles.toArray(new String[profiles.size()]));
 		profilesCombobox.setSelectedItem(graphWrapper.getPr().getProfile());
 		profilesCombobox.addItemListener((itemEvent) -> {
-			try {
-				String item = (String)profilesCombobox.getSelectedItem();
-				graphWrapper.getPr().setProfile(item);
-				// TODO Service
-				new Service().updateFramerate(graphWrapper.getPr());
-				// TODO Profile-Change: Needs full refresh of all nodes, timeline etc. pp
-				// TODO Profile-Change: Change overlay
-			} catch (MIFException e) {
-				LOGGER.error("", e);
-			}
+			String item = (String)profilesCombobox.getSelectedItem();
+			graphWrapper.getPr().setProfile(item);
+			// TODO Service
+			new Service().updateFramerate(graphWrapper.getPr());
+			// TODO Profile-Change: Needs full refresh of all nodes, timeline etc. pp
+			// TODO Profile-Change: Change overlay
 		});
 		profilesCombobox.setMaximumSize(new Dimension(300,30));
 
