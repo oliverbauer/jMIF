@@ -12,6 +12,7 @@
 		<module>core</module>
 		<module>gui</module>
 		<module>docker</module>
+		<module>server</module>
 	</modules>
 
 	<properties>
