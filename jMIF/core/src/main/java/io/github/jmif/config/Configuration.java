@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Configuration {
-	public static boolean showSplashscreen = true;
+	public static boolean showSplashscreen = false;
 	public static final int splashSleepTime = 10;
 	
 	public static final List<String> allowedImageTypes = Arrays.asList("jpg", "JPG");
@@ -22,8 +22,6 @@ public class Configuration {
 	
 	public static boolean useBorders = false;
 	
-	// TODO Config: ShowLogPanel yes/no
-	public static boolean showLogPanel = true;
 	public static boolean disableDebug = true;
 	
 	// TODO Config: Show new or old menubar

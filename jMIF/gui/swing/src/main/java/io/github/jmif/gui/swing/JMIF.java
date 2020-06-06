@@ -34,7 +34,6 @@ import io.github.jmif.entities.MIFFile;
 import io.github.jmif.gui.swing.graph.GraphView;
 import io.github.jmif.gui.swing.listener.ProjectListener;
 import io.github.jmif.gui.swing.listener.ProjectListener.type;
-import io.github.jmif.gui.swing.logger.LogView;
 import io.github.jmif.gui.swing.menu.MenuView;
 import io.github.jmif.gui.swing.selection.SelectionView;
 import io.github.jmif.gui.swing.splash.Splashscreen;
@@ -78,7 +77,6 @@ public class JMIF {
 	private MenuView mifMenuView;
 	private GraphView mifGraphView;
 	private SelectionView mifSelectionView;
-	private LogView mifLogView;
 
 	public static void main(String[] args) throws Exception {
 		if (Configuration.showSplashscreen) {
@@ -106,9 +104,6 @@ public class JMIF {
 		frame.setUndecorated(true); // remove title bar...
 		frame.setTitle("MIF-enizer (MLT/ImageMagickFFMPEG/)");
 
-		mifLogView = new LogView(frame);
-
-		
 		// TODO Menu: disbale save-button, preview and gen-button on start...
 		graphWrapper = createMIFProject("atsc_1080p_25");
 		graphWrapper.getGraph().getSelectionModel().addListener(mxEvent.CHANGE, (sender, evt) -> cellClicked(sender));
@@ -137,16 +132,12 @@ public class JMIF {
 		JComboBox<String> profilesCombobox = new JComboBox<>(profiles.toArray(new String[profiles.size()]));
 		profilesCombobox.setSelectedItem(graphWrapper.getPr().getProfile());
 		profilesCombobox.addItemListener((itemEvent) -> {
-			try {
-				String item = (String)profilesCombobox.getSelectedItem();
-				graphWrapper.getPr().setProfile(item);
-				// TODO 
-				new Service().updateFramerate(graphWrapper.getPr());
-				// TODO Profile-Change: Needs full refresh of all nodes, timeline etc. pp
-				// TODO Profile-Change: Change overlay
-			} catch (MIFException e) {
-				LOGGER.error("", e);
-			}
+			String item = (String)profilesCombobox.getSelectedItem();
+			graphWrapper.getPr().setProfile(item);
+			// TODO Service
+			new Service().updateFramerate(graphWrapper.getPr());
+			// TODO Profile-Change: Needs full refresh of all nodes, timeline etc. pp
+			// TODO Profile-Change: Change overlay
 		});
 		profilesCombobox.setMaximumSize(new Dimension(300,30));
 
@@ -165,7 +156,6 @@ public class JMIF {
 		if (Configuration.transperencyOffset > 0) {
 			panelBox.add(Box.createRigidArea(new Dimension(0, Configuration.transperencyOffset)));
 		}
-		panelBox.add(mifLogView.getPanel());
 
 		frame.setLayout(new GridBagLayout());
 
@@ -188,10 +178,10 @@ public class JMIF {
 
 		var project = new GraphWrapper();
 		project.getPr().setProfile(profile);
-		// TODO 
+		// TODO Service
 		new Service().updateFramerate(project.getPr());
 		project.getPr().setWorkingDir(tempDir.getAbsolutePath());
-		// TODO
+		// TODO Service
 		new Service().createWorkingDirs(project.getPr());
 		project.getPr().setFileOfProject(project.getPr().getWorkingDir() + "defaultproject.xml");
 		project.getPr().setOutputVideo(project.getPr().getWorkingDir()+"output.avi");
@@ -294,7 +284,7 @@ public class JMIF {
 				for (mxCell cell : graphWrapper.getCells()) {
 					mifGraphView.remove(cell, graphWrapper.get(cell));
 				}
-				// TODO New: Remove Audio
+				// TODO Audio: New project: Remove Audio
 				
 				graphWrapper.save();
 				try {

@@ -1,7 +1,11 @@
 package io.github.jmif.entities;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -29,6 +33,9 @@ public abstract class MIFFile {
 
 	@XmlTransient
 	protected boolean fileExists = true;
+	
+	@XmlElement(name = "mifFilters")
+	private List<MeltFilter> meltFilter = new ArrayList<>();
 	
 	public String getFilename() {
 		return filename;
@@ -100,5 +107,17 @@ public abstract class MIFFile {
 
 	public void setFileExists(boolean fileExists) {
 		this.fileExists = fileExists;
+	}
+
+	public void addFilter(MeltFilter currentlySelectedFilter) {
+		meltFilter.add(currentlySelectedFilter);		
+	}
+	
+	public void setFilters(List<MeltFilter> f) {
+		this.meltFilter = f;
+	}
+	
+	public List<MeltFilter> getFilters() {
+		return this.meltFilter;
 	}
 }

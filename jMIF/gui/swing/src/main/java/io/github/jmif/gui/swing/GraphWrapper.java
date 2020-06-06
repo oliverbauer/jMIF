@@ -111,6 +111,8 @@ public class GraphWrapper {
 			var executor = Executors.newWorkStealingPool();
 			for (MIFFile f : project.getMIFFiles()) {
 				MIFFile mifFile = createMIFFile(new File(f.getFile()));
+				mifFile.getFilters().addAll(f.getFilters());
+				
 				executor.submit(() -> {
 					try {
 						new Service().createPreview(mifFile, project.getWorkingDir());
@@ -140,7 +142,7 @@ public class GraphWrapper {
 		var file = fileToAdd.getAbsoluteFile().getAbsolutePath();
 		
 		if (file.endsWith("mp3") || file.endsWith("MP3")) {
-			// TODO
+			// TODO Service
 			var audioFile = new Service().createAudio(fileToAdd.getAbsolutePath());
 			
 			var v1 = insertVertex(

@@ -29,7 +29,6 @@ import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 
-import io.github.jmif.MIFException;
 import io.github.jmif.Service;
 import io.github.jmif.entities.MIFImage;
 
@@ -52,11 +51,11 @@ public class ManualSize {
 		g2.drawImage(ic.getImage(), 0, 0, w, h, null);
 		g2.dispose();
 
-		double ratio = (double) (1920d / 1080d);
-		double displayratio = (double) ((double) w / (double) h);
+		double ratio = 1920d / 1080d;
+		double displayratio = (double) w / (double) h;
 
 		String input = ic.getIconWidth() + "x" + ic.getIconHeight();
-		double inputRadio = (double) ((double) ic.getIconWidth() / (double) ic.getIconHeight());
+		double inputRadio = (double) ic.getIconWidth() / (double) ic.getIconHeight();
 		String output = w + "x" + h;
 
 		logger.info("Ratio " + ratio + " 1920x1080 scaled from " + input + " (ASP " + inputRadio + ") to " + output
@@ -113,7 +112,8 @@ public class ManualSize {
 
 		mxGraphComponent graphComponent = new mxGraphComponent(graph) {
 			private static final long serialVersionUID = -7004590790552267843L;
-
+			
+			@Override
 			public mxInteractiveCanvas createCanvas() {
 				return new mxInteractiveCanvas() {
 
@@ -136,10 +136,8 @@ public class ManualSize {
 
 						return shape;
 					}
-
 				};
 			}
-
 		};
 		graphComponent.setConnectable(false); // Inhibit edge creation in the graph.
 		graph.addListener(mxEvent.CELLS_MOVED, (sender, evt) -> {
@@ -158,20 +156,14 @@ public class ManualSize {
 
 		JButton ok = new JButton("OK");
 		JButton cancel = new JButton("Cancel");
-		ok.addActionListener((event) -> {
-			try {
-				mifImage.setManualStyleCommand(command);
-				// TODO
-				new Service().createManualPreview(mifImage);
-				resizeStyle.setSelectedItem("MANUAL");
-				frame.dispose();
-			} catch (MIFException e) {
-				e.printStackTrace();
-			}
-		});
-		cancel.addActionListener((event) -> {
+		ok.addActionListener(event -> {
+			mifImage.setManualStyleCommand(command);
+			// TODO Service
+			new Service().createManualPreview(mifImage);
+			resizeStyle.setSelectedItem("MANUAL");
 			frame.dispose();
 		});
+		cancel.addActionListener(event -> frame.dispose());
 		
 		panel.add(graphComponent, BorderLayout.CENTER);
 		

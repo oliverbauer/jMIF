@@ -1,5 +1,6 @@
 package io.github.jmif.gui.swing.selection;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 
@@ -64,14 +65,7 @@ public class SelectionView {
 		
 		int w = 5500;
 		imageView = new ImageView();
-		Box picturePanel = imageView.getBox();
-		int h = 350;
-		picturePanel.setMinimumSize(new Dimension(w, h));
-		picturePanel.setPreferredSize(new Dimension(w, h));
-		picturePanel.setMaximumSize(new Dimension(w, h));
-		if (Configuration.useBorders) {
-			picturePanel.setBorder(BorderFactory.createLineBorder(Color.BLUE, 2, true));
-		}
+		int h = 550;
 		
 		videoView = new VideoView();
 		JPanel videoPanel = videoView.getPanel();
@@ -101,7 +95,7 @@ public class SelectionView {
 			singleFrameBox.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 2, true));
 		}
 		
-		tabPane.addTab("ImageView", wrap(imageDetailsView.getBox(), picturePanel));
+		tabPane.addTab("ImageView", wrap(imageDetailsView.getBox(), imageView.getJPanel()));
 		tabPane.addTab("VideoView", wrap(videoDetailsView.getBox(), videoPanel));
 		tabPane.addTab("AudioView", wrap(audioDetailsView.getBox(), null));
 		tabPane.addTab("FrameView", wrap(frameDetailsView.getBox(), singleFrameBox));
@@ -114,18 +108,15 @@ public class SelectionView {
 		}
 	}
     
-    private Box wrap(JComponent c1, JComponent c2) {
-		Box veritcalBox = Box.createVerticalBox();
+    private JPanel wrap(JComponent c1, JComponent c2) {
+		JPanel panel = new JPanel(new BorderLayout());
 		if (c1 != null) {
-			veritcalBox.add(c1);
-		}
-		if (Configuration.transperencyOffset > 0) {
-			veritcalBox.add(Box.createVerticalStrut(Configuration.transperencyOffset));
+			panel.add(c1, BorderLayout.NORTH);
 		}
 		if (c2 != null) {
-			veritcalBox.add(c2);
+			panel.add(c2, BorderLayout.CENTER);
 		}
-		return veritcalBox;
+		return panel;
     }
 	
 	public void clearSelection() {
