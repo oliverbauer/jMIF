@@ -2,8 +2,10 @@ package io.github.jmif.gui.swing;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.Assert;
 import org.junit.Test;
 
 import io.github.jmif.Service;
@@ -47,5 +49,16 @@ public class ProjectXmlTests {
 		mifFile.addFilter(filter);
 		
 		project.save();
+		project.load();
+		
+		Assert.assertEquals(1, project.getPr().getMIFFiles().size());
+		Assert.assertEquals(1, project.getPr().getMIFFiles().get(0).getFilters().size());
+		
+		mifFile = project.getPr().getMIFFiles().get(0);
+		filter = mifFile.getFilters().get(0);
+		Assert.assertEquals("oldfilm", filter.getFiltername());
+		
+		Map<String,String> usage = filter.getFilterUsage();
+		Assert.assertEquals("400", usage.get("delta"));
 	}
 }

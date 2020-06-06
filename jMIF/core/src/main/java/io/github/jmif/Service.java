@@ -61,7 +61,7 @@ public class Service {
 		project.setFramerate(framerate);
 	}
 
-	public void createWorkingDirs(MIFProject project) throws MIFException {
+	public void createWorkingDirs(MIFProject project) {
 		if (!project.getWorkingDir().endsWith("/")) {
 			project.setWorkingDir(project.getWorkingDir()+"/");
 		}
@@ -254,7 +254,7 @@ public class Service {
 		videoO.setPreviewImages(previewImages);
 	}
 
-	public void createManualPreview(MIFImage image) throws MIFException {
+	public void createManualPreview(MIFImage image) {
 		image.setStyle("MANUAL");
 		Process process;
 		try {
@@ -318,8 +318,8 @@ public class Service {
 		var estimatedWith = (int) (aspectHeight * 1.78);
 
 		var wxh = estimatedWith + "x" + aspectHeight;
-		var fileWOending = filename.substring(0, filename.lastIndexOf("."));
-		var fileending = filename.substring(filename.lastIndexOf(".") + 1);
+		var fileWOending = filename.substring(0, filename.lastIndexOf('.'));
+		var fileending = filename.substring(filename.lastIndexOf('.') + 1);
 		image.setImagePreview(workingDir + "preview/" + fileWOending + "_thumb." + wxh + "."
 				+ fileending);
 		image.setPreviewHardResize(workingDir + "preview/" + fileWOending + "_hard." + wxh + "."
@@ -472,7 +472,7 @@ public class Service {
 		return audioFile;
 	}
 	
-	private void checkLengthInSeconds(MIFAudioFile audio) throws MIFException {
+	private void checkLengthInSeconds(MIFAudioFile audio) {
 		Process process;
 		try {
 			String command = "ffprobe -v error -select_streams a:0 -show_entries stream=duration,bit_rate -of default=noprint_wrappers=1:nokey=1 "+audio.getAudiofile();
@@ -496,7 +496,7 @@ public class Service {
 		}
 	}
 
-	private void updateFile(MIFFile file) throws MIFException {
+	private void updateFile(MIFFile file) {
 		file.setFileExists(new File(file.getFile()).exists());
 		file.setFilename(file.getFile().substring(file.getFile().lastIndexOf('/')+1));
 	}

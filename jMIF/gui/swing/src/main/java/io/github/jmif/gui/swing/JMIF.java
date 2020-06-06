@@ -135,7 +135,7 @@ public class JMIF {
 			try {
 				String item = (String)profilesCombobox.getSelectedItem();
 				graphWrapper.getPr().setProfile(item);
-				// TODO 
+				// TODO Service
 				new Service().updateFramerate(graphWrapper.getPr());
 				// TODO Profile-Change: Needs full refresh of all nodes, timeline etc. pp
 				// TODO Profile-Change: Change overlay
@@ -182,10 +182,10 @@ public class JMIF {
 
 		var project = new GraphWrapper();
 		project.getPr().setProfile(profile);
-		// TODO 
+		// TODO Service
 		new Service().updateFramerate(project.getPr());
 		project.getPr().setWorkingDir(tempDir.getAbsolutePath());
-		// TODO
+		// TODO Service
 		new Service().createWorkingDirs(project.getPr());
 		project.getPr().setFileOfProject(project.getPr().getWorkingDir() + "defaultproject.xml");
 		project.getPr().setOutputVideo(project.getPr().getWorkingDir()+"output.avi");
@@ -288,7 +288,7 @@ public class JMIF {
 				for (mxCell cell : graphWrapper.getCells()) {
 					mifGraphView.remove(cell, graphWrapper.get(cell));
 				}
-				// TODO New: Remove Audio
+				// TODO Audio: New project: Remove Audio
 				
 				graphWrapper.save();
 				try {

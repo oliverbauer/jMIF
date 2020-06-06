@@ -80,12 +80,19 @@ public class ImageView {
 		
 		clearIcons();
 		
-		panel = new JPanel(new BorderLayout());
-		panel.add(leftBox, BorderLayout.WEST);
+		Box box = Box.createVerticalBox();
+		box.add(Box.createVerticalStrut(10));
+		
+		JPanel panel2 = new JPanel(new BorderLayout());
+		panel2.add(leftBox, BorderLayout.WEST);
 		Box h = Box.createHorizontalBox();
 		h.add(Box.createHorizontalStrut(10));
 		h.add(rightBox);
-		panel.add(h, BorderLayout.CENTER);
+		panel2.add(h, BorderLayout.CENTER);
+		
+		box.add(panel2);
+		panel = new JPanel(new BorderLayout());
+		panel.add(box, BorderLayout.CENTER);
 	}
 
 	public JPanel getJPanel() {
@@ -169,7 +176,8 @@ public class ImageView {
 	}
 	
 	private void updateCurrentlyAppliedFilters() {
-		// TODO after each filter there should be a small remove-icon
+		// TODO Filter: After each filter there should be a small remove-icon
+		// TODO Filter: Each filter should be clickable: select from dropdown and set values as selected
 		lblCurrentlyAppliedFilters.setText("Currently applied filters: "+
 				selectedMeltFile.getFilters().stream().map(MeltFilter::getFiltername).collect(Collectors.joining(", ")));
 	}
@@ -182,6 +190,7 @@ public class ImageView {
 		filters.add("greyscale");
 		filters.add("grayscale");
 		filters.add("oldfilm");
+		// TODO Filter: Retrieve all available filters for images (prefetch on startup?)
 //		try {
 //			filters = new Service().getFilters();
 //				
@@ -195,7 +204,6 @@ public class ImageView {
 			}
 			
 			String filter = (String)selectedFilter.getSelectedItem();
-
 			
 			try {
 				List<String> details = new Service().getFilterDetails(filter);
@@ -217,8 +225,8 @@ public class ImageView {
 						// Extract parameter details...
 						d = d.trim();
 						if (d.contains(":")) {
-							String key = d.substring(0, d.indexOf(":")).trim();
-							String description = d.substring(d.indexOf(":")+1).trim();
+							String key = d.substring(0, d.indexOf(':')).trim();
+							String description = d.substring(d.indexOf(':')+1).trim();
 
 							meltFilter.appendConfigurationDetail(currentParameter, key, description);
 						} else {
@@ -245,7 +253,7 @@ public class ImageView {
 		addFilter = new JButton("add");
 		addFilter.addActionListener(e -> {
 			selectedMeltFile.addFilter(currentlySelectedFilter);
-			// TODO Filters: The image should be updated!
+			// TODO Filter: The image should be updated! Needs new creation and execution of melt file!
 			updateCurrentlyAppliedFilters();
 		});
 		dropDownBoxesBox.add(addFilter);
@@ -277,10 +285,30 @@ public class ImageView {
 			
 			horizontal.add(Box.createHorizontalStrut(10));
 			JTextField textField = new JTextField(keyValue.get("default"));
+			textField.addActionListener(e -> {
+				String enteredText = textField.getSelectedText();
+				// TODO Filter: validate input?
+				meltFilter.getFilterUsage().put(param, enteredText);
+				
+			});
 			textField.setMinimumSize(new Dimension(100, 20));
 			textField.setPreferredSize(new Dimension(100, 20));
 			textField.setMaximumSize(new Dimension(100, 20));
 			horizontal.add(textField);
+			
+			// description + minimum +maximum daneben...
+			JLabel description = new JLabel(keyValue.get("description"));
+			description.setMinimumSize(new Dimension(400, 20));
+			description.setPreferredSize(new Dimension(400, 20));
+			description.setMaximumSize(new Dimension(400, 20));
+			horizontal.add(Box.createHorizontalStrut(10));
+			horizontal.add(description);
+			
+			// TODO Filter: show allowed values, if no minimum, maximum
+			JLabel minMax = new JLabel("min="+keyValue.get("minimum")+",max="+keyValue.get("maximum"));
+			horizontal.add(Box.createHorizontalStrut(10));
+			horizontal.add(minMax);
+			
 			horizontal.add(Box.createHorizontalGlue());
 			filterConfigurationContent.add(horizontal);
 		}

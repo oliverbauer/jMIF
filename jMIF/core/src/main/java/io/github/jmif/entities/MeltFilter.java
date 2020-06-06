@@ -12,14 +12,12 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlRootElement(name = "meltfilter")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class MeltFilter {
-//	@XmlAttribute
 	private String filtername; // e.g. oldfilm
-//	@XmlAttribute
-	private String valueToUse;
 	
 	@XmlTransient
 	private Map<String, Map<String, String>> configuration;     // e.g. delta -> {"title", "Y-Delta"},{"type", "integer},....
 	
+	// What the user has entered... overrides default values
 	private Map<String, String> filterUsage;
 	
 	public MeltFilter() {
@@ -39,14 +37,6 @@ public class MeltFilter {
 
 	public void setFilterUsage(Map<String, String> filterUsage) {
 		this.filterUsage = filterUsage;
-	}
-
-	public String getValueToUse() {
-		return valueToUse;
-	}
-
-	public void setValueToUse(String valueToUse) {
-		this.valueToUse = valueToUse;
 	}
 
 	public void appendConfigurationParameter(String parameter) {

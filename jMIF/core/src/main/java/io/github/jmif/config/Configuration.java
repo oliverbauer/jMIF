@@ -22,8 +22,6 @@ public class Configuration {
 	
 	public static boolean useBorders = false;
 	
-	// TODO Config: ShowLogPanel yes/no
-	public static boolean showLogPanel = true;
 	public static boolean disableDebug = true;
 	
 	// TODO Config: Show new or old menubar
