@@ -23,7 +23,8 @@
 							<alias>${project.artifactId}</alias>
 							<name>${project.groupId}/${project.artifactId}:${project.version}</name>
 							<build>
-								<from>adoptopenjdk/openjdk14 </from>
+<!-- 							<dockerFile>.</dockerFile> -->
+<!-- 								<from>adoptopenjdk/openjdk14 </from> -->
 								<assembly>
 									<descriptorRef>artifact-with-dependencies</descriptorRef>
 								</assembly>
