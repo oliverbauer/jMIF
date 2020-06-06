@@ -6,6 +6,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -65,18 +66,50 @@ public class ImageLibraryView {
 				createImageList(images);
 			}
 		});
+		JButton chooseDirectoryRec = new JButton("Select directory (recursivly)");
+		chooseDirectoryRec.addActionListener(a -> {
+			JFileChooser c = new JFileChooser();
+			c.setMultiSelectionEnabled(false);
+			c.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			
+			int returnVal = c.showOpenDialog(new JFrame());
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				File directory = c.getSelectedFile();
+				createImageList(collectImagesRecursivly(directory));
+			}
+		});
+
 		newBox = Box.createVerticalBox();
 		scrollPane = new JScrollPane(newBox);
 		
 		int w = 5500;
-		int h = 650;
+		int h = 450;
 		scrollPane.setMinimumSize(new Dimension(w, h));
 		scrollPane.setPreferredSize(new Dimension(w, h));
 		scrollPane.setMaximumSize(new Dimension(w, h));
 		
 		
 		box.add(chooseDirectory);
+		box.add(chooseDirectoryRec);
 		box.add(scrollPane);
+	}
+	
+	private List<File> collectImagesRecursivly(File dir) {
+	    List<File> fileTree = new ArrayList<>();
+	    if(dir == null || dir.listFiles() == null){
+	        return fileTree;
+	    }
+	    for (File file : dir.listFiles()) {
+	        if (file.isFile()) {
+	        	String type = file.getName().substring(file.getName().lastIndexOf('.') + 1);
+				if (Configuration.allowedImageTypes.contains(type)) {
+					fileTree.add(file);
+				}
+	        } else {
+	        	fileTree.addAll(collectImagesRecursivly(file));
+	        }
+	    }
+	    return fileTree;
 	}
 	
 	private void createImageList(List<File> images) {
