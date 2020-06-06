@@ -14,8 +14,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class MIFProject {
 	
 	@XmlElementWrapper(name = "mifFiles")
-	@XmlElements({ @XmlElement(name = "mifImagee", type = MIFImage.class),
-			@XmlElement(name = "mifVideo", type = MIFVideo.class) })
+	@XmlElements({ @XmlElement(name = "mifImages", type = MIFImage.class),
+			@XmlElement(name = "mifVideos", type = MIFVideo.class) })
 	private List<MIFFile> mifFiles;
 	
 	private MIFAudioTrack audiotrack;

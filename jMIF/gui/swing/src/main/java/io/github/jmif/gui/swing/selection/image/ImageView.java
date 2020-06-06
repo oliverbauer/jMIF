@@ -1,11 +1,17 @@
 package io.github.jmif.gui.swing.selection.image;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -13,15 +19,22 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mxgraph.model.mxCell;
 
+import io.github.jmif.MIFException;
+import io.github.jmif.Service;
 import io.github.jmif.config.Configuration;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
+import io.github.jmif.entities.MeltFilter;
 
 public class ImageView {
 	private static final Logger logger = LoggerFactory.getLogger(ImageView.class);
@@ -33,62 +46,53 @@ public class ImageView {
 	private JLabel resizeStyleDetailsLabel;
 	private JComboBox<String> resizeStyleDetails;
 	private JButton manualExtraction = new JButton("manual");
-
-	private Box box;
+	private JLabel lblCurrentlyAppliedFilters;
+	private JComboBox<String> selectedFilter;
+	private JButton addFilter;
+	
+	private JPanel panel;
 
 	public ImageView() {
-		box = Box.createHorizontalBox();
 
 		// Left part is the original image
-
-		box.add(Box.createHorizontalStrut(10));
-
-		Box pic1Box = Box.createVerticalBox();
+		Box leftBox = Box.createVerticalBox();
 		imgPicture = new JLabel[2];
 		imgPicture[0] = new JLabel();
 		imgPicture[0].setBorder(BorderFactory.createLineBorder(Color.black));
 		imgPicture[0].setBackground(new Color(1.0f, 1.0f, 1.0f, 0.0f));
 		imgPicture[0].setForeground(new Color(1.0f, 1.0f, 1.0f, 0.0f));
-		pic1Box.add(imgPicture[0]);
-		pic1Box.add(Box.createVerticalGlue());
+		leftBox.add(imgPicture[0]);
 
-		box.add(pic1Box);
-		box.add(Box.createHorizontalStrut(10));
-
-		// Right side
-
-		Box previewBox = Box.createVerticalBox();
-		previewBox.add(Box.createVerticalStrut(5));
-		previewBox.add(dropdownBoxes());
-		previewBox.add(Box.createVerticalStrut(5));
-		previewBox.add(getImage2());
-		previewBox.add(Box.createVerticalGlue());
-		if (Configuration.useBorders) {
-			previewBox.setBorder(BorderFactory.createLineBorder(Color.black));
-		}
-
-		imgPicture[0].setVisible(false);
-		imgPicture[1].setVisible(false);
-		manualExtraction.setVisible(false);
-
-		Box dropBoxPlusPreview = Box.createVerticalBox();
-		dropBoxPlusPreview.add(previewBox);
-		dropBoxPlusPreview.add(Box.createVerticalGlue());
-		box.add(dropBoxPlusPreview);
-
-		box.setBackground(new Color(1.0f, 1.0f, 1.0f, 0.0f));
-
-		resizeStyleLabel.setVisible(false);
-		resizeStyle.setVisible(false);
-		resizeStyleDetailsLabel.setVisible(false);
-		resizeStyleDetails.setVisible(false);
+		// Right side (center)
+		Box rightBox = Box.createVerticalBox();
+		rightBox.add(getResizeStyleBox());
+		rightBox.add(Box.createVerticalStrut(5));
+		rightBox.add(getPreviewImage());
+		rightBox.add(Box.createVerticalStrut(5));
+		rightBox.add(getCurrentlyAppliedFilters());
+		rightBox.add(Box.createVerticalStrut(5));
+		rightBox.add(getAvailableFiltersBox());
+		rightBox.add(Box.createVerticalStrut(5));
+		rightBox.add(getSelectedFilterConfiguration());
+		rightBox.add(Box.createVerticalGlue());
+		
+		selectedFilter.setSelectedItem("oldfilm");
+		
+		clearIcons();
+		
+		panel = new JPanel(new BorderLayout());
+		panel.add(leftBox, BorderLayout.WEST);
+		Box h = Box.createHorizontalBox();
+		h.add(Box.createHorizontalStrut(10));
+		h.add(rightBox);
+		panel.add(h, BorderLayout.CENTER);
 	}
 
-	public Box getBox() {
-		return box;
+	public JPanel getJPanel() {
+		return panel;
 	}
 
-	private Box getImage2() {
+	private Box getPreviewImage() {
 		Box b = Box.createHorizontalBox();
 		imgPicture[1] = new JLabel();
 		imgPicture[1].setBorder(BorderFactory.createLineBorder(Color.black));
@@ -100,9 +104,8 @@ public class ImageView {
 		return b;
 	}
 
-	private Box dropdownBoxes() {
+	private Box getResizeStyleBox() {
 		Box dropDownBoxesBox = Box.createHorizontalBox();
-		dropDownBoxesBox.add(Box.createHorizontalStrut(10));
 		resizeStyleLabel = new JLabel("Resizestyle: ");
 		dropDownBoxesBox.add(resizeStyleLabel);
 		String[] styleItems = Arrays.asList("HARD", "FILL", "CROP", "MANUAL").toArray(new String[4]);
@@ -127,20 +130,176 @@ public class ImageView {
 		});
 		dropDownBoxesBox.add(manualExtraction);
 
-		dropDownBoxesBox.add(Box.createHorizontalGlue());
+		dropDownBoxesBox.add(Box.createHorizontalGlue()); // Alignment of content starts left
 		if (Configuration.useBorders) {
 			dropDownBoxesBox.setBorder(BorderFactory.createLineBorder(Color.red));
 		}
-		Dimension dim = new Dimension(2500, 50);
+		Dimension dim = new Dimension(2500, 25); // max height = 50
 		dropDownBoxesBox.setMinimumSize(dim);
 		dropDownBoxesBox.setPreferredSize(dim);
 		dropDownBoxesBox.setMaximumSize(dim);
 		
-		// TODO Image: Use Filter JCombobox with at least NONE,GRAYSCALE as an example: https://github.com/oliverbauer/jMIF/issues/3
-		
 		return dropDownBoxesBox;
 	}
 
+	private Box filterConfigurationContent;
+	private JScrollPane scrollPane;
+	private JScrollPane getSelectedFilterConfiguration() {
+		filterConfigurationContent = Box.createVerticalBox();
+
+		scrollPane = new JScrollPane(filterConfigurationContent);
+		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		
+		return scrollPane;
+	}
+	
+	private Box getCurrentlyAppliedFilters() {
+		Box box = Box.createHorizontalBox();
+		
+		lblCurrentlyAppliedFilters = new JLabel("Currently applied filters: TODO");
+		box.add(lblCurrentlyAppliedFilters);
+		
+		Dimension dim = new Dimension(2500, 25); // max height = 25
+		box.setMinimumSize(dim);
+		box.setPreferredSize(dim);
+		box.setMaximumSize(dim);
+		
+		return box;
+	}
+	
+	private void updateCurrentlyAppliedFilters() {
+		// TODO after each filter there should be a small remove-icon
+		lblCurrentlyAppliedFilters.setText("Currently applied filters: "+
+				selectedMeltFile.getFilters().stream().map(MeltFilter::getFiltername).collect(Collectors.joining(", ")));
+	}
+	
+	private MeltFilter currentlySelectedFilter = null;
+	private Box getAvailableFiltersBox() {
+		List<String> filters = new ArrayList<>();
+		filters.add("avfilter.deflicker");
+		filters.add("frei0r.alphagrad");
+		filters.add("greyscale");
+		filters.add("grayscale");
+		filters.add("oldfilm");
+//		try {
+//			filters = new Service().getFilters();
+//				
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+		selectedFilter = new JComboBox<>(filters.toArray(new String[filters.size()]));
+		selectedFilter.addItemListener(e -> {
+			if (e.getStateChange() == ItemEvent.DESELECTED) {
+				return;
+			}
+			
+			String filter = (String)selectedFilter.getSelectedItem();
+
+			
+			try {
+				List<String> details = new Service().getFilterDetails(filter);
+				
+				// E.g. oldfilm has 8 parameter...
+				
+				MeltFilter meltFilter = new MeltFilter(filter);
+				
+				boolean parametersStarted = false;
+				String currentParameter = null;
+				for (String d : details) {
+					if (d.contains("parameters:")) {
+						parametersStarted = true;
+					} else if (d.contains("identifier:") && parametersStarted) {
+						currentParameter = d.substring(d.indexOf("identifier: ")+"identifier: ".length());
+						meltFilter.appendConfigurationParameter(currentParameter); // z.B. delta, every, brightnessdelta_up, ...
+						
+					} else if (parametersStarted) {
+						// Extract parameter details...
+						d = d.trim();
+						if (d.contains(":")) {
+							String key = d.substring(0, d.indexOf(":")).trim();
+							String description = d.substring(d.indexOf(":")+1).trim();
+
+							meltFilter.appendConfigurationDetail(currentParameter, key, description);
+						} else {
+							// End of output...
+						}
+					}
+				}
+				
+				showFilterConfiguration(meltFilter);
+				
+				currentlySelectedFilter = meltFilter;
+				
+			} catch (MIFException e1) {
+				logger.error("Unable to get filter-details for '"+filter+"'", e1);
+			}
+		});
+		selectedFilter.setPreferredSize(new Dimension(240, 25));
+		selectedFilter.setMaximumSize(new Dimension(240, 25));
+				
+		Box dropDownBoxesBox = Box.createHorizontalBox();
+		dropDownBoxesBox.add(selectedFilter);
+		dropDownBoxesBox.add(Box.createHorizontalStrut(10));
+		
+		addFilter = new JButton("add");
+		addFilter.addActionListener(e -> {
+			selectedMeltFile.addFilter(currentlySelectedFilter);
+			// TODO Filters: The image should be updated!
+			updateCurrentlyAppliedFilters();
+		});
+		dropDownBoxesBox.add(addFilter);
+		dropDownBoxesBox.add(Box.createHorizontalGlue());
+		
+		Dimension dim = new Dimension(2500, 25); // max height = 25
+		dropDownBoxesBox.setMinimumSize(dim);
+		dropDownBoxesBox.setPreferredSize(dim);
+		dropDownBoxesBox.setMaximumSize(dim);
+		
+		return dropDownBoxesBox;
+	}
+	
+	private void showFilterConfiguration(MeltFilter meltFilter) {
+		filterConfigurationContent.removeAll();
+
+		Map<String, Map<String, String>> configuration = meltFilter.getConfiguration();
+		for (Entry<String, Map<String, String>> entry : configuration.entrySet()) {
+			String param = entry.getKey();
+			
+			Map<String, String> keyValue = entry.getValue();
+
+			Box horizontal = Box.createHorizontalBox();
+			JLabel firstLabel = new JLabel(param);
+			firstLabel.setMinimumSize(new Dimension(250, 20));
+			firstLabel.setPreferredSize(new Dimension(250, 20));
+			firstLabel.setMaximumSize(new Dimension(250, 20));
+			horizontal.add(firstLabel);
+			
+			horizontal.add(Box.createHorizontalStrut(10));
+			JTextField textField = new JTextField(keyValue.get("default"));
+			textField.setMinimumSize(new Dimension(100, 20));
+			textField.setPreferredSize(new Dimension(100, 20));
+			textField.setMaximumSize(new Dimension(100, 20));
+			horizontal.add(textField);
+			horizontal.add(Box.createHorizontalGlue());
+			filterConfigurationContent.add(horizontal);
+		}
+		if (configuration.entrySet().isEmpty()) {
+			filterConfigurationContent.setVisible(false);
+			scrollPane.setVisible(false);
+		}
+		if (!configuration.entrySet().isEmpty()) {
+			filterConfigurationContent.setVisible(true);
+			scrollPane.setVisible(true);
+			filterConfigurationContent.add(Box.createVerticalGlue());
+		}
+		
+		filterConfigurationContent.updateUI();
+		if (panel != null) {
+			panel.updateUI();
+		}
+	}
+	
 	@SuppressWarnings("unused")
 	private mxCell selectedCell;
 	private MIFFile selectedMeltFile;
@@ -202,7 +361,7 @@ public class ImageView {
 					resizeStyleDetailsLabel.setText("Crop from where: ");
 				}
 				
-				box.updateUI();
+				panel.updateUI();
 			}
 		};
 	}
@@ -223,7 +382,15 @@ public class ImageView {
 		resizeStyleDetailsLabel.setVisible(false);
 		resizeStyleDetails.setVisible(false);
 
-		box.updateUI();
+		selectedFilter.setVisible(false);
+		addFilter.setVisible(false);
+		lblCurrentlyAppliedFilters.setVisible(false);
+		filterConfigurationContent.setVisible(false);
+		scrollPane.setVisible(false);
+		
+		if (panel != null) {
+			panel.updateUI();
+		}
 	}
 
 	public void setPreviewPicture(String imagePreview) {
@@ -242,8 +409,14 @@ public class ImageView {
 		resizeStyle.setVisible(true);
 		resizeStyleDetailsLabel.setVisible(true);
 		resizeStyleDetails.setVisible(true);
-
-		box.updateUI();
+		
+		selectedFilter.setVisible(true);
+		addFilter.setVisible(true);
+		lblCurrentlyAppliedFilters.setVisible(true);
+		filterConfigurationContent.setVisible(true);
+		scrollPane.setVisible(true);
+		
+		panel.updateUI();
 	}
 
 	public void setSelectedPicture(String previewCrop) {
@@ -253,6 +426,6 @@ public class ImageView {
 		}
 		imgPicture[1].setIcon(new ImageIcon(previewCrop));
 
-		box.updateUI();
+		panel.updateUI();
 	}
 }

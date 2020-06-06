@@ -541,4 +541,45 @@ public class Service {
 			throw new MIFException(e);
 		}
 	}
+	
+	public List<String> getFilters() throws MIFException {
+		try {
+			List<String> filters = new ArrayList<>();
+			Process process = new ProcessBuilder("bash", "-c", "melt -query \"filters\"")
+				.start();
+			process.waitFor();
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+				String line;
+				while ((line = reader.readLine()) != null) {
+					if (line.startsWith(" ")) {
+						line = line.replace(" ", "");
+						line = line.replace("-", "");
+						line = line.trim();
+						filters.add(line);
+					}
+				}
+			}
+			return filters;
+		} catch (IOException | InterruptedException e) {
+			throw new MIFException(e);
+		}
+	}
+	
+	public List<String> getFilterDetails(String filter) throws MIFException {
+		try {
+			List<String> filterDetails = new ArrayList<>();
+			Process process = new ProcessBuilder("bash", "-c", "melt -query \"filter\"="+filter)
+				.start();
+			process.waitFor();
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+				String line;
+				while ((line = reader.readLine()) != null) {
+					filterDetails.add(line);
+				}
+			}
+			return filterDetails;
+		} catch (IOException | InterruptedException e) {
+			throw new MIFException(e);
+		}
+	}
 }

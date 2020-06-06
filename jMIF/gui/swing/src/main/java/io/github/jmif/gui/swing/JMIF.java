@@ -34,7 +34,6 @@ import io.github.jmif.entities.MIFFile;
 import io.github.jmif.gui.swing.graph.GraphView;
 import io.github.jmif.gui.swing.listener.ProjectListener;
 import io.github.jmif.gui.swing.listener.ProjectListener.type;
-import io.github.jmif.gui.swing.logger.LogView;
 import io.github.jmif.gui.swing.menu.MenuView;
 import io.github.jmif.gui.swing.selection.SelectionView;
 import io.github.jmif.gui.swing.splash.Splashscreen;
@@ -78,7 +77,6 @@ public class JMIF {
 	private MenuView mifMenuView;
 	private GraphView mifGraphView;
 	private SelectionView mifSelectionView;
-	private LogView mifLogView;
 
 	public static void main(String[] args) throws Exception {
 		if (Configuration.showSplashscreen) {
@@ -106,9 +104,6 @@ public class JMIF {
 		frame.setUndecorated(true); // remove title bar...
 		frame.setTitle("MIF-enizer (MLT/ImageMagickFFMPEG/)");
 
-		mifLogView = new LogView(frame);
-
-		
 		// TODO Menu: disbale save-button, preview and gen-button on start...
 		graphWrapper = createMIFProject("atsc_1080p_25");
 		graphWrapper.getGraph().getSelectionModel().addListener(mxEvent.CHANGE, (sender, evt) -> cellClicked(sender));
@@ -165,7 +160,6 @@ public class JMIF {
 		if (Configuration.transperencyOffset > 0) {
 			panelBox.add(Box.createRigidArea(new Dimension(0, Configuration.transperencyOffset)));
 		}
-		panelBox.add(mifLogView.getPanel());
 
 		frame.setLayout(new GridBagLayout());
 

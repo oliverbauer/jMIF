@@ -1,9 +1,7 @@
 package io.github.jmif.gui.swing.selection.image;
 
-import java.awt.Color;
 import java.awt.Dimension;
 
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -12,7 +10,6 @@ import javax.swing.JTextField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.jmif.config.Configuration;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.gui.swing.GraphWrapper;
 
@@ -32,10 +29,10 @@ public class ImageDetailsView {
 	private JLabel labelOVerlay = new JLabel("Overlay");
 
 	private MIFFile meltFile;
-	private Box panel;
+	private Box box;
 	
 	public ImageDetailsView(GraphWrapper mifProject) {
-		Box box = Box.createVerticalBox();
+		box = Box.createVerticalBox();
 		
 	    wrap(box, labelFile, filename);
 	    wrap(box, labelDisplayname, displayName);
@@ -80,28 +77,6 @@ public class ImageDetailsView {
 	    		logger.warn("Not allowed: ", t);
 	    	}
 	    });
-	    
-	    box.add(Box.createRigidArea(new Dimension(0,10)));
-		Box boxUpdate = Box.createHorizontalBox();
-		boxUpdate.add(Box.createHorizontalGlue());
-		box.add(boxUpdate);
-		
-		box.add(Box.createRigidArea(new Dimension(0,10)));
-		
-		panel = Box.createHorizontalBox();
-		panel.add(box);
-		panel.setBackground(Configuration.bgColor);
-		panel.add(Box.createHorizontalGlue());
-		if (Configuration.useBorders) {
-			panel.setBorder(BorderFactory.createLineBorder(Color.RED, 2, true));
-		}
-		
-		clearDetails();
-		
-		Dimension dim = new Dimension(5200, 100);
-		panel.setPreferredSize(dim);
-		panel.setMinimumSize(dim);
-		panel.setMaximumSize(dim);
 	}
 
 	private void wrap(Box box, JComponent c1, JComponent c2) {
@@ -119,7 +94,7 @@ public class ImageDetailsView {
 	}
 	
 	public Box getBox() {
-		return panel;
+		return box;
 	}
 	
 	public void clearDetails() {
@@ -136,7 +111,7 @@ public class ImageDetailsView {
 		labelDimension.setVisible(false);
 		labelOVerlay.setVisible(false);
 		
-		panel.updateUI();
+		box.updateUI();
 	}
 
 	public void setDetails(MIFFile meltFile) {
@@ -159,6 +134,6 @@ public class ImageDetailsView {
 		labelDimension.setVisible(true);
 		labelOVerlay.setVisible(true);
 		
-		panel.updateUI();
+		box.updateUI();
 	}
 }
