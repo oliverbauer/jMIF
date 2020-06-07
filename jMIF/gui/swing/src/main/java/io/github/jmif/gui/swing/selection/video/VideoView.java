@@ -29,14 +29,6 @@ public class VideoView {
 	    videoScrollPane.add(videoPanel);
 	}
 	
-	public void clearIcons() {
-		for (int i=0; i<=9; i++) {
-			imgVideoLabel[i].setIcon(null);
-			imgVideoLabel[i].setVisible(false);
-		}
-		videoPanel.updateUI();
-	}
-	
 	public void setIcons(String[] p) {
 		for (int i=0; i<=9; i++) {
 			if (!new File(p[i]).exists()) {

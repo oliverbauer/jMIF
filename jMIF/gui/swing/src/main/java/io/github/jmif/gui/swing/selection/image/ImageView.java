@@ -45,6 +45,7 @@ public class ImageView {
 	
 	private static final Logger logger = LoggerFactory.getLogger(ImageView.class);
 
+	private MeltFilter currentlySelectedFilter = null;
 	private JLabel[] imgPicture;
 
 	private JLabel resizeStyleLabel;
@@ -58,11 +59,15 @@ public class ImageView {
 	private JComboBox<String> selectedFilter;
 	private JButton addFilter;
 	private JButton previewFilter;
-	
+	private Box filterConfigurationContent;
+	private JScrollPane scrollPane;	
 	private JPanel panel;
 
+	@SuppressWarnings("unused")
+	private mxCell selectedCell;
+	private MIFFile selectedMeltFile;
+	
 	public ImageView() {
-
 		// Left part is the original image
 		Box leftBox = Box.createVerticalBox();
 		imgPicture = new JLabel[2];
@@ -79,7 +84,6 @@ public class ImageView {
 		rightBox.add(getPreviewImage());
 		rightBox.add(Box.createVerticalStrut(5));
 		
-		
 		currentlyAppliedFilters = getCurrentlyAppliedFilters();
 		rightBox.add(currentlyAppliedFilters);
 		rightBox.add(Box.createVerticalStrut(5));
@@ -89,8 +93,6 @@ public class ImageView {
 		rightBox.add(Box.createVerticalGlue());
 		
 		selectedFilter.setSelectedItem("oldfilm");
-		
-		clearIcons();
 		
 		Box box = Box.createVerticalBox();
 		box.add(Box.createVerticalStrut(10));
@@ -161,8 +163,6 @@ public class ImageView {
 		return dropDownBoxesBox;
 	}
 
-	private Box filterConfigurationContent;
-	private JScrollPane scrollPane;
 	private JScrollPane getSelectedFilterConfiguration() {
 		filterConfigurationContent = Box.createVerticalBox();
 
@@ -188,7 +188,6 @@ public class ImageView {
 	}
 	
 	private void updateCurrentlyAppliedFilters() {
-		// TODO Filter: After each filter there should be a small remove-icon
 		// TODO Filter: Each filter should be clickable: select from dropdown and set values as selected
 		if (selectedMeltFile != null) {
 			currentlyAppliedFilters.removeAll();
@@ -212,7 +211,7 @@ public class ImageView {
 				});
 				currentlyAppliedFilters.add(removeFilter);
 				
-				if (i!=filters.size()-1) {
+				if (i != filters.size() - 1) {
 					currentlyAppliedFilters.add(new JLabel(", "));
 				}
 			}
@@ -233,11 +232,10 @@ public class ImageView {
 		updateCurrentlyAppliedFilters();
 	}
 	
-	private MeltFilter currentlySelectedFilter = null;
 	private Box getAvailableFiltersBox() {
 		List<String> filters = new ArrayList<>();
 
-		for (MeltFilterDetails meltFilterDetails : melt.getMeltFilterDetails()) {
+		for (MeltFilterDetails meltFilterDetails : melt.getMeltVideoFilterDetails()) {
 			filters.add(meltFilterDetails.getFiltername());
 		}
 		
@@ -257,13 +255,10 @@ public class ImageView {
 					addFilter.setEnabled(true);
 				}
 			}
-			
 
 			MeltFilter meltFilter = new MeltFilter(filter);
 			showFilterConfiguration(meltFilter);
 			currentlySelectedFilter = meltFilter;
-			
-			
 		});
 		selectedFilter.setPreferredSize(new Dimension(240, 25));
 		selectedFilter.setMaximumSize(new Dimension(240, 25));
@@ -282,8 +277,6 @@ public class ImageView {
 		});
 		previewFilter = new JButton("preview");
 		previewFilter.addActionListener(e -> {
-
-			
 			StringBuilder sb  = new StringBuilder();
 			sb.append("melt ")
 				.append(selectedMeltFile.getFile())
@@ -303,7 +296,6 @@ public class ImageView {
 			for (String v : filterUsage.keySet()) {
 				sb.append(v).append("=").append(filterUsage.get(v)).append(" ");
 			}
-			// TODO 
 			sb.append(" -consumer sdl2 terminate_on_pause=1");
 			try {
 				String command = sb.toString();
@@ -311,14 +303,10 @@ public class ImageView {
 				MIFProject temp = new MIFProject();
 				temp.setWorkingDir("/tmp/");
 				new MIFProjectExecutor(temp).execute(command);
-				
-				System.err.println(command);
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}			
 		});
-		
 		
 		dropDownBoxesBox.add(addFilter);
 		dropDownBoxesBox.add(previewFilter);
@@ -335,7 +323,8 @@ public class ImageView {
 	private void showFilterConfiguration(MeltFilter meltFilter) {
 		filterConfigurationContent.removeAll();
 
-		MeltFilterDetails meltFilterDetails = new Melt().getMeltFilterDetailsFor(meltFilter);
+		MeltFilterDetails meltFilterDetails = 
+				melt.getMeltFilterDetailsFor(meltFilter);
 		
 		Map<String, Integer> configIndex = meltFilterDetails.getConfigIndex(); // parameter to integer
 		List<Map<String, String>> configuration = meltFilterDetails.getConfiguration();
@@ -372,8 +361,15 @@ public class ImageView {
 			horizontal.add(Box.createHorizontalStrut(10));
 			horizontal.add(description);
 			
-			// TODO Filter: show allowed values, if no minimum, maximum
-			JLabel minMax = new JLabel("min="+keyValue.get("minimum")+",max="+keyValue.get("maximum"));
+			String details = null;
+			if (keyValue.get("values") != null) {
+				details = "values="+keyValue.get("values");
+			} else if (keyValue.get("minimum") != null) {
+				details = "min="+keyValue.get("minimum")+",max="+keyValue.get("maximum");
+			} else {
+				details = "type="+keyValue.get("type");
+			}
+			JLabel minMax = new JLabel(details);
 			horizontal.add(Box.createHorizontalStrut(10));
 			horizontal.add(minMax);
 			
@@ -396,10 +392,6 @@ public class ImageView {
 		}
 	}
 	
-	@SuppressWarnings("unused")
-	private mxCell selectedCell;
-	private MIFFile selectedMeltFile;
-
 	public void update(mxCell cell, MIFFile meltFile) {
 		this.selectedMeltFile = meltFile;
 		this.selectedCell = cell;
@@ -462,34 +454,6 @@ public class ImageView {
 				panel.updateUI();
 			}
 		};
-	}
-
-	public void clearIcons() {
-		this.selectedMeltFile = null;
-		this.selectedCell = null;
-
-		imgPicture[0].setVisible(false);
-		imgPicture[1].setVisible(false);
-		manualExtraction.setVisible(false);
-
-		imgPicture[0].setIcon(null);
-		imgPicture[1].setIcon(null);
-
-		resizeStyleLabel.setVisible(false);
-		resizeStyle.setVisible(false);
-		resizeStyleDetailsLabel.setVisible(false);
-		resizeStyleDetails.setVisible(false);
-
-		selectedFilter.setVisible(false);
-		addFilter.setVisible(false);
-		previewFilter.setVisible(false);
-		lblCurrentlyAppliedFilters.setVisible(false);
-		filterConfigurationContent.setVisible(false);
-		scrollPane.setVisible(false);
-		
-		if (panel != null) {
-			panel.updateUI();
-		}
 	}
 
 	public void setPreviewPicture(String imagePreview) {

@@ -23,7 +23,6 @@ import io.github.jmif.entities.MIFVideo;
 import io.github.jmif.gui.swing.GraphWrapper;
 import io.github.jmif.gui.swing.selection.audio.AudioDetailsView;
 import io.github.jmif.gui.swing.selection.audio.AudioView;
-import io.github.jmif.gui.swing.selection.frame.FrameDetailsView;
 import io.github.jmif.gui.swing.selection.frame.FrameView;
 import io.github.jmif.gui.swing.selection.image.ImageDetailsView;
 import io.github.jmif.gui.swing.selection.image.ImageView;
@@ -52,7 +51,6 @@ public class SelectionView {
 	private AudioDetailsView audioDetailsView;
 	
 	private FrameView singleFrameView;
-	private FrameDetailsView frameDetailsView;
 
     public SelectionView(GraphWrapper mifProject) {
 		panel = Box.createVerticalBox();
@@ -60,8 +58,6 @@ public class SelectionView {
 		imageDetailsView = new ImageDetailsView(mifProject);
 		videoDetailsView = new VideoDetailsView(mifProject);
 		audioDetailsView = new AudioDetailsView(mifProject);
-		frameDetailsView = new FrameDetailsView(mifProject);
-				
 		
 		int w = 5500;
 		imageView = new ImageView();
@@ -98,8 +94,13 @@ public class SelectionView {
 		tabPane.addTab("ImageView", wrap(imageDetailsView.getBox(), imageView.getJPanel()));
 		tabPane.addTab("VideoView", wrap(videoDetailsView.getBox(), videoPanel));
 		tabPane.addTab("AudioView", wrap(audioDetailsView.getBox(), null));
-		tabPane.addTab("FrameView", wrap(frameDetailsView.getBox(), singleFrameBox));
+		tabPane.addTab("FrameView", wrap(null,                     singleFrameBox));
 		tabPane.addTab("ImageLibrary", wrap(new ImageLibraryView(mifProject).getBox(), null));
+		tabPane.setSelectedIndex(4);
+		tabPane.setEnabledAt(0, false);
+		tabPane.setEnabledAt(1, false);
+		tabPane.setEnabledAt(2, false);
+		tabPane.setEnabledAt(3, false);
 		
 		panel.add(tabPane);
 		
@@ -123,9 +124,6 @@ public class SelectionView {
 		this.selectedMeltFile = null;
 		this.selectedCell = null;
 		this.selectedAudioFile = null;
-
-		videoView.clearIcons();
-		imageView.clearIcons();
 	}
 	
 	public void setSingleFrameView() {
