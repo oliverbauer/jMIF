@@ -198,6 +198,7 @@ public class MIFProjectExecutor {
 					for (MeltFilter currentlyAddedFilters : meltfile.getFilters()) {
 						sb.append(" -attach-cut ");
 						sb.append(currentlyAddedFilters.getFiltername());
+						sb.append(" ");
 						Map<String, String> filterUsage = currentlyAddedFilters.getFilterUsage();
 						for (String v : filterUsage.keySet()) {
 							sb.append(v).append("=").append(filterUsage.get(v)).append(" ");
