@@ -1,7 +1,7 @@
 /**
  * 
  */
-package io.github.jmif;
+package io.github.jmif.server.rest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +10,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+
+import io.github.jmif.MIFException;
 
 /**
  * @author thebrunner

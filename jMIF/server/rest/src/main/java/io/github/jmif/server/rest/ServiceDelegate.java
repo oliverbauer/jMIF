@@ -1,10 +1,12 @@
 /**
  * 
  */
-package io.github.jmif;
+package io.github.jmif.server.rest;
 
 import java.util.Optional;
 
+import io.github.jmif.MIFException;
+import io.github.jmif.Service;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFProject;
