@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -49,6 +51,8 @@ public class ImageView {
 	private JLabel resizeStyleDetailsLabel;
 	private JComboBox<String> resizeStyleDetails;
 	private JButton manualExtraction = new JButton("manual");
+	
+	private Box currentlyAppliedFilters;
 	private JLabel lblCurrentlyAppliedFilters;
 	private JComboBox<String> selectedFilter;
 	private JButton addFilter;
@@ -73,7 +77,10 @@ public class ImageView {
 		rightBox.add(Box.createVerticalStrut(5));
 		rightBox.add(getPreviewImage());
 		rightBox.add(Box.createVerticalStrut(5));
-		rightBox.add(getCurrentlyAppliedFilters());
+		
+		
+		currentlyAppliedFilters = getCurrentlyAppliedFilters();
+		rightBox.add(currentlyAppliedFilters);
 		rightBox.add(Box.createVerticalStrut(5));
 		rightBox.add(getAvailableFiltersBox());
 		rightBox.add(Box.createVerticalStrut(5));
@@ -168,7 +175,7 @@ public class ImageView {
 	private Box getCurrentlyAppliedFilters() {
 		Box box = Box.createHorizontalBox();
 		
-		lblCurrentlyAppliedFilters = new JLabel("Currently applied filters: TODO");
+		lblCurrentlyAppliedFilters = new JLabel("Currently applied filters: -");
 		box.add(lblCurrentlyAppliedFilters);
 		
 		Dimension dim = new Dimension(2500, 25); // max height = 25
@@ -183,9 +190,46 @@ public class ImageView {
 		// TODO Filter: After each filter there should be a small remove-icon
 		// TODO Filter: Each filter should be clickable: select from dropdown and set values as selected
 		if (selectedMeltFile != null) {
-			lblCurrentlyAppliedFilters.setText("Currently applied filters: "+
-				selectedMeltFile.getFilters().stream().map(MeltFilter::getFiltername).collect(Collectors.joining(", ")));
+			currentlyAppliedFilters.removeAll();
+			
+			lblCurrentlyAppliedFilters.setText("Currently applied filters: ");
+			currentlyAppliedFilters.add(lblCurrentlyAppliedFilters);
+			
+			List<MeltFilter> filters = selectedMeltFile.getFilters();
+			for (int i=0; i<=filters.size()-1; i++) {
+				String filterName = filters.get(i).getFiltername();
+				JLabel filterNameLabel = new JLabel(filterName);
+			
+				currentlyAppliedFilters.add(filterNameLabel);
+				
+				JLabel removeFilter = new JLabel(new ImageIcon(ImageView.class.getClassLoader().getResource("images/png/removeFilter.png")));
+				removeFilter.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						removeFilter(filterName);
+					}
+				});
+				currentlyAppliedFilters.add(removeFilter);
+				
+				if (i!=filters.size()-1) {
+					currentlyAppliedFilters.add(new JLabel(", "));
+				}
+			}
+			
+			currentlyAppliedFilters.updateUI();
+			panel.updateUI();
 		}
+	}
+	
+	private void removeFilter(String filterName) {
+		MeltFilter filter = selectedMeltFile.getFilters().stream().filter(f -> f.getFiltername().equals(filterName)).findAny().get();
+		selectedMeltFile.getFilters().remove(filter);
+
+		if (filterName.equals((String)selectedFilter.getSelectedItem())) {
+			addFilter.setEnabled(true);
+		}
+		
+		updateCurrentlyAppliedFilters();
 	}
 	
 	private MeltFilter currentlySelectedFilter = null;
