@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
@@ -32,16 +31,18 @@ import org.slf4j.LoggerFactory;
 
 import com.mxgraph.model.mxCell;
 
-import io.github.jmif.MIFException;
-import io.github.jmif.Service;
 import io.github.jmif.builder.MIFProjectExecutor;
 import io.github.jmif.config.Configuration;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFProject;
 import io.github.jmif.entities.MeltFilter;
+import io.github.jmif.melt.Melt;
+import io.github.jmif.melt.MeltFilterDetails;
 
 public class ImageView {
+	private Melt melt = new Melt();
+	
 	private static final Logger logger = LoggerFactory.getLogger(ImageView.class);
 
 	private JLabel[] imgPicture;
@@ -235,18 +236,11 @@ public class ImageView {
 	private MeltFilter currentlySelectedFilter = null;
 	private Box getAvailableFiltersBox() {
 		List<String> filters = new ArrayList<>();
-		filters.add("avfilter.deflicker");
-		filters.add("frei0r.alphagrad");
-		filters.add("greyscale");
-		filters.add("grayscale");
-		filters.add("oldfilm");
-		// TODO Filter: Retrieve all available filters for images (prefetch on startup?)
-//		try {
-//			filters = new Service().getFilters();
-//				
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
+
+		for (MeltFilterDetails meltFilterDetails : melt.getMeltFilterDetails()) {
+			filters.add(meltFilterDetails.getFiltername());
+		}
+		
 		selectedFilter = new JComboBox<>(filters.toArray(new String[filters.size()]));
 		selectedFilter.addItemListener(e -> {
 			if (e.getStateChange() == ItemEvent.DESELECTED) {
@@ -264,43 +258,12 @@ public class ImageView {
 				}
 			}
 			
-			try {
-				List<String> details = new Service().getFilterDetails(filter);
-				
-				// E.g. oldfilm has 8 parameter...
-				
-				MeltFilter meltFilter = new MeltFilter(filter);
-				
-				boolean parametersStarted = false;
-				String currentParameter = null;
-				for (String d : details) {
-					if (d.contains("parameters:")) {
-						parametersStarted = true;
-					} else if (d.contains("identifier:") && parametersStarted) {
-						currentParameter = d.substring(d.indexOf("identifier: ")+"identifier: ".length());
-						meltFilter.appendConfigurationParameter(currentParameter); // z.B. delta, every, brightnessdelta_up, ...
-						
-					} else if (parametersStarted) {
-						// Extract parameter details...
-						d = d.trim();
-						if (d.contains(":")) {
-							String key = d.substring(0, d.indexOf(':')).trim();
-							String description = d.substring(d.indexOf(':')+1).trim();
 
-							meltFilter.appendConfigurationDetail(currentParameter, key, description);
-						} else {
-							// End of output...
-						}
-					}
-				}
-				
-				showFilterConfiguration(meltFilter);
-				
-				currentlySelectedFilter = meltFilter;
-				
-			} catch (MIFException e1) {
-				logger.error("Unable to get filter-details for '"+filter+"'", e1);
-			}
+			MeltFilter meltFilter = new MeltFilter(filter);
+			showFilterConfiguration(meltFilter);
+			currentlySelectedFilter = meltFilter;
+			
+			
 		});
 		selectedFilter.setPreferredSize(new Dimension(240, 25));
 		selectedFilter.setMaximumSize(new Dimension(240, 25));
@@ -372,11 +335,14 @@ public class ImageView {
 	private void showFilterConfiguration(MeltFilter meltFilter) {
 		filterConfigurationContent.removeAll();
 
-		Map<String, Map<String, String>> configuration = meltFilter.getConfiguration();
-		for (Entry<String, Map<String, String>> entry : configuration.entrySet()) {
-			String param = entry.getKey();
+		MeltFilterDetails meltFilterDetails = new Melt().getMeltFilterDetailsFor(meltFilter);
+		
+		Map<String, Integer> configIndex = meltFilterDetails.getConfigIndex(); // parameter to integer
+		List<Map<String, String>> configuration = meltFilterDetails.getConfiguration();
+		
+		for (String param : configIndex.keySet()) {
 			
-			Map<String, String> keyValue = entry.getValue();
+			Map<String, String> keyValue = configuration.get(configIndex.get(param));
 
 			Box horizontal = Box.createHorizontalBox();
 			JLabel firstLabel = new JLabel(param);
@@ -414,11 +380,11 @@ public class ImageView {
 			horizontal.add(Box.createHorizontalGlue());
 			filterConfigurationContent.add(horizontal);
 		}
-		if (configuration.entrySet().isEmpty()) {
+		if (configuration.isEmpty()) {
 			filterConfigurationContent.setVisible(false);
 			scrollPane.setVisible(false);
 		}
-		if (!configuration.entrySet().isEmpty()) {
+		if (!configuration.isEmpty()) {
 			filterConfigurationContent.setVisible(true);
 			scrollPane.setVisible(true);
 			filterConfigurationContent.add(Box.createVerticalGlue());
