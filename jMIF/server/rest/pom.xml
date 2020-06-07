@@ -34,7 +34,7 @@
 				<groupId>io.fabric8</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
 				<extensions>true</extensions>
-				<executions>
+<!--				<executions>
 					<execution>
 						<phase>package</phase>
 						<goals>
@@ -42,7 +42,7 @@
 						</goals>
 					</execution>
 				</executions>
-				<configuration>
+-->				<configuration>
 					<images>
 						<image>
 							<name>${project.artifactId}</name>
