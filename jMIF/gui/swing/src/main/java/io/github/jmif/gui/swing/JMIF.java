@@ -280,11 +280,14 @@ public class JMIF {
 					LOGGER.error("", e);
 				}
 			} else if (t == type.NEW_PROJECT) {
-				// Remove all cells
+				// Remove all image/video cells
 				for (mxCell cell : graphWrapper.getCells()) {
 					mifGraphView.remove(cell, graphWrapper.get(cell));
 				}
-				// TODO Audio: New project: Remove Audio
+				// Remove all audio cells
+				for (mxCell cell : graphWrapper.getAudioCells()) {
+					mifGraphView.remove(cell, graphWrapper.getAudio(cell));
+				}
 				
 				graphWrapper.save();
 				try {
