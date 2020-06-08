@@ -16,6 +16,7 @@ import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFProject;
 import io.github.jmif.entities.MIFVideo;
+import io.github.jmif.entities.MIFImage.ImageResizeStyle;
 
 /**
  * @author thebrunner
@@ -255,7 +256,7 @@ public class Service {
 	}
 
 	public void createManualPreview(MIFImage image) {
-		image.setStyle("MANUAL");
+		image.setStyle(ImageResizeStyle.MANUAL);
 		Process process;
 		try {
 			String temp = image.getManualStyleCommand();

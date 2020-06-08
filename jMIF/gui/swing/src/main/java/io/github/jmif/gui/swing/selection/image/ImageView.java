@@ -33,8 +33,8 @@ import com.mxgraph.model.mxCell;
 
 import io.github.jmif.builder.MIFProjectExecutor;
 import io.github.jmif.config.Configuration;
-import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
+import io.github.jmif.entities.MIFImage.ImageResizeStyle;
 import io.github.jmif.entities.MIFProject;
 import io.github.jmif.entities.MeltFilter;
 import io.github.jmif.melt.Melt;
@@ -49,7 +49,7 @@ public class ImageView {
 	private JLabel[] imgPicture;
 
 	private JLabel resizeStyleLabel;
-	private JComboBox<String> resizeStyle;
+	private JComboBox<ImageResizeStyle> resizeStyle;
 	private JLabel resizeStyleDetailsLabel;
 	private JComboBox<String> resizeStyleDetails;
 	private JButton manualExtraction = new JButton("manual");
@@ -64,7 +64,7 @@ public class ImageView {
 	private JPanel panel;
 
 	private mxCell selectedCell;
-	private MIFFile selectedMeltFile;
+	private MIFImage selectedMeltFile;
 	
 	public ImageView() {
 		// Left part is the original image
@@ -128,10 +128,9 @@ public class ImageView {
 		Box dropDownBoxesBox = Box.createHorizontalBox();
 		resizeStyleLabel = new JLabel("Resizestyle: ");
 		dropDownBoxesBox.add(resizeStyleLabel);
-		String[] styleItems = Arrays.asList("HARD", "FILL", "CROP", "MANUAL").toArray(new String[4]);
-		resizeStyle = new JComboBox<>(styleItems);
+		resizeStyle = new JComboBox<>(ImageResizeStyle.values());
 		resizeStyle.addItemListener(getItemListener());
-		resizeStyle.setSelectedItem("CROP");
+		resizeStyle.setSelectedItem(ImageResizeStyle.CROP);
 		resizeStyle.setPreferredSize(new Dimension(80, 25));
 		resizeStyle.setMaximumSize(new Dimension(80, 25));
 		dropDownBoxesBox.add(resizeStyle);
@@ -396,21 +395,25 @@ public class ImageView {
 		update(selectedCell, selectedMeltFile);
 	}
 	
-	public void update(mxCell cell, MIFFile meltFile) {
+	public void update(mxCell cell, MIFImage meltFile) {
 		this.selectedMeltFile = meltFile;
 		this.selectedCell = cell;
 
-		String selectedItem = ((MIFImage) meltFile).getStyle();
+		ImageResizeStyle selectedItem = meltFile.getStyle();
 		resizeStyle.setSelectedItem(selectedItem);
-		// TODO Image: Enum for style
-		if (selectedItem.equals("CROP")) {
-			setSelectedPicture(((MIFImage) meltFile).getPreviewCrop());
-		} else if (selectedItem.contentEquals("FILL")) {
-			setSelectedPicture(((MIFImage) meltFile).getPreviewFillWColor());
-		} else if (selectedItem.equals("HARD")) {
-			setSelectedPicture(((MIFImage) meltFile).getPreviewHardResize());
-		} else if (selectedItem.equals("MANUAL")) {
-			setSelectedPicture(((MIFImage) meltFile).getPreviewManual());
+		switch (selectedItem) {
+			case CROP:
+				setSelectedPicture(meltFile.getPreviewCrop());
+				break;
+			case FILL:
+				setSelectedPicture(meltFile.getPreviewFillWColor());
+				break;
+			case HARD:
+				setSelectedPicture(meltFile.getPreviewHardResize());
+				break;
+			case MANUAL:
+				setSelectedPicture(meltFile.getPreviewManual());
+				break;
 		}
 		
 		updateCurrentlyAppliedFilters();
@@ -419,29 +422,29 @@ public class ImageView {
 	private ItemListener getItemListener() {
 		return e -> {
 			if (e.getStateChange() == ItemEvent.SELECTED && selectedMeltFile != null) {
-				String item = (String) e.getItem();
+				ImageResizeStyle item = (ImageResizeStyle) e.getItem();
 				((MIFImage) selectedMeltFile).setStyle(item);
 				
 				logger.info("Switching over '{}'", item);
 				switch (item) {
-				case "HARD":
+				case HARD:
 					imgPicture[1].setIcon(new ImageIcon(((MIFImage) selectedMeltFile).getPreviewHardResize()));
 					resizeStyleDetails.setVisible(false);
 					resizeStyleDetailsLabel.setVisible(false);
 					break;
-				case "FILL":
+				case FILL:
 					imgPicture[1].setIcon(new ImageIcon(((MIFImage) selectedMeltFile).getPreviewFillWColor()));
 					resizeStyleDetails.setVisible(true);
 					resizeStyleDetailsLabel.setVisible(true);
 					resizeStyleDetailsLabel.setText("Fill color:");
 					break;
-				case "CROP":
+				case CROP:
 					imgPicture[1].setIcon(new ImageIcon(((MIFImage) selectedMeltFile).getPreviewCrop()));
 					resizeStyleDetails.setVisible(true);
 					resizeStyleDetailsLabel.setVisible(true);
 					resizeStyleDetailsLabel.setText("Crop from where: ");
 					break;
-				case "MANUAL":
+				case MANUAL:
 					imgPicture[1].setIcon(new ImageIcon(((MIFImage) selectedMeltFile).getPreviewManual()));
 					resizeStyleDetails.setVisible(false);
 					resizeStyleDetailsLabel.setVisible(false);

@@ -171,7 +171,7 @@ public class SelectionView {
 			tabPane.setEnabledAt(3, false);
 			
 			imageView.setPreviewPicture(((MIFImage)meltFile).getImagePreview());
-			imageView.update(cell, meltFile);
+			imageView.update(cell, (MIFImage)meltFile);
 			imageDetailsView.setDetails(meltFile);
 		} else {
 			tabPane.setSelectedIndex(1);

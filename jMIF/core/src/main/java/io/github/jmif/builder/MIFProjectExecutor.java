@@ -251,14 +251,14 @@ public class MIFProjectExecutor {
 					LOGGER.info("Create {}", output);
 
 					switch (((MIFImage) f).getStyle()) {
-					case "CROP":
+					case CROP:
 						// TODO Image Crop convert
-					case "HARD":
+					case HARD:
 						// TODO Image Hard convert
-					case "FILL":
+					case FILL:
 						execute("convert "+input+" -geometry 1920x -crop 1920x1080+0+180 -quality 100 "+output);
 						break;
-					case "MANUAL":
+					case MANUAL:
 						execute("convert "+input+" "+((MIFImage) f).getManualStyleCommand()+" "+output);
 						break;
 					}

@@ -5,10 +5,14 @@ import javax.xml.bind.annotation.XmlTransient;
 
 @XmlRootElement(name = "picture")
 public class MIFImage extends MIFFile {
-
-	// CROP, HARD, FILL, MANUAL
-	// TODO Image: Use enum for style: CROP, HARD, FILL, MANUAL
-	private String style = "CROP";
+	public static enum ImageResizeStyle {
+		CROP,
+		HARD,
+		FILL,
+		MANUAL
+	}
+	
+	private ImageResizeStyle style = ImageResizeStyle.CROP;
 	private String manualStyleCommand = null;
 	
 	@XmlTransient
@@ -53,11 +57,11 @@ public class MIFImage extends MIFFile {
 		this.manualStyleCommand = manualStyleCommand;
 	}
 
-	public String getStyle() {
+	public ImageResizeStyle getStyle() {
 		return style;
 	}
 
-	public void setStyle(String style) {
+	public void setStyle(ImageResizeStyle style) {
 		this.style = style;
 	}
 
