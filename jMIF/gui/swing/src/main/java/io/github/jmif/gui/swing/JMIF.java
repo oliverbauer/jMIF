@@ -40,25 +40,14 @@ import io.github.jmif.gui.swing.splash.Splashscreen;
 import io.github.jmif.util.TimeUtil;
 
 /**
- * jMIF (MLT, IMAGEMAGICK, FFMPEG), you may add a 'L' on the right position :-)
+ * jMIF (MLT, IMAGEMAGICK, FFMPEG)
  * 
- * TODO Disable click on node until Thread with preview images finished
- * (otherwise image will not be displayed) 
- * 
- * TODO Image: Create Preview Image Libaray
- * from DIR... dbl click: add melt file:-) 
- * 
- * TODO Release profile (bzip2) with
- * example-Dir included 
- * 
+ * TODO Disable click on node until Thread with preview images finished (otherwise image will not be displayed) 
+ * TODO Release profile (bzip2) with example-Dir included 
  * TODO Config-Button (store config in HOME-Dir) 
- * 
  * TODO Menu: About (Used Software etc.) 
- * 
  * TODO Menu: How to Install/Use 
- * 
  * TODO Switch to Gradle 
- * 
  * TODO Config: Allow in-memory-preview (byte-arrays of pictures - needs more RAM) or hd-preview (copy files - needs more HD/Time for IO) 
  * 
  * TODO Audio: "audiowaveform -i 001.mp3 -o test.png -w 1000 -h 200 -s 0 -e ${seconds} --no-axis-labels" (or (better?) use Sox).. needs optional check in SplashScreen 
@@ -67,7 +56,6 @@ import io.github.jmif.util.TimeUtil;
  *	$ sudo apt-get install audiowaveform
  *
  * TODO MLT: Checkout  https://gl-transitions.com/
- * 
  * TODO Allow multiple files with same name
  */
 public class JMIF {
@@ -214,36 +202,9 @@ public class JMIF {
 		executor.submit(() -> {
 			try {
 				new Service().createPreview(file1, project.getPr().getWorkingDir());
-			} catch (Exception e) {
-				LOGGER.error("", e);
-			}
-		});
-		executor.submit(
-				() -> {
-					try {
-						new Service().createPreview(file2, project.getPr().getWorkingDir());
-					} catch (Exception e) {
-						LOGGER.error("", e);
-					}
-				});
-		executor.submit(
-				() -> {
-					try {
-						new Service().createPreview(file3, project.getPr().getWorkingDir());
-					} catch (Exception e) {
-						LOGGER.error("", e);
-					}
-				}
-				);
-		executor.submit(() -> {
-			try {
+				new Service().createPreview(file2, project.getPr().getWorkingDir());
+				new Service().createPreview(file3, project.getPr().getWorkingDir());
 				new Service().createPreview(file4, project.getPr().getWorkingDir());
-			} catch (Exception e) {
-				LOGGER.error("", e);
-			}
-		});
-		executor.submit(() -> {
-			try {
 				new Service().createPreview(file5, project.getPr().getWorkingDir());
 			} catch (Exception e) {
 				LOGGER.error("", e);

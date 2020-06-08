@@ -116,7 +116,7 @@ public class ImageDetailsView {
 
 	public void setDetails(MIFFile meltFile) {
 		this.meltFile = meltFile;
-		filename.setText(meltFile.getFile());
+		filename.setText(meltFile.getFile().getName());
 		displayName.setText(meltFile.getDisplayName());
 		framelengthToDisplay.setText(String.valueOf(meltFile.getFramelength()));
 		overlay.setText(String.valueOf(meltFile.getOverlayToPrevious()));

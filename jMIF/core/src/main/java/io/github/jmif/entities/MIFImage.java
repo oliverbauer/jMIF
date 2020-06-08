@@ -1,5 +1,7 @@
 package io.github.jmif.entities;
 
+import java.io.File;
+
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -40,7 +42,7 @@ public class MIFImage extends MIFFile {
 
 	}
 
-	public MIFImage(String file, String display, float frames, String dim, int overlay) {
+	public MIFImage(File file, String display, float frames, String dim, int overlay) {
 		setFile(file);
 		setDisplayName(display);
 		setFramelength(frames);

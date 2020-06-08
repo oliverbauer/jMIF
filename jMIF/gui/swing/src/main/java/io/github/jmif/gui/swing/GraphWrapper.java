@@ -110,7 +110,7 @@ public class GraphWrapper {
 			
 			var executor = Executors.newWorkStealingPool();
 			for (MIFFile f : project.getMIFFiles()) {
-				MIFFile mifFile = createMIFFile(new File(f.getFile()));
+				MIFFile mifFile = createMIFFile(f.getFile());
 				mifFile.getFilters().addAll(f.getFilters());
 				
 				executor.submit(() -> {
@@ -166,7 +166,7 @@ public class GraphWrapper {
 		if (file.endsWith("JPG") || file.endsWith("jpg")) {
 			var display = file.substring(file.lastIndexOf('/') + 1);
 
-			var image = new Service().createImage(file, display, 5*pr.getFramerate(), "-1x-1", pr.getFramerate(), pr.getWorkingDir(), pr.getFramerate());
+			var image = new Service().createImage(fileToAdd, display, 5*pr.getFramerate(), "-1x-1", pr.getFramerate(), pr.getWorkingDir(), pr.getFramerate());
 
 			if (!pr.getMIFFiles().isEmpty()) {
 				currentLength -= image.getOverlayToPrevious();
@@ -185,7 +185,7 @@ public class GraphWrapper {
 			return image;
 		} else if (file.endsWith("mp4") || file.endsWith("MP4")) {
 			var display = file.substring(file.lastIndexOf('/') + 1);
-			var video = new Service().createVideo(file, display, -1, "1920x1080", pr.getFramerate(), pr.getWorkingDir(), pr.getFramerate());
+			var video = new Service().createVideo(fileToAdd, display, -1, "1920x1080", pr.getFramerate(), pr.getWorkingDir(), pr.getFramerate());
 
 			if (!pr.getMIFFiles().isEmpty()) {
 				currentLength -= video.getOverlayToPrevious();

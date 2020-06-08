@@ -40,7 +40,7 @@ public class ManualSize {
 		JFrame frame = new JFrame();
 		JPanel panel = new JPanel(new BorderLayout());
 
-		ImageIcon ic = new ImageIcon(mifImage.getFile());
+		ImageIcon ic = new ImageIcon(mifImage.getFile().getAbsolutePath());
 
 		int w = ic.getIconWidth() / 5;
 		int h = ic.getIconHeight() / 5;
