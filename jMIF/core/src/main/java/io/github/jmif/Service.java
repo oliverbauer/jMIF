@@ -264,8 +264,16 @@ public class Service {
 			logger.info("Execute {}", temp);
 
 			process = new ProcessBuilder("bash", "-c", "convert "+image.getFile()+" "+temp+" "+image.getPreviewManual())
-					.redirectErrorStream(true)
-					.start();
+				.redirectErrorStream(true)
+				.start();
+			
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+				String line;
+				while ((line = reader.readLine()) != null) {
+					logger.info(line);
+				}
+			}
+			
 			process.waitFor();
 		} catch (Exception e) {
 			logger.error("Unable to create manual style image ",e);

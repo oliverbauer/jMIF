@@ -37,7 +37,7 @@ public class ManualSize {
 	
 	private String command = null;
 	
-	public void showFrame(MIFImage mifImage, JComboBox<String> resizeStyle) {
+	public void showFrame(MIFImage mifImage, ImageView imageView) {
 		JFrame frame = new JFrame();
 		JPanel panel = new JPanel(new BorderLayout());
 
@@ -160,7 +160,7 @@ public class ManualSize {
 			mifImage.setManualStyleCommand(command);
 			// TODO Service
 			new Service().createManualPreview(mifImage);
-			resizeStyle.setSelectedItem("MANUAL");
+			imageView.refreshFromManualSize();
 			frame.dispose();
 		});
 		cancel.addActionListener(event -> frame.dispose());

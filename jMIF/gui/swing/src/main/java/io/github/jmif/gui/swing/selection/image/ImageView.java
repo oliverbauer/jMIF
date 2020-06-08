@@ -147,7 +147,7 @@ public class ImageView {
 		dropDownBoxesBox.add(Box.createHorizontalStrut(10));
 		manualExtraction.addActionListener(e -> {
 			ManualSize manualSize = new ManualSize();
-			manualSize.showFrame((MIFImage)selectedMeltFile, resizeStyle);
+			manualSize.showFrame((MIFImage)selectedMeltFile, this);
 		});
 		dropDownBoxesBox.add(manualExtraction);
 
@@ -390,6 +390,10 @@ public class ImageView {
 		if (panel != null) {
 			panel.updateUI();
 		}
+	}
+	
+	public void refreshFromManualSize() {
+		update(selectedCell, selectedMeltFile);
 	}
 	
 	public void update(mxCell cell, MIFFile meltFile) {
