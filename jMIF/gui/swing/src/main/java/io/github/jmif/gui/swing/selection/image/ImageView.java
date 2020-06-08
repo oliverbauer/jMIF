@@ -63,7 +63,6 @@ public class ImageView {
 	private JScrollPane scrollPane;	
 	private JPanel panel;
 
-	@SuppressWarnings("unused")
 	private mxCell selectedCell;
 	private MIFFile selectedMeltFile;
 	
@@ -279,6 +278,7 @@ public class ImageView {
 		previewFilter.addActionListener(e -> {
 			StringBuilder sb  = new StringBuilder();
 			sb.append("melt ")
+				// TODO Filter: Preview: may be file-style has been changed to CROP, MANUAAL... 
 				.append(selectedMeltFile.getFile())
 				.append(" out=50 ");
 			for (MeltFilter currentlyAddedFilters : selectedMeltFile.getFilters()) {

@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -141,17 +142,19 @@ public class Melt {
 	}
 	
 	public List<MeltFilterDetails> getMeltVideoFilterDetails() {
-		List<MeltFilterDetails> allFilter = getOrLoad();
-		List<MeltFilterDetails> list = new ArrayList<>();
-		for (MeltFilterDetails m : allFilter) {
-			Map<String, String> generalInformations = m.getGeneralInformations();
-			if (generalInformations != null && generalInformations.containsKey("tags")) {
-				if (generalInformations.get("tags").equals("Video")) {
-					list.add(m);
-				}
-			}
-		}
-		return list;
+		return getOrLoad()
+			.stream()
+			.filter(i -> i.getGeneralInformations().containsKey("tags"))
+			.filter(i -> i.getGeneralInformations().get("tags").equals("Video"))
+			.collect(Collectors.toList());
+	}
+	
+	public List<MeltFilterDetails> getMeltAudioFilterDetails() {
+		return getOrLoad()
+			.stream()
+			.filter(i -> i.getGeneralInformations().containsKey("tags"))
+			.filter(i -> i.getGeneralInformations().get("tags").equals("Audio"))
+			.collect(Collectors.toList());
 	}
 	
 	public MeltFilterDetails getMeltFilterDetailsFor(MeltFilter meltFilter) {
