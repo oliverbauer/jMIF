@@ -3,6 +3,7 @@ package io.github.jmif.melt;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -40,7 +41,7 @@ public class Melt {
 			
 				this.meltFilters.addAll(m.getMeltFilterDetails());
 				
-				System.err.println("loaded...");
+				logger.info("Loaded 'meltfilterdetails.xml'");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -127,6 +128,8 @@ public class Melt {
 			var marshaller = context.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 			marshaller.marshal(this, new File("meltfilterdetails.xml"));
+			
+			logger.info("Saved 'meltfilterdetails.xml'");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -135,6 +138,22 @@ public class Melt {
 	
 	public List<MeltFilterDetails> getMeltFilterDetails() {
 		return getOrLoad();
+	}
+	
+	public List<MeltFilterDetails> getMeltVideoFilterDetails() {
+		return getOrLoad()
+			.stream()
+			.filter(i -> i.getGeneralInformations().containsKey("tags"))
+			.filter(i -> i.getGeneralInformations().get("tags").equals("Video"))
+			.collect(Collectors.toList());
+	}
+	
+	public List<MeltFilterDetails> getMeltAudioFilterDetails() {
+		return getOrLoad()
+			.stream()
+			.filter(i -> i.getGeneralInformations().containsKey("tags"))
+			.filter(i -> i.getGeneralInformations().get("tags").equals("Audio"))
+			.collect(Collectors.toList());
 	}
 	
 	public MeltFilterDetails getMeltFilterDetailsFor(MeltFilter meltFilter) {

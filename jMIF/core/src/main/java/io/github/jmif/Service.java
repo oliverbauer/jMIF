@@ -16,6 +16,7 @@ import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFProject;
 import io.github.jmif.entities.MIFVideo;
+import io.github.jmif.entities.MIFImage.ImageResizeStyle;
 
 /**
  * @author thebrunner
@@ -84,11 +85,10 @@ public class Service {
 		}
 	}
 
-	public MIFVideo createVideo(String file, String display, float frames, String dim, int overlay, String workingDir, int profileFramelength) throws MIFException {
+	public MIFVideo createVideo(File file, String display, float frames, String dim, int overlay, String workingDir, int profileFramelength) throws MIFException {
 		var video = new MIFVideo(file, display, frames, dim, overlay);
 		updateFile(video);
 		copy(video, workingDir);
-		var path = video.getFile().substring(0, video.getFile().lastIndexOf('/'));
 		var filename = video.getFilename();
 
 		logger.info("Init: Video {}", filename);
@@ -100,7 +100,7 @@ public class Service {
 			// bit_rate=128771 => 128 kbps
 			command = "ffprobe -v error -select_streams a:0 -show_entries stream=bit_rate,codec_long_name -of default=noprint_wrappers=1 " + video.getFile();
 			process = new ProcessBuilder("bash", "-c", command)
-					.directory(new File(path))
+					.directory(file.getParentFile())
 					.redirectErrorStream(true)
 					.start();
 			try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
@@ -123,7 +123,7 @@ public class Service {
 			// bit_rate=2504857  => 2504 kbps
 			command = "ffprobe -v error -select_streams v:0 -show_entries stream=width,height,duration,bit_rate,codec_long_name,display_aspect_ratio,r_frame_rate -of default=noprint_wrappers=1 " + video.getFile();
 			process = new ProcessBuilder("bash", "-c", command)
-					.directory(new File(path))
+					.directory(file.getParentFile())
 					.redirectErrorStream(true)
 					.start();
 			try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
@@ -173,7 +173,7 @@ public class Service {
 	}
 
 	private void createPreview(MIFVideo videoO, String workingDir) throws MIFException {
-		var filename = videoO.getFile().substring(videoO.getFile().lastIndexOf('/') + 1);
+		var filename = videoO.getFile().getName();
 		var video = workingDir+"/orig/"+filename;
 
 		if (videoO.getWidth() == -1 || videoO.getHeight() == -1) {
@@ -255,7 +255,7 @@ public class Service {
 	}
 
 	public void createManualPreview(MIFImage image) {
-		image.setStyle("MANUAL");
+		image.setStyle(ImageResizeStyle.MANUAL);
 		Process process;
 		try {
 			String temp = image.getManualStyleCommand();
@@ -264,15 +264,23 @@ public class Service {
 			logger.info("Execute {}", temp);
 
 			process = new ProcessBuilder("bash", "-c", "convert "+image.getFile()+" "+temp+" "+image.getPreviewManual())
-					.redirectErrorStream(true)
-					.start();
+				.redirectErrorStream(true)
+				.start();
+			
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+				String line;
+				while ((line = reader.readLine()) != null) {
+					logger.info(line);
+				}
+			}
+			
 			process.waitFor();
 		} catch (Exception e) {
 			logger.error("Unable to create manual style image ",e);
 		}
 	}
 
-	public MIFImage createImage(String file, String display, float frames, String dim, int overlay, String workingDir, int framelength) throws MIFException {
+	public MIFImage createImage(File file, String display, float frames, String dim, int overlay, String workingDir, int framelength) throws MIFException {
 		var image = new MIFImage(file, display, frames, dim, overlay);
 		updateFile(image);
 		copy(image, workingDir);
@@ -280,7 +288,6 @@ public class Service {
 			framelength = 5*framelength; // constant, default: 5 seconds...
 		}
 
-		var path = image.getFile().substring(0, image.getFile().lastIndexOf('/'));
 		var filename = image.getFilename();
 
 		var copy = workingDir + "orig/" + filename;
@@ -291,8 +298,10 @@ public class Service {
 			var command = "ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "	+ copy;
 			Process process;
 			try {
-				process = new ProcessBuilder("bash", "-c", command).directory(new File(path)).redirectErrorStream(true)
-						.start();
+				process = new ProcessBuilder("bash", "-c", command)
+					.directory(file.getParentFile())
+					.redirectErrorStream(true)
+					.start();
 				String output = null;
 
 				try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
@@ -318,16 +327,16 @@ public class Service {
 		var estimatedWith = (int) (aspectHeight * 1.78);
 
 		var wxh = estimatedWith + "x" + aspectHeight;
-		var fileWOending = filename.substring(0, filename.lastIndexOf('.'));
-		var fileending = filename.substring(filename.lastIndexOf('.') + 1);
-		image.setImagePreview(workingDir + "preview/" + fileWOending + "_thumb." + wxh + "."
-				+ fileending);
-		image.setPreviewHardResize(workingDir + "preview/" + fileWOending + "_hard." + wxh + "."
-				+ fileending);
-		image.setPreviewFillWColor(workingDir + "preview/" + fileWOending + "_fill." + wxh + "."
-				+ fileending);
-		image.setPreviewCrop(workingDir + "preview/" + fileWOending + "_kill." + wxh + "." + fileending);
-		image.setPreviewManual(workingDir + "preview/" + fileWOending + "_manual." + wxh + "." + fileending);
+		var withoutFileExtension = filename.substring(0, filename.lastIndexOf('.'));
+		var fileExtension = image.getFileExtension();
+		image.setImagePreview(workingDir + "preview/" + withoutFileExtension + "_thumb." + wxh + "."
+				+ fileExtension);
+		image.setPreviewHardResize(workingDir + "preview/" + withoutFileExtension + "_hard." + wxh + "."
+				+ fileExtension);
+		image.setPreviewFillWColor(workingDir + "preview/" + withoutFileExtension + "_fill." + wxh + "."
+				+ fileExtension);
+		image.setPreviewCrop(workingDir + "preview/" + withoutFileExtension + "_kill." + wxh + "." + fileExtension);
+		image.setPreviewManual(workingDir + "preview/" + withoutFileExtension + "_manual." + wxh + "." + fileExtension);
 		return image;
 	}
 
@@ -497,8 +506,8 @@ public class Service {
 	}
 
 	private void updateFile(MIFFile file) {
-		file.setFileExists(new File(file.getFile()).exists());
-		file.setFilename(file.getFile().substring(file.getFile().lastIndexOf('/')+1));
+		file.setFileExists(file.getFile().exists());
+		file.setFilename(file.getFile().getName());
 	}
 	
 	private void copy(MIFFile file, String workingDir) throws MIFException {

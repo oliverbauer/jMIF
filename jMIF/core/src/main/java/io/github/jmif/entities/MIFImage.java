@@ -1,14 +1,20 @@
 package io.github.jmif.entities;
 
+import java.io.File;
+
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 @XmlRootElement(name = "picture")
 public class MIFImage extends MIFFile {
-
-	// CROP, HARD, FILL, MANUAL
-	// TODO Image: Use enum for style: CROP, HARD, FILL, MANUAL
-	private String style = "CROP";
+	public static enum ImageResizeStyle {
+		CROP,
+		HARD,
+		FILL,
+		MANUAL
+	}
+	
+	private ImageResizeStyle style = ImageResizeStyle.CROP;
 	private String manualStyleCommand = null;
 	
 	@XmlTransient
@@ -36,7 +42,7 @@ public class MIFImage extends MIFFile {
 
 	}
 
-	public MIFImage(String file, String display, float frames, String dim, int overlay) {
+	public MIFImage(File file, String display, float frames, String dim, int overlay) {
 		setFile(file);
 		setDisplayName(display);
 		setFramelength(frames);
@@ -53,11 +59,11 @@ public class MIFImage extends MIFFile {
 		this.manualStyleCommand = manualStyleCommand;
 	}
 
-	public String getStyle() {
+	public ImageResizeStyle getStyle() {
 		return style;
 	}
 
-	public void setStyle(String style) {
+	public void setStyle(ImageResizeStyle style) {
 		this.style = style;
 	}
 

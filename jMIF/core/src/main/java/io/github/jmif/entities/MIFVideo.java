@@ -1,5 +1,7 @@
 package io.github.jmif.entities;
 
+import java.io.File;
+
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -20,7 +22,7 @@ public class MIFVideo extends MIFFile {
 
 	}
 
-	public MIFVideo(String file, String display, float frames, String dim, int overlay) {
+	public MIFVideo(File file, String display, float frames, String dim, int overlay) {
 		setFile(file);
 		setDisplayName(display);
 		setFramelength(frames);

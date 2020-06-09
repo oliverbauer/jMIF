@@ -10,7 +10,6 @@ import java.util.Map;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -37,11 +36,11 @@ public class ManualSize {
 	
 	private String command = null;
 	
-	public void showFrame(MIFImage mifImage, JComboBox<String> resizeStyle) {
+	public void showFrame(MIFImage mifImage, ImageView imageView) {
 		JFrame frame = new JFrame();
 		JPanel panel = new JPanel(new BorderLayout());
 
-		ImageIcon ic = new ImageIcon(mifImage.getFile());
+		ImageIcon ic = new ImageIcon(mifImage.getFile().getAbsolutePath());
 
 		int w = ic.getIconWidth() / 5;
 		int h = ic.getIconHeight() / 5;
@@ -160,7 +159,7 @@ public class ManualSize {
 			mifImage.setManualStyleCommand(command);
 			// TODO Service
 			new Service().createManualPreview(mifImage);
-			resizeStyle.setSelectedItem("MANUAL");
+			imageView.refreshFromManualSize();
 			frame.dispose();
 		});
 		cancel.addActionListener(event -> frame.dispose());

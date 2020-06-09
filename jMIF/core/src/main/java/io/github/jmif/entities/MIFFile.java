@@ -1,5 +1,6 @@
 package io.github.jmif.entities;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +13,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlRootElement(name = "meltfile")
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class MIFFile {
-	private String file;
+	private File file;
 	private String filename;
 	protected String displayName;
 
@@ -45,6 +46,10 @@ public abstract class MIFFile {
 		this.filename = filename;
 	}
 
+	public String getFileExtension() {
+		return filename.substring(filename.lastIndexOf('.') + 1);
+	}
+	
 	public boolean isInitialized() {
 		return initialized;
 	}
@@ -77,11 +82,11 @@ public abstract class MIFFile {
 		this.displayName = displayName;
 	}
 
-	public void setFile(String file) {
+	public void setFile(File file) {
 		this.file = file;
 	}
 
-	public String getFile() {
+	public File getFile() {
 		return this.file;
 	}
 	

@@ -3,6 +3,7 @@
  */
 package io.github.jmif.server.rest;
 
+import java.io.File;
 import java.util.Optional;
 
 import io.github.jmif.MIFException;
@@ -51,7 +52,7 @@ public class ServiceDelegate {
 
 	public long createVideo(String file, String display, float frames, String dim, int overlay, String workingDir, int profileFramelength) throws MIFException {
 		return executor.doIt(() -> {
-			return service.createVideo(file, display, frames, dim, overlay, workingDir, profileFramelength);
+			return service.createVideo(new File(file), display, frames, dim, overlay, workingDir, profileFramelength);
 		});
 	}
 
@@ -71,7 +72,7 @@ public class ServiceDelegate {
 
 	public long createImage(String file, String display, float frames, String dim, int overlay, String workingDir, int framelength) throws MIFException {
 		return executor.doIt(() -> {
-			return service.createImage(file, display, frames, dim, overlay, workingDir, framelength);
+			return service.createImage(new File(file), display, frames, dim, overlay, workingDir, framelength);
 		});
 	}
 

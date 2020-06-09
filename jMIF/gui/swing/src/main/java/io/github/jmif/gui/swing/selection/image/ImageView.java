@@ -33,8 +33,8 @@ import com.mxgraph.model.mxCell;
 
 import io.github.jmif.builder.MIFProjectExecutor;
 import io.github.jmif.config.Configuration;
-import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
+import io.github.jmif.entities.MIFImage.ImageResizeStyle;
 import io.github.jmif.entities.MIFProject;
 import io.github.jmif.entities.MeltFilter;
 import io.github.jmif.melt.Melt;
@@ -45,10 +45,11 @@ public class ImageView {
 	
 	private static final Logger logger = LoggerFactory.getLogger(ImageView.class);
 
+	private MeltFilter currentlySelectedFilter = null;
 	private JLabel[] imgPicture;
 
 	private JLabel resizeStyleLabel;
-	private JComboBox<String> resizeStyle;
+	private JComboBox<ImageResizeStyle> resizeStyle;
 	private JLabel resizeStyleDetailsLabel;
 	private JComboBox<String> resizeStyleDetails;
 	private JButton manualExtraction = new JButton("manual");
@@ -58,11 +59,14 @@ public class ImageView {
 	private JComboBox<String> selectedFilter;
 	private JButton addFilter;
 	private JButton previewFilter;
-	
+	private Box filterConfigurationContent;
+	private JScrollPane scrollPane;	
 	private JPanel panel;
 
+	private mxCell selectedCell;
+	private MIFImage selectedMeltFile;
+	
 	public ImageView() {
-
 		// Left part is the original image
 		Box leftBox = Box.createVerticalBox();
 		imgPicture = new JLabel[2];
@@ -79,7 +83,6 @@ public class ImageView {
 		rightBox.add(getPreviewImage());
 		rightBox.add(Box.createVerticalStrut(5));
 		
-		
 		currentlyAppliedFilters = getCurrentlyAppliedFilters();
 		rightBox.add(currentlyAppliedFilters);
 		rightBox.add(Box.createVerticalStrut(5));
@@ -89,8 +92,6 @@ public class ImageView {
 		rightBox.add(Box.createVerticalGlue());
 		
 		selectedFilter.setSelectedItem("oldfilm");
-		
-		clearIcons();
 		
 		Box box = Box.createVerticalBox();
 		box.add(Box.createVerticalStrut(10));
@@ -127,10 +128,9 @@ public class ImageView {
 		Box dropDownBoxesBox = Box.createHorizontalBox();
 		resizeStyleLabel = new JLabel("Resizestyle: ");
 		dropDownBoxesBox.add(resizeStyleLabel);
-		String[] styleItems = Arrays.asList("HARD", "FILL", "CROP", "MANUAL").toArray(new String[4]);
-		resizeStyle = new JComboBox<>(styleItems);
+		resizeStyle = new JComboBox<>(ImageResizeStyle.values());
 		resizeStyle.addItemListener(getItemListener());
-		resizeStyle.setSelectedItem("CROP");
+		resizeStyle.setSelectedItem(ImageResizeStyle.CROP);
 		resizeStyle.setPreferredSize(new Dimension(80, 25));
 		resizeStyle.setMaximumSize(new Dimension(80, 25));
 		dropDownBoxesBox.add(resizeStyle);
@@ -145,7 +145,7 @@ public class ImageView {
 		dropDownBoxesBox.add(Box.createHorizontalStrut(10));
 		manualExtraction.addActionListener(e -> {
 			ManualSize manualSize = new ManualSize();
-			manualSize.showFrame((MIFImage)selectedMeltFile, resizeStyle);
+			manualSize.showFrame((MIFImage)selectedMeltFile, this);
 		});
 		dropDownBoxesBox.add(manualExtraction);
 
@@ -161,8 +161,6 @@ public class ImageView {
 		return dropDownBoxesBox;
 	}
 
-	private Box filterConfigurationContent;
-	private JScrollPane scrollPane;
 	private JScrollPane getSelectedFilterConfiguration() {
 		filterConfigurationContent = Box.createVerticalBox();
 
@@ -188,7 +186,6 @@ public class ImageView {
 	}
 	
 	private void updateCurrentlyAppliedFilters() {
-		// TODO Filter: After each filter there should be a small remove-icon
 		// TODO Filter: Each filter should be clickable: select from dropdown and set values as selected
 		if (selectedMeltFile != null) {
 			currentlyAppliedFilters.removeAll();
@@ -212,7 +209,7 @@ public class ImageView {
 				});
 				currentlyAppliedFilters.add(removeFilter);
 				
-				if (i!=filters.size()-1) {
+				if (i != filters.size() - 1) {
 					currentlyAppliedFilters.add(new JLabel(", "));
 				}
 			}
@@ -233,11 +230,10 @@ public class ImageView {
 		updateCurrentlyAppliedFilters();
 	}
 	
-	private MeltFilter currentlySelectedFilter = null;
 	private Box getAvailableFiltersBox() {
 		List<String> filters = new ArrayList<>();
 
-		for (MeltFilterDetails meltFilterDetails : melt.getMeltFilterDetails()) {
+		for (MeltFilterDetails meltFilterDetails : melt.getMeltVideoFilterDetails()) {
 			filters.add(meltFilterDetails.getFiltername());
 		}
 		
@@ -257,13 +253,10 @@ public class ImageView {
 					addFilter.setEnabled(true);
 				}
 			}
-			
 
 			MeltFilter meltFilter = new MeltFilter(filter);
 			showFilterConfiguration(meltFilter);
 			currentlySelectedFilter = meltFilter;
-			
-			
 		});
 		selectedFilter.setPreferredSize(new Dimension(240, 25));
 		selectedFilter.setMaximumSize(new Dimension(240, 25));
@@ -282,10 +275,9 @@ public class ImageView {
 		});
 		previewFilter = new JButton("preview");
 		previewFilter.addActionListener(e -> {
-
-			
 			StringBuilder sb  = new StringBuilder();
 			sb.append("melt ")
+				// TODO Filter: Preview: may be file-style has been changed to CROP, MANUAAL... 
 				.append(selectedMeltFile.getFile())
 				.append(" out=50 ");
 			for (MeltFilter currentlyAddedFilters : selectedMeltFile.getFilters()) {
@@ -303,7 +295,6 @@ public class ImageView {
 			for (String v : filterUsage.keySet()) {
 				sb.append(v).append("=").append(filterUsage.get(v)).append(" ");
 			}
-			// TODO 
 			sb.append(" -consumer sdl2 terminate_on_pause=1");
 			try {
 				String command = sb.toString();
@@ -311,14 +302,10 @@ public class ImageView {
 				MIFProject temp = new MIFProject();
 				temp.setWorkingDir("/tmp/");
 				new MIFProjectExecutor(temp).execute(command);
-				
-				System.err.println(command);
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}			
 		});
-		
 		
 		dropDownBoxesBox.add(addFilter);
 		dropDownBoxesBox.add(previewFilter);
@@ -335,7 +322,8 @@ public class ImageView {
 	private void showFilterConfiguration(MeltFilter meltFilter) {
 		filterConfigurationContent.removeAll();
 
-		MeltFilterDetails meltFilterDetails = new Melt().getMeltFilterDetailsFor(meltFilter);
+		MeltFilterDetails meltFilterDetails = 
+				melt.getMeltFilterDetailsFor(meltFilter);
 		
 		Map<String, Integer> configIndex = meltFilterDetails.getConfigIndex(); // parameter to integer
 		List<Map<String, String>> configuration = meltFilterDetails.getConfiguration();
@@ -372,8 +360,15 @@ public class ImageView {
 			horizontal.add(Box.createHorizontalStrut(10));
 			horizontal.add(description);
 			
-			// TODO Filter: show allowed values, if no minimum, maximum
-			JLabel minMax = new JLabel("min="+keyValue.get("minimum")+",max="+keyValue.get("maximum"));
+			String details = null;
+			if (keyValue.get("values") != null) {
+				details = "values="+keyValue.get("values");
+			} else if (keyValue.get("minimum") != null) {
+				details = "min="+keyValue.get("minimum")+",max="+keyValue.get("maximum");
+			} else {
+				details = "type="+keyValue.get("type");
+			}
+			JLabel minMax = new JLabel(details);
 			horizontal.add(Box.createHorizontalStrut(10));
 			horizontal.add(minMax);
 			
@@ -396,25 +391,29 @@ public class ImageView {
 		}
 	}
 	
-	@SuppressWarnings("unused")
-	private mxCell selectedCell;
-	private MIFFile selectedMeltFile;
-
-	public void update(mxCell cell, MIFFile meltFile) {
+	public void refreshFromManualSize() {
+		update(selectedCell, selectedMeltFile);
+	}
+	
+	public void update(mxCell cell, MIFImage meltFile) {
 		this.selectedMeltFile = meltFile;
 		this.selectedCell = cell;
 
-		String selectedItem = ((MIFImage) meltFile).getStyle();
+		ImageResizeStyle selectedItem = meltFile.getStyle();
 		resizeStyle.setSelectedItem(selectedItem);
-		// TODO Image: Enum for style
-		if (selectedItem.equals("CROP")) {
-			setSelectedPicture(((MIFImage) meltFile).getPreviewCrop());
-		} else if (selectedItem.contentEquals("FILL")) {
-			setSelectedPicture(((MIFImage) meltFile).getPreviewFillWColor());
-		} else if (selectedItem.equals("HARD")) {
-			setSelectedPicture(((MIFImage) meltFile).getPreviewHardResize());
-		} else if (selectedItem.equals("MANUAL")) {
-			setSelectedPicture(((MIFImage) meltFile).getPreviewManual());
+		switch (selectedItem) {
+			case CROP:
+				setSelectedPicture(meltFile.getPreviewCrop());
+				break;
+			case FILL:
+				setSelectedPicture(meltFile.getPreviewFillWColor());
+				break;
+			case HARD:
+				setSelectedPicture(meltFile.getPreviewHardResize());
+				break;
+			case MANUAL:
+				setSelectedPicture(meltFile.getPreviewManual());
+				break;
 		}
 		
 		updateCurrentlyAppliedFilters();
@@ -423,29 +422,29 @@ public class ImageView {
 	private ItemListener getItemListener() {
 		return e -> {
 			if (e.getStateChange() == ItemEvent.SELECTED && selectedMeltFile != null) {
-				String item = (String) e.getItem();
+				ImageResizeStyle item = (ImageResizeStyle) e.getItem();
 				((MIFImage) selectedMeltFile).setStyle(item);
 				
 				logger.info("Switching over '{}'", item);
 				switch (item) {
-				case "HARD":
+				case HARD:
 					imgPicture[1].setIcon(new ImageIcon(((MIFImage) selectedMeltFile).getPreviewHardResize()));
 					resizeStyleDetails.setVisible(false);
 					resizeStyleDetailsLabel.setVisible(false);
 					break;
-				case "FILL":
+				case FILL:
 					imgPicture[1].setIcon(new ImageIcon(((MIFImage) selectedMeltFile).getPreviewFillWColor()));
 					resizeStyleDetails.setVisible(true);
 					resizeStyleDetailsLabel.setVisible(true);
 					resizeStyleDetailsLabel.setText("Fill color:");
 					break;
-				case "CROP":
+				case CROP:
 					imgPicture[1].setIcon(new ImageIcon(((MIFImage) selectedMeltFile).getPreviewCrop()));
 					resizeStyleDetails.setVisible(true);
 					resizeStyleDetailsLabel.setVisible(true);
 					resizeStyleDetailsLabel.setText("Crop from where: ");
 					break;
-				case "MANUAL":
+				case MANUAL:
 					imgPicture[1].setIcon(new ImageIcon(((MIFImage) selectedMeltFile).getPreviewManual()));
 					resizeStyleDetails.setVisible(false);
 					resizeStyleDetailsLabel.setVisible(false);
@@ -462,34 +461,6 @@ public class ImageView {
 				panel.updateUI();
 			}
 		};
-	}
-
-	public void clearIcons() {
-		this.selectedMeltFile = null;
-		this.selectedCell = null;
-
-		imgPicture[0].setVisible(false);
-		imgPicture[1].setVisible(false);
-		manualExtraction.setVisible(false);
-
-		imgPicture[0].setIcon(null);
-		imgPicture[1].setIcon(null);
-
-		resizeStyleLabel.setVisible(false);
-		resizeStyle.setVisible(false);
-		resizeStyleDetailsLabel.setVisible(false);
-		resizeStyleDetails.setVisible(false);
-
-		selectedFilter.setVisible(false);
-		addFilter.setVisible(false);
-		previewFilter.setVisible(false);
-		lblCurrentlyAppliedFilters.setVisible(false);
-		filterConfigurationContent.setVisible(false);
-		scrollPane.setVisible(false);
-		
-		if (panel != null) {
-			panel.updateUI();
-		}
 	}
 
 	public void setPreviewPicture(String imagePreview) {

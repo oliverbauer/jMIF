@@ -136,7 +136,7 @@ public class VideoDetailsView {
 	
 	public void setDetails(MIFVideo mifVideo) {
 		this.mifVideo = mifVideo;
-		this.filename.setText(mifVideo.getFile());
+		this.filename.setText(mifVideo.getFile().getName());
 		this.displayName.setText(mifVideo.getDisplayName());
 		this.framelengthToDisplay.setText(String.valueOf(mifVideo.getFramelength()));
 		this.vFps.setText(String.valueOf(mifVideo.getFps()));
