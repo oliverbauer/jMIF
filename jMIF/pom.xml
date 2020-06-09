@@ -11,7 +11,7 @@
 	<modules>
 		<module>core</module>
 		<module>gui</module>
-		<module>server</module>
+<!--		<module>server</module> -->
 	</modules>
 
 	<properties>
