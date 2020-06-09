@@ -1,13 +1,11 @@
 /**
  * 
  */
-package io.github.jmif.server.rest;
+package io.github.jmif;
 
 import java.io.File;
 import java.util.Optional;
 
-import io.github.jmif.MIFException;
-import io.github.jmif.Service;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFProject;
@@ -16,12 +14,13 @@ import io.github.jmif.entities.MIFProject;
  * @author thebrunner
  *
  */
-public class ServiceDelegate {
+public class ServiceExecutor implements MIF {
 
 	private final Service service = new Service();
 
 	private final ThreadExecutor executor = new ThreadExecutor();
 
+	@Override
 	public long exportImage(MIFProject pr, String output, int frame) throws MIFException {
 		return executor.doIt(() -> {
 			service.exportImage(pr, output, frame);
@@ -29,6 +28,7 @@ public class ServiceDelegate {
 		});
 	}
 
+	@Override
 	public long convert(MIFProject pr, boolean preview) throws MIFException {
 		return executor.doIt(() -> {
 			service.convert(pr, preview);
@@ -36,6 +36,7 @@ public class ServiceDelegate {
 		});
 	}
 
+	@Override
 	public long updateFramerate(MIFProject project) {
 		return executor.doIt(() -> {
 			service.updateFramerate(project);
@@ -43,6 +44,7 @@ public class ServiceDelegate {
 		});
 	}
 
+	@Override
 	public long createWorkingDirs(MIFProject project) {
 		return executor.doIt(() -> {
 			service.createWorkingDirs(project);
@@ -50,12 +52,14 @@ public class ServiceDelegate {
 		});
 	}
 
+	@Override
 	public long createVideo(String file, String display, float frames, String dim, int overlay, String workingDir, int profileFramelength) throws MIFException {
 		return executor.doIt(() -> {
 			return service.createVideo(new File(file), display, frames, dim, overlay, workingDir, profileFramelength);
 		});
 	}
 
+	@Override
 	public long createPreview(MIFFile file, String workingDir) throws MIFException {
 		return executor.doIt(() -> {
 			service.createPreview(file, workingDir);
@@ -63,6 +67,7 @@ public class ServiceDelegate {
 		});
 	}
 
+	@Override
 	public long createManualPreview(MIFImage image) {
 		return executor.doIt(() -> {
 			service.createManualPreview(image);
@@ -70,36 +75,28 @@ public class ServiceDelegate {
 		});
 	}
 
+	@Override
 	public long createImage(String file, String display, float frames, String dim, int overlay, String workingDir, int framelength) throws MIFException {
 		return executor.doIt(() -> {
 			return service.createImage(new File(file), display, frames, dim, overlay, workingDir, framelength);
 		});
 	}
 
+	@Override
 	public long createAudio(String path) throws MIFException {
 		return executor.doIt(() -> {
 			return service.createAudio(path);
 		});
 	}
 
+	@Override
 	public long getProfiles() throws MIFException {
 		return executor.doIt(() -> {
 			return service.getProfiles();
 		});
 	}
 
-	public long getFilters() throws MIFException {
-		return executor.doIt(() -> {
-			return service.getFilters();
-		});
-	}
-
-	public long getFilterDetails(String filter) throws MIFException {
-		return executor.doIt(() -> {
-			return service.getFilterDetails(filter);
-		});
-	}
-
+	@Override
 	public Optional<?> get(long id) throws MIFException {
 		return executor.get(id);
 	}

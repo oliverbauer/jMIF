@@ -12,14 +12,17 @@ import io.github.jmif.Service;
 import io.github.jmif.entities.MeltFilter;
 
 public class ProjectXmlTests {
+	
+	private final Service service = new Service();
+	
 	@Test
 	public void simpleImage() throws Exception {
 		var tempDir = Files.createTempDirectory("jMIF").toFile();
 
 		var project = new GraphWrapper();
-		new Service().updateFramerate(project.getPr());
+		service.updateFramerate(project.getPr());
 		project.getPr().setWorkingDir(tempDir.getAbsolutePath());
-		new Service().createWorkingDirs(project.getPr());
+		service.createWorkingDirs(project.getPr());
 		project.getPr().setFileOfProject(project.getPr().getWorkingDir() + "defaultproject.xml");
 		project.getPr().setOutputVideo(project.getPr().getWorkingDir()+"output.avi");
 		FileUtils.copyInputStreamToFile(JMIF.class.getClassLoader().getResourceAsStream("defaultproject/1.JPG"),
@@ -34,9 +37,9 @@ public class ProjectXmlTests {
 		var tempDir = Files.createTempDirectory("jMIF").toFile();
 
 		var project = new GraphWrapper();
-		new Service().updateFramerate(project.getPr());
+		service.updateFramerate(project.getPr());
 		project.getPr().setWorkingDir(tempDir.getAbsolutePath());
-		new Service().createWorkingDirs(project.getPr());
+		service.createWorkingDirs(project.getPr());
 		project.getPr().setFileOfProject(project.getPr().getWorkingDir() + "defaultproject.xml");
 		project.getPr().setOutputVideo(project.getPr().getWorkingDir()+"output.avi");
 		FileUtils.copyInputStreamToFile(JMIF.class.getClassLoader().getResourceAsStream("defaultproject/1.JPG"),

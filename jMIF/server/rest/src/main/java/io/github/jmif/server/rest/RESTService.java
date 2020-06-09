@@ -14,7 +14,9 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.github.jmif.MIF;
 import io.github.jmif.MIFException;
+import io.github.jmif.ServiceExecutor;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFProject;
@@ -26,7 +28,7 @@ import io.github.jmif.entities.MIFProject;
 @ApplicationPath("/jmif")
 public class RESTService extends Application {
 
-	private final ServiceDelegate delegate = new ServiceDelegate();
+	private final MIF delegate = new ServiceExecutor();
 	
 	@GET
 	@Path("/get/{id}")
@@ -102,19 +104,6 @@ public class RESTService extends Application {
 	@Path("/getProfiles")
 	public Response getProfiles() throws MIFException {
 		return Response.accepted(delegate.getProfiles()).build();
-	}
-
-	@POST
-	@Path("/getFilters")
-	public Response getFilters() throws MIFException {
-		return Response.accepted(delegate.getFilters()).build();
-	}
-	
-	@POST
-	@Path("/getFilterDetails")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response getFilterDetails(String filter) throws MIFException {
-		return Response.accepted(delegate.getFilterDetails(filter)).build();
 	}
 
 }

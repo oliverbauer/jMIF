@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import com.mxgraph.model.mxCell;
 
 import io.github.jmif.MIFException;
-import io.github.jmif.Service;
 import io.github.jmif.config.Configuration;
 import io.github.jmif.entities.MIFAudioFile;
 import io.github.jmif.entities.MIFFile;
@@ -35,14 +34,14 @@ public class GraphView {
 	private static final Logger logger = LoggerFactory.getLogger(GraphView.class);
 	
 	private JFrame frame;
-	private GraphWrapper mifProject;
+	private GraphWrapper graphWrapper;
 	private SelectionView mifPanel;
 	
 	private Box graphPanel;
 	
-	public GraphView(JFrame frame, GraphWrapper mifProject, SelectionView mifPanel) {
+	public GraphView(JFrame frame, GraphWrapper graphWrapper, SelectionView mifPanel) {
 		this.frame = frame;
-		this.mifProject = mifProject;
+		this.graphWrapper = graphWrapper;
 		this.mifPanel = mifPanel;
 	}
 	
@@ -79,7 +78,7 @@ public class GraphView {
 		addRemoveForTracksBox.add(verticalAddRemove);
 		addRemoveForTracksBox.add(Box.createHorizontalStrut(5));
 		
-		addRemoveForTracksBox.add(mifProject.getGraphComponent());
+		addRemoveForTracksBox.add(graphWrapper.getGraphComponent());
 		addRemoveForTracksBox.add(Box.createHorizontalStrut(10));
 		graphPanel.add(addRemoveForTracksBox);
 	}
@@ -98,8 +97,8 @@ public class GraphView {
 					
 					int returnVal = c.showOpenDialog(frame);
 					if (returnVal == JFileChooser.APPROVE_OPTION) {
-						mifProject.createMIFAudioFile(c.getSelectedFile());
-						mifProject.redrawGraph();
+						graphWrapper.createMIFAudioFile(c.getSelectedFile());
+						graphWrapper.redrawGraph();
 					}
 				} catch (HeadlessException | MIFException e1) {
 					e1.printStackTrace();
@@ -140,20 +139,20 @@ public class GraphView {
 					for (File fileToAdd : selectedFiles) {
 						MIFFile f;
 						try {
-							f = mifProject.createMIFFile(fileToAdd);
+							f = graphWrapper.createMIFFile(fileToAdd);
 							added.add(f);
 						} catch (MIFException | IOException | InterruptedException e1) {
 							logger.error("Unable to create file", e1);
 						}
 					}
-					mifProject.redrawGraph();
+					graphWrapper.redrawGraph();
 					
 					// Exec background threads...
 					ExecutorService executor = Executors.newWorkStealingPool();
 					for (MIFFile f : added) {
 						executor.submit(() -> {
 							try {
-								new Service().createPreview(f, mifProject.getPr().getWorkingDir());
+								graphWrapper.getService().createPreview(f, graphWrapper.getPr().getWorkingDir());
 							} catch (Exception ex) {
 								logger.error("", e);
 							}
@@ -199,20 +198,20 @@ public class GraphView {
 	}
 	
 	public void remove(mxCell cell, MIFFile meltfile) {
-		mifProject.remove(meltfile, cell);
-		mifProject.remove(cell);
+		graphWrapper.remove(meltfile, cell);
+		graphWrapper.remove(cell);
 
 		mifPanel.clearSelection();
 		// Timeline etc.
-		mifProject.redrawGraph();
+		graphWrapper.redrawGraph();
 	}
 	
 	public void remove(mxCell cell, MIFAudioFile meltfile) {
-		mifProject.remove(meltfile, cell);
-		mifProject.remove(cell);
+		graphWrapper.remove(meltfile, cell);
+		graphWrapper.remove(cell);
 
 		mifPanel.clearSelection();
 		// Timeline etc.
-		mifProject.redrawGraph();
+		graphWrapper.redrawGraph();
 	}
 }

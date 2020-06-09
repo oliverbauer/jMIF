@@ -45,6 +45,8 @@ import io.github.jmif.util.TimeUtil;
 public class GraphWrapper {
 	private static final Logger logger = LoggerFactory.getLogger(GraphWrapper.class);
 	
+	private final Service service = new Service();
+	
 	private Map<mxCell, MIFFile> nodeToMIFFile;
 	private Map<mxCell, MIFAudioFile> nodeToMIFAudio;
 
@@ -115,7 +117,7 @@ public class GraphWrapper {
 				
 				executor.submit(() -> {
 					try {
-						new Service().createPreview(mifFile, project.getWorkingDir());
+						service.createPreview(mifFile, project.getWorkingDir());
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -143,7 +145,7 @@ public class GraphWrapper {
 		
 		if (file.endsWith("mp3") || file.endsWith("MP3")) {
 			// TODO Service
-			var audioFile = new Service().createAudio(fileToAdd.getAbsolutePath());
+			var audioFile = service.createAudio(fileToAdd.getAbsolutePath());
 			
 			var v1 = insertVertex(
 				"mp3",
@@ -166,7 +168,7 @@ public class GraphWrapper {
 		if (file.endsWith("JPG") || file.endsWith("jpg")) {
 			var display = file.substring(file.lastIndexOf('/') + 1);
 
-			var image = new Service().createImage(fileToAdd, display, 5*pr.getFramerate(), "-1x-1", pr.getFramerate(), pr.getWorkingDir(), pr.getFramerate());
+			var image = service.createImage(fileToAdd, display, 5*pr.getFramerate(), "-1x-1", pr.getFramerate(), pr.getWorkingDir(), pr.getFramerate());
 
 			if (!pr.getMIFFiles().isEmpty()) {
 				currentLength -= image.getOverlayToPrevious();
@@ -185,7 +187,7 @@ public class GraphWrapper {
 			return image;
 		} else if (file.endsWith("mp4") || file.endsWith("MP4")) {
 			var display = file.substring(file.lastIndexOf('/') + 1);
-			var video = new Service().createVideo(fileToAdd, display, -1, "1920x1080", pr.getFramerate(), pr.getWorkingDir(), pr.getFramerate());
+			var video = service.createVideo(fileToAdd, display, -1, "1920x1080", pr.getFramerate(), pr.getWorkingDir(), pr.getFramerate());
 
 			if (!pr.getMIFFiles().isEmpty()) {
 				currentLength -= video.getOverlayToPrevious();
@@ -447,7 +449,7 @@ public class GraphWrapper {
 	    		
 			// TODO Use temp dir...
 			var output = pr.getWorkingDir()+"frame-"+frame+".jpg";
-			new Service().exportImage(pr, output, frame);
+			service.exportImage(pr, output, frame);
 	    		
 			logger.info("Created image for frame {} in {}", frame, TimeUtil.getMessage(time));
 			
@@ -531,5 +533,9 @@ public class GraphWrapper {
 
 	public boolean isSingleFrameNode(mxCell cell) {
 		return cell == framePreview;
+	}
+
+	public Service getService() {
+		return service;
 	}
 }

@@ -25,7 +25,6 @@ import org.imgscalr.Scalr.Mode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.jmif.Service;
 import io.github.jmif.config.Configuration;
 import io.github.jmif.gui.swing.GraphWrapper;
 
@@ -34,12 +33,12 @@ public class ImageLibraryView {
 	
 	private Box box;
 	private JScrollPane scrollPane;
-	private GraphWrapper mifProject;
+	private GraphWrapper graphWrapper;
 	
 	private Box newBox;
 	
-	public ImageLibraryView(GraphWrapper mifProject) {
-		this.mifProject = mifProject;
+	public ImageLibraryView(GraphWrapper graphWrapper) {
+		this.graphWrapper = graphWrapper;
 		box = Box.createVerticalBox();
 		
 		JButton chooseDirectory = new JButton("Select directory");
@@ -140,8 +139,8 @@ public class ImageLibraryView {
 					var executor = Executors.newWorkStealingPool();
 					executor.submit(() -> {
 						try {
-							var file1 = mifProject.createMIFFile(f);
-							new Service().createPreview(file1, mifProject.getPr().getWorkingDir());
+							var file1 = graphWrapper.createMIFFile(f);
+							graphWrapper.getService().createPreview(file1, graphWrapper.getPr().getWorkingDir());
 						} catch (Exception ex) {
 							logger.error("", ex);
 						}

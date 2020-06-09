@@ -28,15 +28,15 @@ import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 
-import io.github.jmif.Service;
 import io.github.jmif.entities.MIFImage;
+import io.github.jmif.gui.swing.GraphWrapper;
 
 public class ManualSize {
 	private static final Logger logger = LoggerFactory.getLogger(ManualSize.class);
-	
+
 	private String command = null;
 	
-	public void showFrame(MIFImage mifImage, ImageView imageView) {
+	public void showFrame(final GraphWrapper graphWrapper, MIFImage mifImage, ImageView imageView) {
 		JFrame frame = new JFrame();
 		JPanel panel = new JPanel(new BorderLayout());
 
@@ -157,8 +157,7 @@ public class ManualSize {
 		JButton cancel = new JButton("Cancel");
 		ok.addActionListener(event -> {
 			mifImage.setManualStyleCommand(command);
-			// TODO Service
-			new Service().createManualPreview(mifImage);
+			graphWrapper.getService().createManualPreview(mifImage);
 			imageView.refreshFromManualSize();
 			frame.dispose();
 		});

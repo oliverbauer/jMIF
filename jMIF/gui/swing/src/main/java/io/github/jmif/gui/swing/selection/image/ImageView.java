@@ -31,12 +31,14 @@ import org.slf4j.LoggerFactory;
 
 import com.mxgraph.model.mxCell;
 
+import io.github.jmif.MIFException;
 import io.github.jmif.builder.MIFProjectExecutor;
 import io.github.jmif.config.Configuration;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFImage.ImageResizeStyle;
 import io.github.jmif.entities.MIFProject;
 import io.github.jmif.entities.MeltFilter;
+import io.github.jmif.gui.swing.GraphWrapper;
 import io.github.jmif.melt.Melt;
 import io.github.jmif.melt.MeltFilterDetails;
 
@@ -45,6 +47,8 @@ public class ImageView {
 	
 	private static final Logger logger = LoggerFactory.getLogger(ImageView.class);
 
+	private final GraphWrapper graphWrapper;
+	
 	private MeltFilter currentlySelectedFilter = null;
 	private JLabel[] imgPicture;
 
@@ -66,7 +70,10 @@ public class ImageView {
 	private mxCell selectedCell;
 	private MIFImage selectedMeltFile;
 	
-	public ImageView() {
+	public ImageView(final GraphWrapper graphWrapper) throws MIFException {
+		
+		this.graphWrapper = graphWrapper;
+		
 		// Left part is the original image
 		Box leftBox = Box.createVerticalBox();
 		imgPicture = new JLabel[2];
@@ -145,7 +152,7 @@ public class ImageView {
 		dropDownBoxesBox.add(Box.createHorizontalStrut(10));
 		manualExtraction.addActionListener(e -> {
 			ManualSize manualSize = new ManualSize();
-			manualSize.showFrame((MIFImage)selectedMeltFile, this);
+			manualSize.showFrame(graphWrapper, (MIFImage)selectedMeltFile, this);
 		});
 		dropDownBoxesBox.add(manualExtraction);
 
@@ -230,33 +237,37 @@ public class ImageView {
 		updateCurrentlyAppliedFilters();
 	}
 	
-	private Box getAvailableFiltersBox() {
+	private Box getAvailableFiltersBox() throws MIFException {
 		List<String> filters = new ArrayList<>();
 
-		for (MeltFilterDetails meltFilterDetails : melt.getMeltVideoFilterDetails()) {
+		for (MeltFilterDetails meltFilterDetails : graphWrapper.getService().getMeltVideoFilterDetails(melt)) {
 			filters.add(meltFilterDetails.getFiltername());
 		}
 		
 		selectedFilter = new JComboBox<>(filters.toArray(new String[filters.size()]));
 		selectedFilter.addItemListener(e -> {
-			if (e.getStateChange() == ItemEvent.DESELECTED) {
-				return;
-			}
-			
-			String filter = (String)selectedFilter.getSelectedItem();
-
-			if (selectedMeltFile != null) {
-				// do not add a filter twice
-				if (selectedMeltFile.getFilters().stream().map(MeltFilter::getFiltername).collect(Collectors.toSet()).contains(filter)) {
-					addFilter.setEnabled(false);
-				} else {
-					addFilter.setEnabled(true);
+			try {
+				if (e.getStateChange() == ItemEvent.DESELECTED) {
+					return;
 				}
-			}
+				
+				String filter = (String)selectedFilter.getSelectedItem();
 
-			MeltFilter meltFilter = new MeltFilter(filter);
-			showFilterConfiguration(meltFilter);
-			currentlySelectedFilter = meltFilter;
+				if (selectedMeltFile != null) {
+					// do not add a filter twice
+					if (selectedMeltFile.getFilters().stream().map(MeltFilter::getFiltername).collect(Collectors.toSet()).contains(filter)) {
+						addFilter.setEnabled(false);
+					} else {
+						addFilter.setEnabled(true);
+					}
+				}
+
+				MeltFilter meltFilter = new MeltFilter(filter);
+				showFilterConfiguration(meltFilter);
+				currentlySelectedFilter = meltFilter;
+			} catch (MIFException e1) {
+				logger.error("", e);
+			}
 		});
 		selectedFilter.setPreferredSize(new Dimension(240, 25));
 		selectedFilter.setMaximumSize(new Dimension(240, 25));
@@ -319,11 +330,11 @@ public class ImageView {
 		return dropDownBoxesBox;
 	}
 	
-	private void showFilterConfiguration(MeltFilter meltFilter) {
+	private void showFilterConfiguration(MeltFilter meltFilter) throws MIFException {
 		filterConfigurationContent.removeAll();
 
 		MeltFilterDetails meltFilterDetails = 
-				melt.getMeltFilterDetailsFor(meltFilter);
+				graphWrapper.getService().getMeltFilterDetailsFor(melt, meltFilter);
 		
 		Map<String, Integer> configIndex = meltFilterDetails.getConfigIndex(); // parameter to integer
 		List<Map<String, String>> configuration = meltFilterDetails.getConfiguration();
