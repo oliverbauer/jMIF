@@ -6,6 +6,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,9 +18,12 @@ import io.github.jmif.builder.MIFProjectExecutor;
 import io.github.jmif.entities.MIFAudioFile;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
+import io.github.jmif.entities.MIFImage.ImageResizeStyle;
 import io.github.jmif.entities.MIFProject;
 import io.github.jmif.entities.MIFVideo;
-import io.github.jmif.entities.MIFImage.ImageResizeStyle;
+import io.github.jmif.entities.MeltFilter;
+import io.github.jmif.melt.Melt;
+import io.github.jmif.melt.MeltFilterDetails;
 
 /**
  * @author thebrunner
@@ -155,11 +162,9 @@ public class Service {
 		}
 
 		// set images...
-		var previewImages = new String[10];
 		for (int i = 1; i <= 10; i++) {
-			previewImages[i - 1] = workingDir+"/preview/"+"_low_"+filename+"_"+i+".png";
+			video.addPreviewImage(workingDir+"/preview/"+"_low_"+filename+"_"+i+".png");
 		}
-		video.setPreviewImages(previewImages);
 
 		return video;
 	}
@@ -172,13 +177,13 @@ public class Service {
 		}
 	}
 
-	private void createPreview(MIFVideo videoO, String workingDir) throws MIFException {
-		var filename = videoO.getFile().getName();
-		var video = workingDir+"/orig/"+filename;
+	private void createPreview(MIFVideo video, String workingDir) throws MIFException {
+		var filename = video.getFile().getName();
+		var videoFileName = workingDir+"/orig/"+filename;
 
-		if (videoO.getWidth() == -1 || videoO.getHeight() == -1) {
+		if (video.getWidth() == -1 || video.getHeight() == -1) {
 			logger.info("Init: Check Width/Height");
-			var command = "ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 " + video;
+			var command = "ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 " + videoFileName;
 			Process process;
 			try {
 				process = new ProcessBuilder("bash", "-c", command)
@@ -199,8 +204,8 @@ public class Service {
 			} catch (IOException e) {
 				throw new MIFException(e);
 			}
-			videoO.setWidth(Integer.valueOf(output.substring(0, output.indexOf('x'))));
-			videoO.setHeight(Integer.valueOf(output.substring(output.indexOf('x') + 1)));
+			video.setWidth(Integer.valueOf(output.substring(0, output.indexOf('x'))));
+			video.setHeight(Integer.valueOf(output.substring(output.indexOf('x') + 1)));
 		} else {
 			logger.debug("Init: Width/Height already known");
 		}
@@ -212,7 +217,7 @@ public class Service {
 		var videoLowQuality = workingDir+"/preview/_low_"+filename;
 		if (!new File(videoLowQuality).exists()) {
 			logger.info("Init: Create Preview-Video (low quality) {}", videoLowQuality);
-			var command = "ffmpeg -y -i " + video + " -vf scale=320:-1 -c:v libx264 -crf 0 -an -r 25 -preset ultrafast "+videoLowQuality;
+			var command = "ffmpeg -y -i " + videoFileName + " -vf scale=320:-1 -c:v libx264 -crf 0 -an -r 25 -preset ultrafast "+videoLowQuality;
 			try {
 				new ProcessBuilder("bash", "-c", command)
 				.directory(new File(workingDir))
@@ -229,8 +234,8 @@ public class Service {
 		/*
 		 * 10 images from the video 
 		 */
-		var previewImages = videoO.getPreviewImages();
-		var cnt = (int) (videoO.getFramelength() / 10);
+		video.getPreviewImages().clear();
+		var cnt = (int) (video.getFramelength() / 10);
 		for (int i = 1; i <= 10; i++) {
 			var image = workingDir+"/preview/_low_"+filename+"_"+i+".png";
 			if (!new File(image).exists()) {
@@ -246,12 +251,11 @@ public class Service {
 				} catch (InterruptedException | IOException e) {
 					throw new MIFException(e);
 				}
-				previewImages[i - 1] = image;
+				video.addPreviewImage(image);
 			} else {
 				logger.debug("Init: Preview-Video-Image {} already computed", image);
 			}
 		}
-		videoO.setPreviewImages(previewImages);
 	}
 
 	public void createManualPreview(MIFImage image) {
@@ -551,7 +555,7 @@ public class Service {
 		}
 	}
 	
-	public List<String> getFilters() throws MIFException {
+	private List<String> getFilters() throws MIFException {
 		try {
 			List<String> filters = new ArrayList<>();
 			Process process = new ProcessBuilder("bash", "-c", "melt -query \"filters\"")
@@ -574,7 +578,7 @@ public class Service {
 		}
 	}
 	
-	public List<String> getFilterDetails(String filter) throws MIFException {
+	private List<String> getFilterDetails(String filter) throws MIFException {
 		try {
 			List<String> filterDetails = new ArrayList<>();
 			Process process = new ProcessBuilder("bash", "-c", "melt -query \"filter\"="+filter)
@@ -590,5 +594,136 @@ public class Service {
 		} catch (IOException | InterruptedException e) {
 			throw new MIFException(e);
 		}
+	}
+	
+	private List<MeltFilterDetails> save(Melt melt) throws MIFException {
+		var meltFilters = melt.getMeltFilterDetails();
+		
+		// TODO read/write an input xml containing the result of the following expensive output
+		try {
+			List<String> filterNames = getFilters();
+			logger.info("Filter {} loaded", filterNames.size());
+			
+			for (String filter: filterNames) {
+				List<String> details = getFilterDetails(filter);
+				
+				// E.g. oldfilm has 8 parameter...
+				MeltFilterDetails meltFilter = new MeltFilterDetails(filter);
+				
+				boolean parametersStarted = false;
+				boolean valuesStarted = false;
+				String currentParameter = null;
+				for (String d : details) {
+					if (!parametersStarted) {
+						if (d.contains(":")) {
+							String parts[] = d.split(":");
+							
+							if (parts.length == 2) {
+								meltFilter.addGeneralInformations(parts[0].trim(), parts[1].trim());
+							} else {
+								meltFilter.addGeneralInformations(parts[0].trim(), "tags...");
+							}
+						} else {
+							if (d.contains("Video")) {
+								meltFilter.addGeneralInformations("tags", "Video");
+							} else if (d.contains("Audio")) {
+								meltFilter.addGeneralInformations("tags", "Audio");
+							}
+						}
+					}
+					
+					if (d.contains("parameters:")) {
+						parametersStarted = true;
+						valuesStarted = false;
+					} else if (d.contains("identifier:") && parametersStarted) {
+						currentParameter = d.substring(d.indexOf("identifier: ")+"identifier: ".length());
+						meltFilter.appendConfigurationParameter(currentParameter); // z.B. delta, every, brightnessdelta_up, ...
+						valuesStarted = false;
+					} else if (d.contains("values") && parametersStarted) {
+						valuesStarted = true;
+					} else if (parametersStarted) {
+						// Extract parameter details...
+						d = d.trim();
+						if (d.contains(":")) {
+							valuesStarted = false;
+							
+							String key = d.substring(0, d.indexOf(':')).trim();
+							String description = d.substring(d.indexOf(':')+1).trim();
+	
+							meltFilter.appendConfigurationDetail(currentParameter, key, description);
+						} else {
+							if (valuesStarted) {
+								d = d.replace("-", "");
+								d = d.trim();
+								
+								// ... is last line
+								if (!d.contentEquals("...")) {
+									meltFilter.appendAllowedValueForParameter(currentParameter, d);
+								}
+							}
+						}
+					}
+				}
+				
+				logger.info("-{} done", filter);
+				
+				meltFilters.add(meltFilter);
+			}
+			
+			var context = JAXBContext.newInstance(Melt.class);
+			var marshaller = context.createMarshaller();
+			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+			marshaller.marshal(melt, new File("meltfilterdetails.xml"));
+			
+			logger.info("Saved 'meltfilterdetails.xml'");
+		} catch (Exception e) {
+			throw new MIFException(e);
+		}
+		return meltFilters;
+	}
+	
+	private List<MeltFilterDetails> getOrLoad(Melt melt) throws MIFException {
+		var meltFilters = melt.getMeltFilterDetails();
+		if (!meltFilters.isEmpty()) {
+			return meltFilters;
+		}
+		
+		if (new File("meltfilterdetails.xml").exists()) {
+			try {
+				var context = JAXBContext.newInstance(Melt.class);
+				var unmarshaller = context.createUnmarshaller();
+				Melt m = (Melt) unmarshaller.unmarshal(new File("meltfilterdetails.xml"));
+			
+				meltFilters.addAll(m.getMeltFilterDetails());
+				
+				logger.info("Loaded 'meltfilterdetails.xml'");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			return meltFilters;
+		} else {
+			return save(melt);
+		}
+	}
+	
+	public List<MeltFilterDetails> getMeltVideoFilterDetails(Melt melt) throws MIFException {
+		return getOrLoad(melt)
+			.stream()
+			.filter(i -> i.getGeneralInformations().containsKey("tags"))
+			.filter(i -> i.getGeneralInformations().get("tags").equals("Video"))
+			.collect(Collectors.toList());
+	}
+	
+	public List<MeltFilterDetails> getMeltAudioFilterDetails(Melt melt) throws MIFException {
+		return getOrLoad(melt)
+			.stream()
+			.filter(i -> i.getGeneralInformations().containsKey("tags"))
+			.filter(i -> i.getGeneralInformations().get("tags").equals("Audio"))
+			.collect(Collectors.toList());
+	}
+	
+	public MeltFilterDetails getMeltFilterDetailsFor(Melt melt, MeltFilter meltFilter) throws MIFException {
+		return getOrLoad(melt).stream().filter(mdf -> mdf.getFiltername().contentEquals(meltFilter.getFiltername())).findAny().get();
 	}
 }

@@ -16,17 +16,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.jmif.MIFException;
-import io.github.jmif.Service;
 import io.github.jmif.config.Configuration;
 import io.github.jmif.gui.swing.GraphWrapper;
 import io.github.jmif.gui.swing.listener.ProjectListener.type;
 import io.github.jmif.gui.swing.menu.util.ButtonFactory;
 
 public class MenuView {
-	private JPanel panel;
 	private static final Logger logger = LoggerFactory.getLogger(MenuView.class);
+
+	private JPanel panel;
 	
-	public MenuView(final GraphWrapper mifProject) {
+	public MenuView(final GraphWrapper graphWrapper) {
 		panel = new JPanel();
 		panel.setLayout(new BorderLayout());
 		panel.setBackground(Configuration.bgColor);
@@ -45,8 +45,8 @@ public class MenuView {
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File project = c.getSelectedFile();
 				 if(!project.exists()) {
-					 mifProject.getPr().setFileOfProject(project.getAbsolutePath());
-					 mifProject.informListeners(type.NEW_PROJECT);
+					 graphWrapper.getPr().setFileOfProject(project.getAbsolutePath());
+					 graphWrapper.informListeners(type.NEW_PROJECT);
 				 }
 			}
 		});
@@ -64,9 +64,9 @@ public class MenuView {
 				
 				logger.info("Loading {}", project.getAbsolutePath());
 				
-				mifProject.getPr().setFileOfProject(project.getAbsolutePath());
+				graphWrapper.getPr().setFileOfProject(project.getAbsolutePath());
 				try {
-					mifProject.load();
+					graphWrapper.load();
 				} catch (MIFException | IOException | InterruptedException e1) {
 					logger.error("Unable to load project", e1);
 				}
@@ -79,7 +79,7 @@ public class MenuView {
 		Box saveBox = Box.createVerticalBox();
 		JButton saveButton = ButtonFactory.newButton("/images/svg/menuButtonQuadSave.svg", "/images/svg/menuButtonQuadSaveHover.svg");
 		saveButton.addActionListener(e -> { 
-			mifProject.save();
+			graphWrapper.save();
 		});
 		saveBox.add(saveButton);
 		horizontalBox.add(saveBox);
@@ -91,13 +91,11 @@ public class MenuView {
 		Box previewBox = Box.createVerticalBox();
 		JButton previewButton = ButtonFactory.newButton("/images/svg/menuButtonQuadPreview.svg", "/images/svg/menuButtonQuadPreviewHover.svg");
 		previewButton.addActionListener(e -> {
-			boolean preview = true;
-			
 			SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 				@Override
 			    public Void doInBackground() {
 		        	try {
-		        		new Service().convert(mifProject.getPr(), preview);
+		        		graphWrapper.getService().convert(graphWrapper.getPr(), true);
 		        	} catch (Exception e1) {
 		        		logger.error("Unable to create preview video", e1);
 		        	}
@@ -114,13 +112,11 @@ public class MenuView {
 		Box renderBox = Box.createVerticalBox();
 		JButton renderButton = ButtonFactory.newButton("/images/svg/menuButtonQuadRender.svg", "/images/svg/menuButtonQuadRenderHover.svg");
 		renderButton.addActionListener(e -> {
-			boolean preview = false;
-			
 			SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 				@Override
 			    public Void doInBackground() {
 		        	try {
-		        		new Service().convert(mifProject.getPr(), preview);
+		        		graphWrapper.getService().convert(graphWrapper.getPr(), false);
 		        	} catch (Exception e1) {
 		        		logger.error("Unable to render project", e1);
 		        	}

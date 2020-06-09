@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import com.mxgraph.model.mxCell;
 
+import io.github.jmif.MIFException;
 import io.github.jmif.config.Configuration;
 import io.github.jmif.entities.MIFAudioFile;
 import io.github.jmif.entities.MIFFile;
@@ -52,15 +53,15 @@ public class SelectionView {
 	
 	private FrameView singleFrameView;
 
-    public SelectionView(GraphWrapper mifProject) {
+    public SelectionView(GraphWrapper graphWrapper) throws MIFException {
 		panel = Box.createVerticalBox();
 		tabPane = new JTabbedPane();
-		imageDetailsView = new ImageDetailsView(mifProject);
-		videoDetailsView = new VideoDetailsView(mifProject);
-		audioDetailsView = new AudioDetailsView(mifProject);
+		imageDetailsView = new ImageDetailsView(graphWrapper);
+		videoDetailsView = new VideoDetailsView(graphWrapper);
+		audioDetailsView = new AudioDetailsView(graphWrapper);
 		
 		int w = 5500;
-		imageView = new ImageView();
+		imageView = new ImageView(graphWrapper);
 		int h = 550;
 		
 		videoView = new VideoView();
@@ -82,7 +83,7 @@ public class SelectionView {
 		}
 		
 		singleFrameView = new FrameView();
-		mifProject.addSingleFrameCreatedListener(singleFrameView);
+		graphWrapper.addSingleFrameCreatedListener(singleFrameView);
 		Box singleFrameBox = singleFrameView.getBox();
 		singleFrameBox.setMinimumSize(new Dimension(w, h));
 		singleFrameBox.setPreferredSize(new Dimension(w, h));
@@ -95,7 +96,7 @@ public class SelectionView {
 		tabPane.addTab("VideoView", wrap(videoDetailsView.getBox(), videoPanel));
 		tabPane.addTab("AudioView", wrap(audioDetailsView.getBox(), null));
 		tabPane.addTab("FrameView", wrap(null,                     singleFrameBox));
-		tabPane.addTab("ImageLibrary", wrap(new ImageLibraryView(mifProject).getBox(), null));
+		tabPane.addTab("ImageLibrary", wrap(new ImageLibraryView(graphWrapper).getBox(), null));
 		tabPane.setSelectedIndex(4);
 		tabPane.setEnabledAt(0, false);
 		tabPane.setEnabledAt(1, false);
@@ -181,8 +182,7 @@ public class SelectionView {
 			tabPane.setEnabledAt(3, false);
 
 			
-			String[] previewImages = ((MIFVideo)meltFile).getPreviewImages();
-			videoView.setIcons(previewImages);
+			videoView.setIcons(((MIFVideo)meltFile).getPreviewImages());
 			videoDetailsView.setDetails( ((MIFVideo)meltFile));
 		}
 

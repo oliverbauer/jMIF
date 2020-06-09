@@ -28,7 +28,6 @@ import com.mxgraph.util.mxEvent;
 import com.mxgraph.view.mxGraphSelectionModel;
 
 import io.github.jmif.MIFException;
-import io.github.jmif.Service;
 import io.github.jmif.config.Configuration;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.gui.swing.graph.GraphView;
@@ -115,15 +114,14 @@ public class JMIF {
 		horizontalBox.add(output);
 		horizontalBox.add(Box.createHorizontalGlue());
 		
-		List<String> profiles = new Service().getProfiles();
+		List<String> profiles = graphWrapper.getService().getProfiles();
 		
 		JComboBox<String> profilesCombobox = new JComboBox<>(profiles.toArray(new String[profiles.size()]));
 		profilesCombobox.setSelectedItem(graphWrapper.getPr().getProfile());
 		profilesCombobox.addItemListener((itemEvent) -> {
 			String item = (String)profilesCombobox.getSelectedItem();
 			graphWrapper.getPr().setProfile(item);
-			// TODO Service
-			new Service().updateFramerate(graphWrapper.getPr());
+			graphWrapper.getService().updateFramerate(graphWrapper.getPr());
 			// TODO Profile-Change: Needs full refresh of all nodes, timeline etc. pp
 			// TODO Profile-Change: Change overlay
 		});
@@ -166,11 +164,9 @@ public class JMIF {
 
 		var project = new GraphWrapper();
 		project.getPr().setProfile(profile);
-		// TODO Service
-		new Service().updateFramerate(project.getPr());
+		project.getService().updateFramerate(project.getPr());
 		project.getPr().setWorkingDir(tempDir.getAbsolutePath());
-		// TODO Service
-		new Service().createWorkingDirs(project.getPr());
+		project.getService().createWorkingDirs(project.getPr());
 		project.getPr().setFileOfProject(project.getPr().getWorkingDir() + "defaultproject.xml");
 		project.getPr().setOutputVideo(project.getPr().getWorkingDir()+"output.avi");
 		FileUtils.copyInputStreamToFile(JMIF.class.getClassLoader().getResourceAsStream("defaultproject/1.JPG"),
@@ -201,11 +197,11 @@ public class JMIF {
 		var executor = Executors.newWorkStealingPool();
 		executor.submit(() -> {
 			try {
-				new Service().createPreview(file1, project.getPr().getWorkingDir());
-				new Service().createPreview(file2, project.getPr().getWorkingDir());
-				new Service().createPreview(file3, project.getPr().getWorkingDir());
-				new Service().createPreview(file4, project.getPr().getWorkingDir());
-				new Service().createPreview(file5, project.getPr().getWorkingDir());
+				project.getService().createPreview(file1, project.getPr().getWorkingDir());
+				project.getService().createPreview(file2, project.getPr().getWorkingDir());
+				project.getService().createPreview(file3, project.getPr().getWorkingDir());
+				project.getService().createPreview(file4, project.getPr().getWorkingDir());
+				project.getService().createPreview(file5, project.getPr().getWorkingDir());
 			} catch (Exception e) {
 				LOGGER.error("", e);
 			}
@@ -230,7 +226,7 @@ public class JMIF {
 					for (MIFFile f : graphWrapper.getPr().getMIFFiles()) {
 						executor.submit(() -> {
 							try {
-								new Service().createPreview(f, graphWrapper.getPr().getWorkingDir());
+								graphWrapper.getService().createPreview(f, graphWrapper.getPr().getWorkingDir());
 							} catch (Exception e) {
 								LOGGER.error("", e);
 							}
