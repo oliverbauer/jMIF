@@ -62,7 +62,7 @@ public class GraphWrapper {
 	private mxGraphComponent graphComponent;
 	private Object parent;
 
-	private mxCell framePreview;
+	private mxCell singleframeSlider;
 	private MIFProject pr;
 	
 	public GraphWrapper() {
@@ -168,40 +168,44 @@ public class GraphWrapper {
 		if (file.endsWith("JPG") || file.endsWith("jpg")) {
 			var display = file.substring(file.lastIndexOf('/') + 1);
 
-			var image = service.createImage(fileToAdd, display, 5*pr.getFramerate(), "-1x-1", pr.getFramerate(), pr.getWorkingDir(), pr.getFramerate());
+			// 5 seconds
+			var image = service.createImage(fileToAdd, display, 5000, "-1x-1", 1000, pr.getWorkingDir());
 
 			if (!pr.getMIFFiles().isEmpty()) {
-				currentLength -= image.getOverlayToPrevious();
+				currentLength -= (image.getOverlayToPrevious() / 1000d);
 			}
 			
-			var v1 = insertVertex(
-				image.getDisplayName(),
-				currentLength + XOFFSET,
-				pr.getMIFFiles().size() % 2 == 0 ? 0 + YOFFSET : 20 + YOFFSET,
-				image.getFramelength(), 
-				20);
+			int x = currentLength + XOFFSET;
+			int y = pr.getMIFFiles().size() % 2 == 0 ? 0 + YOFFSET : 20 + YOFFSET;
+			int w = (int)((image.getDuration() / 1000d) * pr.getFramerate());
+			int h = 20;
+			var v1 = insertVertex(image.getDisplayName(), x, y, w, h);
+
 			put(image, v1);
 			
-			currentLength += image.getFramelength();
+			currentLength += (image.getDuration() / 1000d) * pr.getFramerate();
 			
 			return image;
 		} else if (file.endsWith("mp4") || file.endsWith("MP4")) {
 			var display = file.substring(file.lastIndexOf('/') + 1);
-			var video = service.createVideo(fileToAdd, display, -1, "1920x1080", pr.getFramerate(), pr.getWorkingDir(), pr.getFramerate());
+			// 1 second overlay
+			var video = service.createVideo(fileToAdd, display, -1, "1920x1080", 1000, pr.getWorkingDir());
 
 			if (!pr.getMIFFiles().isEmpty()) {
-				currentLength -= video.getOverlayToPrevious();
+				currentLength -= (video.getOverlayToPrevious() / 1000d);
 			}
 			
-			var v1 = insertVertex(
-				video.getDisplayName(),
-				currentLength + XOFFSET,
-				pr.getMIFFiles().size() % 2 == 0 ? 0 + YOFFSET : 20 + YOFFSET,
-				video.getFramelength(), 
-				20);	
+			int x = currentLength + XOFFSET;
+			int y = pr.getMIFFiles().size() % 2 == 0 ? 0 + YOFFSET : 20 + YOFFSET;
+			int w = (int)((video.getDuration() / 1000d) * pr.getFramerate());
+			int h = 20;
+
+			var v1 = insertVertex(video.getDisplayName(), x, y, w, h);  
 			put(video, v1);
 			
-			currentLength += video.getFramelength();
+			logger.info("Node {} x,y=({},{}), w,h=({},{})", video.getDisplayName(), x, y, w, h);
+			currentLength += (video.getDuration() / 1000d) * pr.getFramerate();
+
 			
 			return video;
 		}
@@ -215,13 +219,13 @@ public class GraphWrapper {
 			logger.info("Adding file {}", file.getFile());
 
 			if (current > 0) {
-				currentLength -= file.getOverlayToPrevious();
+				currentLength -= (file.getOverlayToPrevious() / 1000d);
 			}
 			int x = currentLength + XOFFSET;
 			int y = current % 2 == 0 ? 0 + YOFFSET : 20 + YOFFSET;
 			mxCell v1 = insertVertex(x, y, file);
 			put(file, v1);
-			currentLength += file.getFramelength();
+			currentLength += (file.getDuration() / 1000d);
 			current++;
 		}
 		int audioLength = 0;
@@ -256,8 +260,8 @@ public class GraphWrapper {
 
 			c.setValue(file.getDisplayName());
 
-			var frames = file.getFramelength();
-			var overlayInFrames = file.getOverlayToPrevious();
+			var frames = (file.getDuration() / 1000d) * pr.getFramerate();
+			var overlayInFrames = (file.getOverlayToPrevious() / 1000d) * pr.getFramerate();
 			if (current > 0) {
 				currentLength -= overlayInFrames;
 			}
@@ -283,7 +287,7 @@ public class GraphWrapper {
 			MIFAudioFile audioFile = audioEntry.getValue();
 			
 			if (current > 1) {
-				audioLength -= pr.getFramerate();
+				audioLength -= pr.getFramerate(); // FIXME Allow Overlay in milliseconds
 			}
 			
 			var rec = new mxRectangle();
@@ -306,7 +310,7 @@ public class GraphWrapper {
 			meltFile.getDisplayName(), 
 			x,
 			y, 
-			meltFile.getFramelength(), 
+			(meltFile.getDuration() / 1000d), 
 			Configuration.timelineentryHeight);
 	}
 	
@@ -317,7 +321,7 @@ public class GraphWrapper {
 			public boolean isCellSelectable(Object cell) {
 				mxCell c = (mxCell) cell;
 				if (c != null && c.isVertex()) {
-					return get(c) != null || c == framePreview || getAudio(c) != null;
+					return get(c) != null || c == singleframeSlider || getAudio(c) != null;
 				}
 				return false;
 			}
@@ -325,7 +329,7 @@ public class GraphWrapper {
 			// Only the preview-frame-slider should be move-able
 			@Override
 			public boolean isCellMovable(Object cell) {
-				return ((mxCell)cell) == framePreview;
+				return ((mxCell)cell) == singleframeSlider;
 			}
 		};
 		graphComponent = new mxGraphComponent(graph) {
@@ -340,9 +344,9 @@ public class GraphWrapper {
 							int current = 0;
 							for (MIFFile file : pr.getMIFFiles()) {
 								if (current > 0) {
-									length -= file.getOverlayToPrevious();
+									length -= (file.getOverlayToPrevious() / 1000d);
 								}
-								length += file.getFramelength();
+								length += (file.getDuration() / 1000d);
 								current++;
 							}
 							int audioLength = 0;
@@ -412,7 +416,7 @@ public class GraphWrapper {
 		graph.addListener(mxEvent.CELLS_MOVED, (sender, evt) -> {
 			Object[] c = (Object[])evt.getProperties().get("cells");
 			
-			if (c[0] == framePreview) {
+			if (c[0] == singleframeSlider) {
 				mxGeometry bounds = graph.getModel().getGeometry(c[0]);
 				bounds.setY(0);
 				graph.getModel().setGeometry(c[0], bounds); // don't allow move on y-axis
@@ -462,8 +466,8 @@ public class GraphWrapper {
 	}
 
 	public void createFramePreview() {
-		if (framePreview == null) {
-			framePreview = (mxCell) graph.insertVertex(parent, null, "", 50, 0, 10, 120);
+		if (singleframeSlider == null) {
+			singleframeSlider = (mxCell) graph.insertVertex(parent, null, "", 50, 0, 10, 120);
 		}
 	}
 	
@@ -532,7 +536,7 @@ public class GraphWrapper {
 	}
 
 	public boolean isSingleFrameNode(mxCell cell) {
-		return cell == framePreview;
+		return cell == singleframeSlider;
 	}
 
 	public MIFService getService() {

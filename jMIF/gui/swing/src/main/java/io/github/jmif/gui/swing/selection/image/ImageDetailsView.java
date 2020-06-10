@@ -18,15 +18,15 @@ public class ImageDetailsView {
 	
 	private JLabel filename = new JLabel();
 	private JTextField displayName = new JTextField();
-	private JTextField framelengthToDisplay = new JTextField();
+	private JTextField duration = new JTextField();
 	private JTextField overlay = new JTextField();
 	private JLabel dimensionLabel = new JLabel();
 
 	private JLabel labelFile = new JLabel("File");
 	private JLabel labelDisplayname = new JLabel("Displayname");
-	private JLabel labelFrames = new JLabel("Frames");
+	private JLabel labelDuration = new JLabel("Duration [ms]");
 	private JLabel labelDimension = new JLabel("Dimension (wxh)");
-	private JLabel labelOVerlay = new JLabel("Overlay");
+	private JLabel labelOVerlay = new JLabel("Overlay [ms]");
 
 	private MIFFile meltFile;
 	private Box box;
@@ -36,12 +36,12 @@ public class ImageDetailsView {
 		
 	    wrap(box, labelFile, filename);
 	    wrap(box, labelDisplayname, displayName);
-	    wrap(box, labelFrames, framelengthToDisplay);
+	    wrap(box, labelDuration, duration);
 	    wrap(box, labelDimension, dimensionLabel);
 	    wrap(box, labelOVerlay, overlay);
 	    
-	    framelengthToDisplay.addActionListener(e -> {
-	    	String input = framelengthToDisplay.getText();
+	    duration.addActionListener(e -> {
+	    	String input = duration.getText();
 	    	try {
 	    		int i = Integer.parseInt(input);
 	    		
@@ -52,7 +52,7 @@ public class ImageDetailsView {
 	    			throw new IllegalArgumentException("Muss <= 250 Frames sein");
 	    		}
 	    		
-	    		meltFile.setFramelength(i);
+	    		meltFile.setDuration(i);
 	    		mifProject.redrawGraph();
 	    	} catch (Exception t) {
 	    		logger.warn("Not allowed: ", t);
@@ -101,13 +101,13 @@ public class ImageDetailsView {
 		this.meltFile = null;
 		filename.setVisible(false);
 		displayName.setVisible(false);
-		framelengthToDisplay.setVisible(false);
+		duration.setVisible(false);
 		overlay.setVisible(false);
 		dimensionLabel.setVisible(false);
 		
 		labelFile.setVisible(false);
 		labelDisplayname.setVisible(false);
-		labelFrames.setVisible(false);
+		labelDuration.setVisible(false);
 		labelDimension.setVisible(false);
 		labelOVerlay.setVisible(false);
 		
@@ -118,19 +118,19 @@ public class ImageDetailsView {
 		this.meltFile = meltFile;
 		filename.setText(meltFile.getFile().getName());
 		displayName.setText(meltFile.getDisplayName());
-		framelengthToDisplay.setText(String.valueOf(meltFile.getFramelength()));
+		duration.setText(String.valueOf(meltFile.getDuration()));
 		overlay.setText(String.valueOf(meltFile.getOverlayToPrevious()));
 		dimensionLabel.setText(meltFile.getWidth()+"x"+meltFile.getHeight());
 		
 		filename.setVisible(true);
 		displayName.setVisible(true);
-		framelengthToDisplay.setVisible(true);
+		duration.setVisible(true);
 		overlay.setVisible(true);
 		dimensionLabel.setVisible(true);
 		
 		labelFile.setVisible(true);
 		labelDisplayname.setVisible(true);
-		labelFrames.setVisible(true);
+		labelDuration.setVisible(true);
 		labelDimension.setVisible(true);
 		labelOVerlay.setVisible(true);
 		

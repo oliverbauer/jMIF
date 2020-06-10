@@ -22,15 +22,13 @@ public interface MIFService {
 
 	void createWorkingDirs(MIFProject project) throws MIFException;
 
-	MIFVideo createVideo(File file, String display, float frames, String dim, int overlay, String workingDir,
-			int profileFramelength) throws MIFException;
+	MIFVideo createVideo(File file, String display, int frames, String dim, int overlay, String workingDir) throws MIFException;
 
 	void createPreview(MIFFile file, String workingDir) throws MIFException;
 
 	void createManualPreview(MIFImage image) throws MIFException;
 
-	MIFImage createImage(File file, String display, float frames, String dim, int overlay, String workingDir,
-			int framelength) throws MIFException;
+	MIFImage createImage(File file, String display, int frames, String dim, int overlay, String workingDir) throws MIFException;
 
 	MIFAudioFile createAudio(String path) throws MIFException;
 

@@ -37,8 +37,9 @@ public class VideoDetailsView {
 
 	private JLabel labelFile = new JLabel("File");
 	private JLabel labelDisplayname = new JLabel("Displayname");
-	private JLabel labelFrames = new JLabel("Frames");
-	private JLabel labelOVerlay = new JLabel("Overlay");
+	// TODO shows the length of video file in milliseconds.... the textfield should not be editable...create two new fileds for start from, end at... 
+	private JLabel labelFrames = new JLabel("Frames [ms]");
+	private JLabel labelOVerlay = new JLabel("Overlay [ms]");
 	private JLabel labelFPS = new JLabel("V.fps");
 	private JLabel labelVideoCodec = new JLabel("V.codec");
 	private JLabel labelVideoAR = new JLabel("V.aspect ratio");
@@ -76,7 +77,7 @@ public class VideoDetailsView {
 	    			throw new IllegalArgumentException("Must be <= 250 frames");
 	    		}
 	    		
-	    		mifVideo.setFramelength(i);
+	    		mifVideo.setDuration(i);
 	    		mifProject.redrawGraph();
 	    	} catch (Exception t) {
 	    		logger.warn("Not allowed: ", t);
@@ -138,7 +139,7 @@ public class VideoDetailsView {
 		this.mifVideo = mifVideo;
 		this.filename.setText(mifVideo.getFile().getName());
 		this.displayName.setText(mifVideo.getDisplayName());
-		this.framelengthToDisplay.setText(String.valueOf(mifVideo.getFramelength()));
+		this.framelengthToDisplay.setText(String.valueOf(mifVideo.getDuration()));
 		this.vFps.setText(String.valueOf(mifVideo.getFps()));
 		this.vCodec.setText(mifVideo.getVideoCodec());
 		this.aBitrate.setText(String.valueOf(mifVideo.getAudioBitrate())+" kbps");

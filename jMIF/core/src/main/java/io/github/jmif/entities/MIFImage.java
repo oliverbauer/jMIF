@@ -42,10 +42,10 @@ public class MIFImage extends MIFFile {
 
 	}
 
-	public MIFImage(File file, String display, float frames, String dim, int overlay) {
+	public MIFImage(File file, String display, int duration, String dim, int overlay) {
 		setFile(file);
 		setDisplayName(display);
-		setFramelength(frames);
+		setDuration(duration);
 		setWidth(Integer.parseInt(dim.substring(0, dim.indexOf('x'))));
 		setHeight(Integer.parseInt(dim.substring(dim.indexOf('x') + 1)));
 		setOverlayToPrevious(overlay);

@@ -20,14 +20,13 @@ public abstract class MIFFile {
 	// TODO Overlay: Depends on #9 Configuration: Create properties-file
 	// TODO Overlay: Depends on Project-framerate
 	// TODO Overlay: Refactor to use seconds
-	protected int overlayToPrevious = 25; // 1 Second
+	protected int overlayToPrevious = 1000; // 1 Second
 	protected int height = -1;
 	protected int width = -1;
 
 	// Will be set if file gets checked.
-	// Images: Default 125
 	// Videos: Default Videolength
-	protected float framelength = -1;
+	protected int duration = 5000;
 
 	@XmlTransient
 	protected boolean initialized = false;
@@ -90,12 +89,12 @@ public abstract class MIFFile {
 		return this.file;
 	}
 	
-	public float getFramelength() {
-		return framelength;
+	public int getDuration() {
+		return duration;
 	}
 
-	public void setFramelength(float framelength) {
-		this.framelength = framelength;
+	public void setDuration(int framelength) {
+		this.duration = framelength;
 	}
 
 	public int getHeight() {

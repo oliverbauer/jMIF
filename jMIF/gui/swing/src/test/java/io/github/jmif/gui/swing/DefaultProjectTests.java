@@ -11,13 +11,12 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import io.github.jmif.LocalService;
-import io.github.jmif.MIFService;
 import io.github.jmif.entities.MIFAudioFile;
 import io.github.jmif.entities.MIFFile;
 
 public class DefaultProjectTests {
 	
-	private final MIFService service = new LocalService();
+	private final LocalService service = new LocalService();
 	
 	@Test
 	public void withoutOverlay() throws Exception {
@@ -40,12 +39,12 @@ public class DefaultProjectTests {
 		MIFFile f2 = project.createMIFFile(new File(tempDir + "2.MP4"));
 		MIFFile f3 = project.createMIFFile(new File(tempDir + "3.JPG"));
 		MIFAudioFile a1 = project.createMIFAudioFile(new File(tempDir+"audio.mp3"));
-		f1.setFramelength(125f);    // 5 sec
-		f1.setOverlayToPrevious(0); // no overlay
-		f2.setFramelength(125f);    // 5 sec
-		f2.setOverlayToPrevious(0); // no overlay
-		f3.setFramelength(125f);    // 5 sec
-		f3.setOverlayToPrevious(0); // no overlay
+		f1.setDuration(5000);    // 5 sec
+		f1.setOverlayToPrevious(1000); // no overlay
+		f2.setDuration(5000);    // 5 sec
+		f2.setOverlayToPrevious(1000); // no overlay
+		f3.setDuration(5000);    // 5 sec
+		f3.setOverlayToPrevious(1000); // no overlay
 		a1.setEncodeStart(0);     // 15 sec
 		a1.setEncodeEnde(15);     // 15 sec
 		project.save();
@@ -80,11 +79,11 @@ public class DefaultProjectTests {
 		MIFFile f2 = project.createMIFFile(new File(tempDir + "2.MP4"));
 		MIFFile f3 = project.createMIFFile(new File(tempDir + "3.JPG"));
 		MIFAudioFile a1 = project.createMIFAudioFile(new File(tempDir+"audio.mp3"));
-		f1.setFramelength(125f);    // 5 sec
+		f1.setDuration(5000);    // 5 sec
 		f1.setOverlayToPrevious(0); // no overlay
-		f2.setFramelength(125f);    // 5 sec
+		f2.setDuration(5000);    // 5 sec
 		f2.setOverlayToPrevious(25); // no overlay
-		f3.setFramelength(125f);    // 5 sec
+		f3.setDuration(5000);    // 5 sec
 		f3.setOverlayToPrevious(25); // no overlay
 		a1.setEncodeStart(0);     // 13 sec
 		a1.setEncodeEnde(13);     // 13 sec
@@ -117,7 +116,7 @@ public class DefaultProjectTests {
 		pr.setOutputVideo(tempDir+"output4711.avi");
 		MIFFile f1 = project.createMIFFile(new File(tempDir + "1.JPG"));
 		MIFAudioFile a1 = project.createMIFAudioFile(new File(tempDir+"audio.mp3"));
-		f1.setFramelength(125f);
+		f1.setDuration(5000);
 		f1.setOverlayToPrevious(0);
 		a1.setEncodeStart(0);     // 15 sec
 		a1.setEncodeEnde(8);     // 15 sec
