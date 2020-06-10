@@ -3,6 +3,8 @@
  */
 package io.github.jmif.server.rest;
 
+import java.io.File;
+
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -89,7 +91,7 @@ public class RESTService extends Application {
 	@POST
 	@Path("/createImage")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response createImage(String file, String display, float frames, String dim, int overlay, String workingDir, int framelength) throws MIFException {
+	public Response createImage(File file, String display, float frames, String dim, int overlay, String workingDir, int framelength) throws MIFException {
 		return Response.accepted(delegate.createImage(file, display, frames, dim, overlay, workingDir, framelength)).build();
 	}
 
