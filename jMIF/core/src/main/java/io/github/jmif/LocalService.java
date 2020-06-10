@@ -345,14 +345,13 @@ public class LocalService implements MIFService {
 		var wxh = estimatedWith + "x" + aspectHeight;
 		var withoutFileExtension = filename.substring(0, filename.lastIndexOf('.'));
 		var fileExtension = image.getFileExtension();
-		image.setImagePreviewPath(Paths.get(workingDir).resolve("preview").resolve(withoutFileExtension).resolve("_thumb.").resolve(wxh).resolve(".").resolve(
+		image.setImagePreviewPath(Paths.get(workingDir).resolve("preview").resolve(withoutFileExtension + "_thumb."+wxh+"."+
 				fileExtension));
-		image.setPreviewHardResizePath(Paths.get(workingDir).resolve("preview").resolve(withoutFileExtension).resolve("_hard.").resolve(wxh).resolve(".")
-				.resolve(fileExtension));
-		image.setPreviewFillWColorPath(Paths.get(workingDir).resolve("preview").resolve(withoutFileExtension).resolve("_fill.").resolve(wxh).resolve(".").resolve(
+		image.setPreviewHardResizePath(Paths.get(workingDir).resolve("preview").resolve(withoutFileExtension+"_hard."+wxh+"."+fileExtension));
+		image.setPreviewFillWColorPath(Paths.get(workingDir).resolve("preview").resolve(withoutFileExtension+"_fill."+wxh+"."+
 				fileExtension));
-		image.setPreviewCropPath(Paths.get(workingDir).resolve("preview").resolve(withoutFileExtension).resolve("_kill.").resolve(wxh).resolve(".").resolve(fileExtension));
-		image.setPreviewManualPath(Paths.get(workingDir).resolve("preview").resolve(withoutFileExtension).resolve("_manual.").resolve(wxh).resolve(".").resolve(fileExtension));
+		image.setPreviewCropPath(Paths.get(workingDir).resolve("preview").resolve(withoutFileExtension+"_kill."+wxh+"."+fileExtension));
+		image.setPreviewManualPath(Paths.get(workingDir).resolve("preview").resolve(withoutFileExtension+"_manual."+wxh+"."+fileExtension));
 		return image;
 	}
 
