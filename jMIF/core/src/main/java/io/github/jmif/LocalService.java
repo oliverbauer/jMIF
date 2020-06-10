@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
@@ -747,5 +748,38 @@ public class LocalService implements MIFService {
 	@Override
 	public MeltFilterDetails getMeltFilterDetailsFor(Melt melt, MeltFilter meltFilter) throws MIFException {
 		return getOrLoad(melt).stream().filter(mdf -> mdf.getFiltername().contentEquals(meltFilter.getFiltername())).findAny().get();
+	}
+	
+	public void applyFilter(MIFImage mifImage, MeltFilter meltFilter) throws MIFException {
+		StringBuilder sb  = new StringBuilder();
+		sb.append("melt ")
+		// TODO Filter: Preview: may be file-style has been changed to CROP, MANUAAL... 
+		.append(mifImage.getFile())
+		.append(" out=50 ");
+		for (MeltFilter currentlyAddedFilters : mifImage.getFilters()) {
+			sb.append(" -attach-cut ");
+			sb.append(currentlyAddedFilters.getFiltername());
+			Map<String, String> filterUsage = currentlyAddedFilters.getFilterUsage();
+			for (String v : filterUsage.keySet()) {
+				sb.append(v).append("=").append(filterUsage.get(v)).append(" ");
+			}				
+		}
+		sb.append(" -attach-cut ");
+		sb.append(meltFilter.getFiltername())
+		.append(" ");
+		Map<String, String> filterUsage = meltFilter.getFilterUsage();
+		for (String v : filterUsage.keySet()) {
+			sb.append(v).append("=").append(filterUsage.get(v)).append(" ");
+		}
+		sb.append(" -consumer sdl2 terminate_on_pause=1");
+		try {
+			String command = sb.toString();
+
+			MIFProject temp = new MIFProject();
+			temp.setWorkingDir("/tmp/");
+			new MIFProjectExecutor(temp).execute(command);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 	}
 }

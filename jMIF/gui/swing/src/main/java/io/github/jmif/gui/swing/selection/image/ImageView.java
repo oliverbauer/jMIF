@@ -8,7 +8,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,11 +32,9 @@ import org.slf4j.LoggerFactory;
 import com.mxgraph.model.mxCell;
 
 import io.github.jmif.MIFException;
-import io.github.jmif.builder.MIFProjectExecutor;
 import io.github.jmif.config.Configuration;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFImage.ImageResizeStyle;
-import io.github.jmif.entities.MIFProject;
 import io.github.jmif.entities.MeltFilter;
 import io.github.jmif.gui.swing.GraphWrapper;
 import io.github.jmif.melt.Melt;
@@ -287,35 +284,10 @@ public class ImageView {
 		});
 		previewFilter = new JButton("preview");
 		previewFilter.addActionListener(e -> {
-			StringBuilder sb  = new StringBuilder();
-			sb.append("melt ")
-			// TODO Filter: Preview: may be file-style has been changed to CROP, MANUAAL... 
-			.append(selectedMeltFile.getFile())
-			.append(" out=50 ");
-			for (MeltFilter currentlyAddedFilters : selectedMeltFile.getFilters()) {
-				sb.append(" -attach-cut ");
-				sb.append(currentlyAddedFilters.getFiltername());
-				Map<String, String> filterUsage = currentlyAddedFilters.getFilterUsage();
-				for (String v : filterUsage.keySet()) {
-					sb.append(v).append("=").append(filterUsage.get(v)).append(" ");
-				}				
-			}
-			sb.append(" -attach-cut ");
-			sb.append(currentlySelectedFilter.getFiltername())
-			.append(" ");
-			Map<String, String> filterUsage = currentlySelectedFilter.getFilterUsage();
-			for (String v : filterUsage.keySet()) {
-				sb.append(v).append("=").append(filterUsage.get(v)).append(" ");
-			}
-			sb.append(" -consumer sdl2 terminate_on_pause=1");
 			try {
-				String command = sb.toString();
-
-				MIFProject temp = new MIFProject();
-				temp.setWorkingDir("/tmp/");
-				new MIFProjectExecutor(temp).execute(command);
-			} catch (IOException e1) {
-				e1.printStackTrace();
+				graphWrapper.getService().applyFilter(selectedMeltFile, currentlySelectedFilter);
+			} catch (MIFException e1) {
+				logger.error("", e1);
 			}			
 		});
 

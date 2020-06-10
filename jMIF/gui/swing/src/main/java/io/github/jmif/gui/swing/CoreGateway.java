@@ -47,6 +47,7 @@ public class CoreGateway implements MIFService {
 			this.id = id;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public T call() throws Exception {
 			Future<?> result = null;
@@ -206,4 +207,14 @@ public class CoreGateway implements MIFService {
 		}
 	}
 
+	@Override
+	public void applyFilter(MIFImage mifImage, MeltFilter meltFilter) throws MIFException {
+		final var id = service.applyFilter(mifImage, meltFilter);
+		final Waiter<Void> waiter = new Waiter<>(id);
+		try {
+			executor.submit(waiter).get();
+		} catch (InterruptedException | ExecutionException e) {
+			throw new MIFException(e);
+		}
+	}
 }
