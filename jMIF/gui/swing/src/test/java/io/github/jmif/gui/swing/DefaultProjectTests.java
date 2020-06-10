@@ -124,7 +124,7 @@ public class DefaultProjectTests {
 		project.save();
 		Assert.assertTrue(new File(tempDir+"defaultproject4711.xml").exists());
 		
-		new Service().convert(pr, false);
+		service.convert(pr, false);
 		// [consumer avformat] error with audio encode: -541478725 (frame 201) ?????
 		
 		Assert.assertTrue(new File(tempDir+"output4711.avi").exists());

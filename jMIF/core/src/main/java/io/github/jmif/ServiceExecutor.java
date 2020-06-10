@@ -9,6 +9,8 @@ import java.util.Optional;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFProject;
+import io.github.jmif.entities.MeltFilter;
+import io.github.jmif.melt.Melt;
 
 /**
  * @author thebrunner
@@ -76,9 +78,9 @@ public class ServiceExecutor implements MIF {
 	}
 
 	@Override
-	public long createImage(String file, String display, float frames, String dim, int overlay, String workingDir, int framelength) throws MIFException {
+	public long createImage(File file, String display, float frames, String dim, int overlay, String workingDir, int framelength) throws MIFException {
 		return executor.doIt(() -> {
-			return service.createImage(new File(file), display, frames, dim, overlay, workingDir, framelength);
+			return service.createImage(file, display, frames, dim, overlay, workingDir, framelength);
 		});
 	}
 
@@ -93,6 +95,27 @@ public class ServiceExecutor implements MIF {
 	public long getProfiles() throws MIFException {
 		return executor.doIt(() -> {
 			return service.getProfiles();
+		});
+	}
+
+	@Override
+	public long getMeltVideoFilterDetails(Melt melt) throws MIFException {
+		return executor.doIt(() -> {
+			return service.getMeltVideoFilterDetails(melt);
+		});
+	}
+
+	@Override
+	public long getMeltAudioFilterDetails(Melt melt) throws MIFException {
+		return executor.doIt(() -> {
+			return service.getMeltAudioFilterDetails(melt);
+		});
+	}
+
+	@Override
+	public long getMeltFilterDetailsFor(Melt melt, MeltFilter meltFilter) throws MIFException {
+		return executor.doIt(() -> {
+			return service.getMeltFilterDetailsFor(melt, meltFilter);
 		});
 	}
 
