@@ -3,11 +3,11 @@ package io.github.jmif.gui.swing.selection.image;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -474,12 +474,7 @@ public class ImageView {
 		};
 	}
 
-	public void setPreviewPicture(String imagePreview) {
-		if (!new File(imagePreview).exists()) {
-			logger.warn("File does not exists: {}", imagePreview);
-			return;
-		}
-
+	public void setPreviewPicture(Image imagePreview) {
 		imgPicture[0].setVisible(true);
 		imgPicture[1].setVisible(true);
 		manualExtraction.setVisible(true);
@@ -505,11 +500,7 @@ public class ImageView {
 		panel.updateUI();
 	}
 
-	public void setSelectedPicture(String previewCrop) {
-		if (!new File(previewCrop).exists()) {
-			logger.warn("File does not exists: {}", previewCrop);
-			return;
-		}
+	public void setSelectedPicture(Image previewCrop) {
 		imgPicture[1].setIcon(new ImageIcon(previewCrop));
 
 		panel.updateUI();
