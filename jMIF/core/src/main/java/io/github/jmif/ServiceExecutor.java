@@ -4,7 +4,7 @@
 package io.github.jmif;
 
 import java.io.File;
-import java.util.Optional;
+import java.util.concurrent.Future;
 
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
@@ -18,7 +18,7 @@ import io.github.jmif.melt.Melt;
  */
 public class ServiceExecutor implements MIF {
 
-	private final Service service = new Service();
+	private final MIFService service = new LocalService();
 
 	private final ThreadExecutor executor = new ThreadExecutor();
 
@@ -39,7 +39,7 @@ public class ServiceExecutor implements MIF {
 	}
 
 	@Override
-	public long updateFramerate(MIFProject project) {
+	public long updateFramerate(MIFProject project) throws MIFException {
 		return executor.doIt(() -> {
 			service.updateFramerate(project);
 			return null;
@@ -47,7 +47,7 @@ public class ServiceExecutor implements MIF {
 	}
 
 	@Override
-	public long createWorkingDirs(MIFProject project) {
+	public long createWorkingDirs(MIFProject project) throws MIFException {
 		return executor.doIt(() -> {
 			service.createWorkingDirs(project);
 			return null;
@@ -55,9 +55,9 @@ public class ServiceExecutor implements MIF {
 	}
 
 	@Override
-	public long createVideo(String file, String display, float frames, String dim, int overlay, String workingDir, int profileFramelength) throws MIFException {
+	public long createVideo(File file, String display, float frames, String dim, int overlay, String workingDir, int profileFramelength) throws MIFException {
 		return executor.doIt(() -> {
-			return service.createVideo(new File(file), display, frames, dim, overlay, workingDir, profileFramelength);
+			return service.createVideo(file, display, frames, dim, overlay, workingDir, profileFramelength);
 		});
 	}
 
@@ -120,7 +120,7 @@ public class ServiceExecutor implements MIF {
 	}
 
 	@Override
-	public Optional<?> get(long id) throws MIFException {
+	public Future<?> get(long id) throws MIFException {
 		return executor.get(id);
 	}
 }

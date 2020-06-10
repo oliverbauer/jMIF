@@ -28,10 +28,11 @@ import io.github.jmif.melt.MeltFilterDetails;
 /**
  * @author thebrunner
  */
-public class Service {
+public class LocalService implements MIFService {
 
-	private static final Logger logger = LoggerFactory.getLogger(Service.class);
+	private static final Logger logger = LoggerFactory.getLogger(LocalService.class);
 
+	@Override
 	public void exportImage(MIFProject pr, String output, int frame) throws MIFException {
 		try {
 			new MIFProjectExecutor(pr).exportImage(output, frame);
@@ -40,6 +41,7 @@ public class Service {
 		}
 	}
 
+	@Override
 	public void convert(MIFProject pr, boolean preview) throws MIFException {
 		try {
 			new MIFProjectExecutor(pr).convert(preview);
@@ -48,6 +50,7 @@ public class Service {
 		}
 	}
 
+	@Override
 	public void updateFramerate(MIFProject project) {
 		var framerate = project.getFramerate();
 		try {
@@ -69,6 +72,7 @@ public class Service {
 		project.setFramerate(framerate);
 	}
 
+	@Override
 	public void createWorkingDirs(MIFProject project) {
 		if (!project.getWorkingDir().endsWith("/")) {
 			project.setWorkingDir(project.getWorkingDir()+"/");
@@ -92,6 +96,7 @@ public class Service {
 		}
 	}
 
+	@Override
 	public MIFVideo createVideo(File file, String display, float frames, String dim, int overlay, String workingDir, int profileFramelength) throws MIFException {
 		var video = new MIFVideo(file, display, frames, dim, overlay);
 		updateFile(video);
@@ -169,6 +174,7 @@ public class Service {
 		return video;
 	}
 
+	@Override
 	public void createPreview(MIFFile file, String workingDir) throws MIFException {
 		if (file instanceof MIFImage) {
 			createPreview(MIFImage.class.cast(file), workingDir);
@@ -258,6 +264,7 @@ public class Service {
 		}
 	}
 
+	@Override
 	public void createManualPreview(MIFImage image) {
 		image.setStyle(ImageResizeStyle.MANUAL);
 		Process process;
@@ -284,6 +291,7 @@ public class Service {
 		}
 	}
 
+	@Override
 	public MIFImage createImage(File file, String display, float frames, String dim, int overlay, String workingDir, int framelength) throws MIFException {
 		var image = new MIFImage(file, display, frames, dim, overlay);
 		updateFile(image);
@@ -476,6 +484,7 @@ public class Service {
 		// TODO manual preview if exists
 	}
 
+	@Override
 	public MIFAudioFile createAudio(String path) throws MIFException {
 		var audioFile = new MIFAudioFile();
 		audioFile.setAudiofile(path);
@@ -533,6 +542,7 @@ public class Service {
 		}
 	}
 	
+	@Override
 	public List<String> getProfiles() throws MIFException {
 		try {
 			List<String> profiles = new ArrayList<>();
@@ -707,6 +717,7 @@ public class Service {
 		}
 	}
 	
+	@Override
 	public List<MeltFilterDetails> getMeltVideoFilterDetails(Melt melt) throws MIFException {
 		return getOrLoad(melt)
 			.stream()
@@ -715,6 +726,7 @@ public class Service {
 			.collect(Collectors.toList());
 	}
 	
+	@Override
 	public List<MeltFilterDetails> getMeltAudioFilterDetails(Melt melt) throws MIFException {
 		return getOrLoad(melt)
 			.stream()
@@ -723,6 +735,7 @@ public class Service {
 			.collect(Collectors.toList());
 	}
 	
+	@Override
 	public MeltFilterDetails getMeltFilterDetailsFor(Melt melt, MeltFilter meltFilter) throws MIFException {
 		return getOrLoad(melt).stream().filter(mdf -> mdf.getFiltername().contentEquals(meltFilter.getFiltername())).findAny().get();
 	}

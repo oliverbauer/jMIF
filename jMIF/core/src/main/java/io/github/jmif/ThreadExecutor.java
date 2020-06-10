@@ -5,9 +5,7 @@ package io.github.jmif;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
@@ -31,17 +29,12 @@ public class ThreadExecutor {
 		return id;
 	}
 	
-	public synchronized Optional<?> get(long id) throws MIFException {
+	public synchronized Future<?> get(long id) throws MIFException {
 		var result = executables.get(id);
-		if (result.isDone()) {
+		if (result.isDone() || result.isCancelled()) {
 			executables.remove(id);
-			try {
-				return Optional.of(result.get());
-			} catch (InterruptedException | ExecutionException e) {
-				throw new MIFException(e);
-			}
 		}
-		return Optional.empty();
+		return result;
 	}
 	
 	private synchronized long inkrement() {
