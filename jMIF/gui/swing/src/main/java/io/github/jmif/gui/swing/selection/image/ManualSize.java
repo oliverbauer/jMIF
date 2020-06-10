@@ -159,6 +159,7 @@ public class ManualSize {
 		ok.addActionListener(event -> {
 			try {
 				mifImage.setManualStyleCommand(command);
+				
 				graphWrapper.getService().createManualPreview(mifImage);
 				imageView.refreshFromManualSize();
 			} catch (MIFException e) {

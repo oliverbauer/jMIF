@@ -55,9 +55,9 @@ public class ServiceExecutor implements MIF {
 	}
 
 	@Override
-	public long createVideo(File file, String display, float frames, String dim, int overlay, String workingDir, int profileFramelength) throws MIFException {
+	public long createVideo(File file, String display, int frames, String dim, int overlay, String workingDir) throws MIFException {
 		return executor.doIt(() -> {
-			return service.createVideo(file, display, frames, dim, overlay, workingDir, profileFramelength);
+			return service.createVideo(file, display, frames, dim, overlay, workingDir);
 		});
 	}
 
@@ -78,9 +78,9 @@ public class ServiceExecutor implements MIF {
 	}
 
 	@Override
-	public long createImage(File file, String display, float frames, String dim, int overlay, String workingDir, int framelength) throws MIFException {
+	public long createImage(File file, String display, int frames, String dim, int overlay, String workingDir) throws MIFException {
 		return executor.doIt(() -> {
-			return service.createImage(file, display, frames, dim, overlay, workingDir, framelength);
+			return service.createImage(file, display, frames, dim, overlay, workingDir);
 		});
 	}
 

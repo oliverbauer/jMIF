@@ -1,3 +1,4 @@
+
 package io.github.jmif;
 
 import java.io.BufferedReader;
@@ -100,7 +101,7 @@ public class LocalService implements MIFService {
 	}
 
 	@Override
-	public MIFVideo createVideo(File file, String display, float frames, String dim, int overlay, String workingDir, int profileFramelength) throws MIFException {
+	public MIFVideo createVideo(File file, String display, int frames, String dim, int overlay, String workingDir) throws MIFException {
 		var video = new MIFVideo(file, display, frames, dim, overlay);
 		updateFile(video);
 		copy(video, workingDir);
@@ -150,9 +151,11 @@ public class LocalService implements MIFService {
 					} else if (line.startsWith("height")) {
 						video.setHeight(Integer.parseInt(line.substring(line.indexOf('=')+1)));
 					} else if (line.startsWith("duration")) {
+						// E.g. "7.0"
 						line = line.substring(line.indexOf('=')+1);
 						String s = line.substring(0, line.indexOf('.') + 2);
-						video.setFramelength(Float.parseFloat(s) * profileFramelength);
+						int v = (int)(Float.parseFloat(s) * 1000);
+						video.setDuration(v);
 					} else if (line.startsWith("bit_rate")) {
 						video.setVideoBitrate(Integer.parseInt(line.substring(line.indexOf('=')+1)) / 1000);
 					} else if (line.startsWith("codec_long_name")) {
@@ -244,7 +247,7 @@ public class LocalService implements MIFService {
 		 * 10 images from the video 
 		 */
 		video.getPreviewImages().clear();
-		var cnt = (int) (video.getFramelength() / 10);
+		var cnt = (int) (video.getDuration() / 1000d);
 		for (int i = 1; i <= 10; i++) {
 			var image = workingDir+"/preview/_low_"+filename+"_"+i+".png";
 			if (!new File(image).exists()) {
@@ -297,14 +300,10 @@ public class LocalService implements MIFService {
 	}
 
 	@Override
-	public MIFImage createImage(File file, String display, float frames, String dim, int overlay, String workingDir, int framelength) throws MIFException {
+	public MIFImage createImage(File file, String display, int frames, String dim, int overlay, String workingDir) throws MIFException {
 		var image = new MIFImage(file, display, frames, dim, overlay);
 		updateFile(image);
 		copy(image, workingDir);
-		if (framelength == -1) {
-			framelength = 5*framelength; // constant, default: 5 seconds...
-		}
-
 		var filename = image.getFilename();
 
 		var copy = workingDir + "orig/" + filename;

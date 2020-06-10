@@ -108,9 +108,8 @@ public class CoreGateway implements MIFService {
 	}
 
 	@Override
-	public MIFVideo createVideo(File file, String display, float frames, String dim, int overlay, String workingDir,
-			int profileFramelength) throws MIFException {
-		final var id = service.createVideo(file, display, frames, dim, overlay, workingDir, profileFramelength);
+	public MIFVideo createVideo(File file, String display, int frames, String dim, int overlay, String workingDir) throws MIFException {
+		final var id = service.createVideo(file, display, frames, dim, overlay, workingDir);
 		final Waiter<MIFVideo> waiter = new Waiter<>(id);
 		try {
 			return executor.submit(waiter).get();
@@ -142,9 +141,8 @@ public class CoreGateway implements MIFService {
 	}
 
 	@Override
-	public MIFImage createImage(File file, String display, float frames, String dim, int overlay, String workingDir,
-			int framelength) throws MIFException {
-		final var id = service.createImage(file, display, frames, dim, overlay, workingDir, framelength);
+	public MIFImage createImage(File file, String display, int frames, String dim, int overlay, String workingDir) throws MIFException {
+		final var id = service.createImage(file, display, frames, dim, overlay, workingDir);
 		final Waiter<MIFImage> waiter = new Waiter<>(id);
 		try {
 			return	executor.submit(waiter).get();

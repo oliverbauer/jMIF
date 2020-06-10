@@ -120,8 +120,8 @@ public class JMIF {
 		profilesCombobox.setSelectedItem(graphWrapper.getPr().getProfile());
 		profilesCombobox.addItemListener((itemEvent) -> {
 			try {
-			String item = (String)profilesCombobox.getSelectedItem();
-			graphWrapper.getPr().setProfile(item);
+				String item = (String)profilesCombobox.getSelectedItem();
+				graphWrapper.getPr().setProfile(item);
 				graphWrapper.getService().updateFramerate(graphWrapper.getPr());
 			} catch (MIFException e) {
 				// TODO Auto-generated catch block

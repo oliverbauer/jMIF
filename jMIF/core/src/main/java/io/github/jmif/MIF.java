@@ -19,15 +19,13 @@ public interface MIF {
 
 	long createWorkingDirs(MIFProject project) throws MIFException;
 
-	long createVideo(File file, String display, float frames, String dim, int overlay, String workingDir,
-			int profileFramelength) throws MIFException;
+	long createVideo(File file, String display, int frames, String dim, int overlay, String workingDir) throws MIFException;
 
 	long createPreview(MIFFile file, String workingDir) throws MIFException;
 
 	long createManualPreview(MIFImage image) throws MIFException ;
 
-	long createImage(File file, String display, float frames, String dim, int overlay, String workingDir,
-			int framelength) throws MIFException;
+	long createImage(File file, String display, int frames, String dim, int overlay, String workingDir) throws MIFException;
 
 	long createAudio(String path) throws MIFException;
 

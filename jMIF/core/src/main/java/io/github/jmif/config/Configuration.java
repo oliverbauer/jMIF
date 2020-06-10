@@ -8,7 +8,7 @@ public class Configuration {
 	public static boolean showSplashscreen = true;
 	public static final int splashSleepTime = 10;
 	
-	public static final List<String> allowedImageTypes = Arrays.asList("jpg", "JPG");
+	public static final List<String> allowedImageTypes = Arrays.asList("jpg", "JPG", "png", "PNG");
 	public static final List<String> allowedVideoTypes = Arrays.asList("mp4", "MP4", "mpg", "avi");
 	
 	public static int timelineentryHeight = 20;
@@ -17,8 +17,6 @@ public class Configuration {
 	
 	public static Color bgColor = new Color(1.0f, 1.0f, 1.0f, 1.0f); // 1.0f
 //	public static Color bgColor = new Color(0f, 0f, 0f, 1.0f); // 1.0f
-	
-	public static final int fps = 25;
 	
 	public static boolean useBorders = false;
 	

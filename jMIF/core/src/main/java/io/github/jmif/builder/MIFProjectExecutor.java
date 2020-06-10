@@ -191,9 +191,10 @@ public class MIFProjectExecutor {
 				String input = project.getWorkingDir()+"scaled/"+meltfile.getFilename();
 				
 				boolean useMixer = count != 0;
+				int frames = (int)((meltfile.getDuration() / 1000d) * project.getFramerate());
 				
 				if (input.endsWith("jpg") || input.endsWith("JPG")) {
-					sb.append("   ").append(input).append(" in=0 out=").append(meltfile.getFramelength()-1);
+					sb.append("   ").append(input).append(" in=0 out=").append(frames - 1);
 					
 					for (MeltFilter currentlyAddedFilters : meltfile.getFilters()) {
 						sb.append(" -attach-cut ");
@@ -206,10 +207,11 @@ public class MIFProjectExecutor {
 					}
 					
 				} else if (input.endsWith("mp4") || input.endsWith("MP4")) {
-					sb.append("   ").append(input).append(" in=0 out=").append(meltfile.getFramelength()-1);
+					sb.append("   ").append(input).append(" in=0 out=").append(frames - 1);
 				}
 				if (useMixer && meltfile.getOverlayToPrevious() > 0) {
-					sb.append(" -mix ").append(meltfile.getOverlayToPrevious()).append(" -mixer luma");
+					int overlay = (int)((meltfile.getOverlayToPrevious() / 1000d) * project.getFramerate());
+					sb.append(" -mix ").append(overlay).append(" -mixer luma");
 				}
 				sb.append(" \\\n");
 				count++;
