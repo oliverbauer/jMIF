@@ -31,6 +31,7 @@ import com.mxgraph.util.mxEvent;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxGraph;
 
+import io.github.jmif.LocalService;
 import io.github.jmif.MIFException;
 import io.github.jmif.MIFService;
 import io.github.jmif.config.Configuration;
@@ -45,7 +46,7 @@ import io.github.jmif.util.TimeUtil;
 public class GraphWrapper {
 	private static final Logger logger = LoggerFactory.getLogger(GraphWrapper.class);
 	
-	private final MIFService service = new CoreGateway();
+	private final MIFService service = new LocalService();
 	
 	private Map<mxCell, MIFFile> nodeToMIFFile;
 	private Map<mxCell, MIFAudioFile> nodeToMIFAudio;
@@ -164,51 +165,34 @@ public class GraphWrapper {
 		logger.info("Create node for {}", fileToAdd);
 		
 		var file = fileToAdd.getAbsoluteFile().getAbsolutePath();
+		var extension = file.substring(file.lastIndexOf(".")+1);
+
+		MIFFile mifFile = null;
 		
-		if (file.endsWith("JPG") || file.endsWith("jpg")) {
-			var display = file.substring(file.lastIndexOf('/') + 1);
-
-			// 5 seconds
-			var image = service.createImage(fileToAdd, display, 5000, "-1x-1", 1000, pr.getWorkingDir());
-
-			if (!pr.getMIFFiles().isEmpty()) {
-				currentLength -= (image.getOverlayToPrevious() / 1000d);
-			}
-			
-			int x = currentLength + XOFFSET;
-			int y = pr.getMIFFiles().size() % 2 == 0 ? 0 + YOFFSET : 20 + YOFFSET;
-			int w = (int)((image.getDuration() / 1000d) * pr.getFramerate());
-			int h = 20;
-			var v1 = insertVertex(image.getDisplayName(), x, y, w, h);
-
-			put(image, v1);
-			
-			currentLength += (image.getDuration() / 1000d) * pr.getFramerate();
-			
-			return image;
-		} else if (file.endsWith("mp4") || file.endsWith("MP4")) {
-			var display = file.substring(file.lastIndexOf('/') + 1);
-			// 1 second overlay
-			var video = service.createVideo(fileToAdd, display, -1, "1920x1080", 1000, pr.getWorkingDir());
-
-			if (!pr.getMIFFiles().isEmpty()) {
-				currentLength -= (video.getOverlayToPrevious() / 1000d);
-			}
-			
-			int x = currentLength + XOFFSET;
-			int y = pr.getMIFFiles().size() % 2 == 0 ? 0 + YOFFSET : 20 + YOFFSET;
-			int w = (int)((video.getDuration() / 1000d) * pr.getFramerate());
-			int h = 20;
-
-			var v1 = insertVertex(video.getDisplayName(), x, y, w, h);  
-			put(video, v1);
-			
-			logger.info("Node {} x,y=({},{}), w,h=({},{})", video.getDisplayName(), x, y, w, h);
-			currentLength += (video.getDuration() / 1000d) * pr.getFramerate();
-
-			
-			return video;
+		var display = file.substring(file.lastIndexOf('/') + 1);
+		if (Configuration.allowedImageTypes.contains(extension)) {
+			mifFile = service.createImage(fileToAdd, display, 5000, "-1x-1", 1000, pr.getWorkingDir());
+		} else if (Configuration.allowedVideoTypes.contains(extension)) {
+			mifFile = service.createVideo(fileToAdd, display, -1, "1920x1080", 1000, pr.getWorkingDir());
 		}
+		
+		if (mifFile != null) {
+			if (!pr.getMIFFiles().isEmpty()) {
+				currentLength -= (mifFile.getOverlayToPrevious() / 1000d) * pr.getFramerate();
+			}
+
+			int x = currentLength + XOFFSET;
+			int y = pr.getMIFFiles().size() % 2 == 0 ? 0 + YOFFSET : 20 + YOFFSET;
+			int w = (int)((mifFile.getDuration() / 1000d) * pr.getFramerate());
+			int h = 20;
+			var v1 = insertVertex(mifFile.getDisplayName(), x, y, w, h);
+			
+			put(mifFile, v1);
+			
+			currentLength += (mifFile.getDuration() / 1000d) * pr.getFramerate();
+			
+			return mifFile;
+		}			
 		
 		return null;
 	}
