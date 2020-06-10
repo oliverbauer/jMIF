@@ -8,13 +8,12 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import io.github.jmif.LocalService;
 import io.github.jmif.MIFService;
 import io.github.jmif.entities.MeltFilter;
 
 public class ProjectXmlTests {
 	
-	private final MIFService service = new LocalService();
+	private final MIFService service = new CoreGateway();
 	
 	@Test
 	public void simpleImage() throws Exception {

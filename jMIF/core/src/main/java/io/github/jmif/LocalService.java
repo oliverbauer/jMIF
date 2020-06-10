@@ -5,10 +5,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.imageio.ImageIO;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
@@ -277,7 +281,7 @@ public class LocalService implements MIFService {
 
 			logger.info("Execute {}", temp);
 
-			process = new ProcessBuilder("bash", "-c", "convert "+image.getFile()+" "+temp+" "+image.getPreviewManual())
+			process = new ProcessBuilder("bash", "-c", "convert "+image.getFile()+" "+temp+" "+image.getPreviewManualPath())
 				.redirectErrorStream(true)
 				.start();
 			
@@ -289,6 +293,8 @@ public class LocalService implements MIFService {
 			}
 			
 			process.waitFor();
+			
+			image.setPreviewManual(ImageIO.read(image.getPreviewManualPath().toFile()));
 		} catch (Exception e) {
 			logger.error("Unable to create manual style image ",e);
 		}
@@ -340,14 +346,13 @@ public class LocalService implements MIFService {
 		var wxh = estimatedWith + "x" + aspectHeight;
 		var withoutFileExtension = filename.substring(0, filename.lastIndexOf('.'));
 		var fileExtension = image.getFileExtension();
-		image.setImagePreview(workingDir + "preview/" + withoutFileExtension + "_thumb." + wxh + "."
-				+ fileExtension);
-		image.setPreviewHardResize(workingDir + "preview/" + withoutFileExtension + "_hard." + wxh + "."
-				+ fileExtension);
-		image.setPreviewFillWColor(workingDir + "preview/" + withoutFileExtension + "_fill." + wxh + "."
-				+ fileExtension);
-		image.setPreviewCrop(workingDir + "preview/" + withoutFileExtension + "_kill." + wxh + "." + fileExtension);
-		image.setPreviewManual(workingDir + "preview/" + withoutFileExtension + "_manual." + wxh + "." + fileExtension);
+		image.setImagePreviewPath(Paths.get(workingDir).resolve("preview").resolve(withoutFileExtension + "_thumb."+wxh+"."+
+				fileExtension));
+		image.setPreviewHardResizePath(Paths.get(workingDir).resolve("preview").resolve(withoutFileExtension+"_hard."+wxh+"."+fileExtension));
+		image.setPreviewFillWColorPath(Paths.get(workingDir).resolve("preview").resolve(withoutFileExtension+"_fill."+wxh+"."+
+				fileExtension));
+		image.setPreviewCropPath(Paths.get(workingDir).resolve("preview").resolve(withoutFileExtension+"_kill."+wxh+"."+fileExtension));
+		image.setPreviewManualPath(Paths.get(workingDir).resolve("preview").resolve(withoutFileExtension+"_manual."+wxh+"."+fileExtension));
 		return image;
 	}
 
@@ -363,6 +368,7 @@ public class LocalService implements MIFService {
 				.redirectErrorStream(true)
 				.start()
 				.waitFor();
+//				image.set TODO
 			} catch (InterruptedException | IOException e) {
 				throw new MIFException(e);
 			}
@@ -372,17 +378,17 @@ public class LocalService implements MIFService {
 		var aspectHeight = origHeight / 16;
 		var estimatedWith = (int) (aspectHeight * 1.78);
 
-		if (!new File(image.getImagePreview()).exists()) {
+		if (!Files.exists(image.getImagePreviewPath())) {
 			// Create preview: convert -thumbnail 200 abc.png thumb.abc.png
-			logger.info("Init: Create Preview-Image {}", image.getImagePreview());
-			var command = "convert -geometry " + image.getPreviewWidth() + "x " + original + " " + image.getImagePreview();
+			logger.info("Init: Create Preview-Image {}", image.getImagePreviewPath());
+			var command = "convert -geometry " + image.getPreviewWidth() + "x " + original + " " + image.getImagePreviewPath();
 			try {
 				var process = new ProcessBuilder("bash", "-c", command)
 						.directory(new File(workingDir))
 						.redirectErrorStream(true)
 						.start();
 				process.waitFor();
-
+				image.setImagePreview(ImageIO.read(image.getImagePreviewPath().toFile()));
 
 				try (BufferedReader reader = new BufferedReader(
 						new InputStreamReader(process.getInputStream()))) {
@@ -400,29 +406,30 @@ public class LocalService implements MIFService {
 
 			// Preview: 324x243 (Aspect ration) from 5184/16 x 3888/16
 		} else {
-			logger.debug("Init: Preview-Image {} already exists", image.getImagePreview());
+			logger.debug("Init: Preview-Image {} already exists", image.getImagePreviewPath());
 		}
 
-		if (!new File(image.getPreviewHardResize()).exists()) {
-			logger.info("Init: Create HARD-Preview-Image {}", image.getPreviewHardResize());
+		if (!Files.exists(image.getPreviewHardResizePath())) {
+			logger.info("Init: Create HARD-Preview-Image {}", image.getPreviewHardResizePath());
 
-			var hardRescale = "convert " + image.getImagePreview() + " -quality 100 -resize " + estimatedWith + "x"
-					+ aspectHeight + "! " + image.getPreviewHardResize();
+			var hardRescale = "convert " + image.getImagePreviewPath() + " -quality 100 -resize " + estimatedWith + "x"
+					+ aspectHeight + "! " + image.getPreviewHardResizePath();
 			try {
 				var process = new ProcessBuilder("bash", "-c", hardRescale).directory(new File(workingDir))
 						.redirectErrorStream(true).start();
 				process.waitFor();
+				image.setPreviewHardResize(ImageIO.read(image.getPreviewHardResizePath().toFile()));
 			} catch (IOException | InterruptedException e) {
 				throw new MIFException(e);
 			}
 		} else {
-			logger.debug("Init: HARD-Preview-Image {} already exists", image.getPreviewHardResize());
+			logger.debug("Init: HARD-Preview-Image {} already exists", image.getPreviewHardResizePath());
 		}
 
-		if (!new File(image.getPreviewFillWColor()).exists()) {
-			logger.info("Init: Create FILL-Preview-Image {}", image.getPreviewFillWColor());
+		if (!Files.exists(image.getPreviewFillWColorPath())) {
+			logger.info("Init: Create FILL-Preview-Image {}", image.getPreviewFillWColorPath());
 
-			var fill = "convert " + image.getImagePreview() + " -quality 100 -geometry x" + aspectHeight + " fill." + filename;
+			var fill = "convert " + image.getImagePreviewPath() + " -quality 100 -geometry x" + aspectHeight + " fill." + filename;
 			try {
 				var process = new ProcessBuilder("bash", "-c", fill).directory(new File(workingDir))
 						.redirectErrorStream(true).start();
@@ -431,7 +438,7 @@ public class LocalService implements MIFService {
 				var fill2 = "convert fill." + filename + " \\( -clone 0 -quality 100 -blur 0x5 -resize " + estimatedWith
 						+ "x" + aspectHeight + "\\! -fill black -quality 100 -colorize 100% \\) \\( -clone 0 -resize "
 						+ estimatedWith + "x" + aspectHeight + " \\) -delete 0 -gravity center -composite "
-						+ image.getPreviewFillWColor();
+						+ image.getPreviewFillWColorPath();
 				process = new ProcessBuilder("bash", "-c", fill2).directory(new File(workingDir)).redirectErrorStream(true)
 						.start();
 				process.waitFor();
@@ -440,17 +447,19 @@ public class LocalService implements MIFService {
 				process = new ProcessBuilder("bash", "-c", "rm fill." + filename).directory(new File(workingDir))
 						.redirectErrorStream(true).start();
 				process.waitFor();
+
+				image.setPreviewFillWColor(ImageIO.read(image.getPreviewFillWColorPath().toFile()));
 			} catch (InterruptedException | IOException e) {
 				throw new MIFException(e);
 			}
 		} else {
-			logger.debug("Init: FILL-Preview-Image {} already exists", image.getPreviewFillWColor());
+			logger.debug("Init: FILL-Preview-Image {} already exists", image.getPreviewFillWColorPath());
 		}
 
-		if (!new File(image.getPreviewCrop()).exists()) {
-			logger.info("Init: Create CROP-Preview-Image {}", image.getPreviewCrop());
+		if (!Files.exists(image.getPreviewCropPath())) {
+			logger.info("Init: Create CROP-Preview-Image {}", image.getPreviewCropPath());
 
-			var kill = "convert " + image.getImagePreview() + " -quality 100 -geometry " + estimatedWith + "x kill." + filename;
+			var kill = "convert " + image.getImagePreviewPath() + " -quality 100 -geometry " + estimatedWith + "x kill." + filename;
 			try {
 				new ProcessBuilder("bash", "-c", kill)
 				.directory(new File(workingDir))
@@ -459,7 +468,7 @@ public class LocalService implements MIFService {
 				.waitFor();
 
 				var kill2 = "convert kill." + filename + " -quality 100 -crop " + estimatedWith + "x" + aspectHeight
-						+ "+0+46 " + image.getPreviewCrop();
+						+ "+0+46 " + image.getPreviewCropPath();
 				new ProcessBuilder("bash", "-c", kill2)
 				.directory(new File(workingDir))
 				.redirectErrorStream(true)
@@ -472,12 +481,14 @@ public class LocalService implements MIFService {
 				.redirectErrorStream(true)
 				.start()
 				.waitFor();
+
+				image.setPreviewCrop(ImageIO.read(image.getPreviewCropPath().toFile()));
 			} catch (InterruptedException | IOException e) {
 				throw new MIFException(e);
 			}
 
 		} else {
-			logger.debug("Init: CROP-Preview-Image {} already exists", image.getPreviewCrop());
+			logger.debug("Init: CROP-Preview-Image {} already exists", image.getPreviewCropPath());
 		}
 
 		// TODO manual preview if exists
@@ -737,5 +748,38 @@ public class LocalService implements MIFService {
 	@Override
 	public MeltFilterDetails getMeltFilterDetailsFor(Melt melt, MeltFilter meltFilter) throws MIFException {
 		return getOrLoad(melt).stream().filter(mdf -> mdf.getFiltername().contentEquals(meltFilter.getFiltername())).findAny().get();
+	}
+	
+	public void applyFilter(MIFImage mifImage, MeltFilter meltFilter) throws MIFException {
+		StringBuilder sb  = new StringBuilder();
+		sb.append("melt ")
+		// TODO Filter: Preview: may be file-style has been changed to CROP, MANUAAL... 
+		.append(mifImage.getFile())
+		.append(" out=50 ");
+		for (MeltFilter currentlyAddedFilters : mifImage.getFilters()) {
+			sb.append(" -attach-cut ");
+			sb.append(currentlyAddedFilters.getFiltername());
+			Map<String, String> filterUsage = currentlyAddedFilters.getFilterUsage();
+			for (String v : filterUsage.keySet()) {
+				sb.append(v).append("=").append(filterUsage.get(v)).append(" ");
+			}				
+		}
+		sb.append(" -attach-cut ");
+		sb.append(meltFilter.getFiltername())
+		.append(" ");
+		Map<String, String> filterUsage = meltFilter.getFilterUsage();
+		for (String v : filterUsage.keySet()) {
+			sb.append(v).append("=").append(filterUsage.get(v)).append(" ");
+		}
+		sb.append(" -consumer sdl2 terminate_on_pause=1");
+		try {
+			String command = sb.toString();
+
+			MIFProject temp = new MIFProject();
+			temp.setWorkingDir("/tmp/");
+			new MIFProjectExecutor(temp).execute(command);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 	}
 }

@@ -120,6 +120,14 @@ public class ServiceExecutor implements MIF {
 	}
 
 	@Override
+	public long applyFilter(MIFImage mifImage, MeltFilter meltFilter) throws MIFException {
+		return executor.doIt(() -> {
+			 service.applyFilter(mifImage, meltFilter);
+			 return null;
+		});
+	}
+	
+	@Override
 	public Future<?> get(long id) throws MIFException {
 		return executor.get(id);
 	}

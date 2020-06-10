@@ -1,6 +1,8 @@
 package io.github.jmif.entities;
 
+import java.awt.Image;
 import java.io.File;
+import java.nio.file.Path;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -18,19 +20,34 @@ public class MIFImage extends MIFFile {
 	private String manualStyleCommand = null;
 	
 	@XmlTransient
-	private String imagePreview;
+	private Path imagePreviewPath;
 	
 	@XmlTransient
-	private String previewHardResize;
+	private Path previewHardResizePath;
 	
 	@XmlTransient
-	private String previewFillWColor;
+	private Path previewFillWColorPath;
 	
 	@XmlTransient
-	private String previewCrop;
+	private Path previewCropPath;
 	
 	@XmlTransient
-	private String previewManual;
+	private Path previewManualPath;
+
+	@XmlTransient
+	private Image imagePreview;
+	
+	@XmlTransient
+	private Image previewHardResize;
+	
+	@XmlTransient
+	private Image previewFillWColor;
+	
+	@XmlTransient
+	private Image previewCrop;
+	
+	@XmlTransient
+	private Image previewManual;
 
 	@XmlTransient
 	private int previewHeight;
@@ -67,28 +84,28 @@ public class MIFImage extends MIFFile {
 		this.style = style;
 	}
 
-	public String getPreviewHardResize() {
-		return previewHardResize;
+	public Path getPreviewHardResizePath() {
+		return previewHardResizePath;
 	}
 
-	public String getPreviewFillWColor() {
-		return previewFillWColor;
+	public Path getPreviewFillWColorPath() {
+		return previewFillWColorPath;
 	}
 
-	public String getPreviewCrop() {
-		return previewCrop;
+	public Path getPreviewCropPath() {
+		return previewCropPath;
 	}
 
-	public String getImagePreview() {
-		return imagePreview;
+	public Path getImagePreviewPath() {
+		return imagePreviewPath;
 	}
 
-	public String getPreviewManual() {
-		return previewManual;
+	public Path getPreviewManualPath() {
+		return previewManualPath;
 	}
 
-	public void setPreviewManual(String previewManual) {
-		this.previewManual = previewManual;
+	public void setPreviewManualPath(Path previewManual) {
+		this.previewManualPath = previewManual;
 	}
 	
 	public int getPreviewWidth() {
@@ -107,20 +124,60 @@ public class MIFImage extends MIFFile {
 		return previewHeight;
 	}
 	
-	public void setPreviewCrop(String previewCrop) {
-		this.previewCrop = previewCrop;
+	public void setPreviewCropPath(Path previewCrop) {
+		this.previewCropPath = previewCrop;
 	}
 	
-	public void setImagePreview(String imagePreview) {
+	public void setImagePreviewPath(Path imagePreview) {
+		this.imagePreviewPath = imagePreview;
+	}
+	
+	public void setPreviewHardResizePath(Path previewHardResizPathe) {
+		this.previewHardResizePath = previewHardResizPathe;
+	}
+	
+	public void setPreviewFillWColorPath(Path previewFillWColor) {
+		this.previewFillWColorPath = previewFillWColor;
+	}
+
+	public Image getImagePreview() {
+		return imagePreview;
+	}
+
+	public void setImagePreview(Image imagePreview) {
 		this.imagePreview = imagePreview;
 	}
-	
-	public void setPreviewHardResize(String previewHardResize) {
+
+	public Image getPreviewHardResize() {
+		return previewHardResize;
+	}
+
+	public void setPreviewHardResize(Image previewHardResize) {
 		this.previewHardResize = previewHardResize;
 	}
-	
-	public void setPreviewFillWColor(String previewFillWColor) {
+
+	public Image getPreviewFillWColor() {
+		return previewFillWColor;
+	}
+
+	public void setPreviewFillWColor(Image previewFillWColor) {
 		this.previewFillWColor = previewFillWColor;
+	}
+
+	public Image getPreviewCrop() {
+		return previewCrop;
+	}
+
+	public void setPreviewCrop(Image previewCrop) {
+		this.previewCrop = previewCrop;
+	}
+
+	public Image getPreviewManual() {
+		return previewManual;
+	}
+
+	public void setPreviewManual(Image previewManual) {
+		this.previewManual = previewManual;
 	}
 
 }
