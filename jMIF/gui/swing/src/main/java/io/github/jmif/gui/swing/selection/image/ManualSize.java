@@ -28,6 +28,7 @@ import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 
+import io.github.jmif.MIFException;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.gui.swing.GraphWrapper;
 
@@ -156,9 +157,13 @@ public class ManualSize {
 		JButton ok = new JButton("OK");
 		JButton cancel = new JButton("Cancel");
 		ok.addActionListener(event -> {
-			mifImage.setManualStyleCommand(command);
-			graphWrapper.getService().createManualPreview(mifImage);
-			imageView.refreshFromManualSize();
+			try {
+				mifImage.setManualStyleCommand(command);
+				graphWrapper.getService().createManualPreview(mifImage);
+				imageView.refreshFromManualSize();
+			} catch (MIFException e) {
+				logger.error("", e);
+			}
 			frame.dispose();
 		});
 		cancel.addActionListener(event -> frame.dispose());

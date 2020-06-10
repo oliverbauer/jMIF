@@ -1,7 +1,7 @@
 package io.github.jmif;
 
 import java.io.File;
-import java.util.Optional;
+import java.util.concurrent.Future;
 
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
@@ -15,16 +15,16 @@ public interface MIF {
 
 	long convert(MIFProject pr, boolean preview) throws MIFException;
 
-	long updateFramerate(MIFProject project);
+	long updateFramerate(MIFProject project) throws MIFException;
 
-	long createWorkingDirs(MIFProject project);
+	long createWorkingDirs(MIFProject project) throws MIFException;
 
-	long createVideo(String file, String display, float frames, String dim, int overlay, String workingDir,
+	long createVideo(File file, String display, float frames, String dim, int overlay, String workingDir,
 			int profileFramelength) throws MIFException;
 
 	long createPreview(MIFFile file, String workingDir) throws MIFException;
 
-	long createManualPreview(MIFImage image);
+	long createManualPreview(MIFImage image) throws MIFException ;
 
 	long createImage(File file, String display, float frames, String dim, int overlay, String workingDir,
 			int framelength) throws MIFException;
@@ -33,7 +33,7 @@ public interface MIF {
 
 	long getProfiles() throws MIFException;
 
-	Optional<?> get(long id) throws MIFException;
+	Future<?> get(long id) throws MIFException;
 
 	long getMeltVideoFilterDetails(Melt melt) throws MIFException;
 

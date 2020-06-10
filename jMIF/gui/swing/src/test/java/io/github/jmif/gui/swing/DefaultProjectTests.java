@@ -10,13 +10,14 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import io.github.jmif.Service;
+import io.github.jmif.LocalService;
+import io.github.jmif.MIFService;
 import io.github.jmif.entities.MIFAudioFile;
 import io.github.jmif.entities.MIFFile;
 
 public class DefaultProjectTests {
 	
-	private final Service service = new Service();
+	private final MIFService service = new LocalService();
 	
 	@Test
 	public void withoutOverlay() throws Exception {
@@ -50,7 +51,7 @@ public class DefaultProjectTests {
 		project.save();
 		Assert.assertTrue(new File(tempDir+"defaultproject.xml").exists());
 		
-		new Service().convert(pr, false);
+		new LocalService().convert(pr, false);
 		
 		Assert.assertTrue(new File(tempDir+"output.avi").exists());
 		
@@ -91,7 +92,7 @@ public class DefaultProjectTests {
 		project.save();
 		Assert.assertTrue(new File(tempDir+"defaultproject4711.xml").exists());
 		
-		new Service().convert(pr, false);
+		new LocalService().convert(pr, false);
 		
 		Assert.assertTrue(new File(tempDir+"output4711.avi").exists());
 		

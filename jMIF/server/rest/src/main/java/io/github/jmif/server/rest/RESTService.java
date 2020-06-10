@@ -3,6 +3,8 @@
  */
 package io.github.jmif.server.rest;
 
+import java.io.File;
+
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -54,21 +56,21 @@ public class RESTService extends Application {
 	@POST
 	@Path("/updateFramerate")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response updateFramerate(MIFProject project) {
+	public Response updateFramerate(MIFProject project) throws MIFException {
 		return Response.accepted(delegate.updateFramerate(project)).build();
 	}
 
 	@POST
 	@Path("/createWorkingDirs")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response createWorkingDirs(MIFProject project) {
+	public Response createWorkingDirs(MIFProject project) throws MIFException {
 		return Response.accepted(delegate.createWorkingDirs(project)).build();
 	}
 
 	@POST
 	@Path("/createVideo")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response createVideo(String file, String display, float frames, String dim, int overlay, String workingDir, int profileFramelength) throws MIFException {
+	public Response createVideo(File file, String display, float frames, String dim, int overlay, String workingDir, int profileFramelength) throws MIFException {
 		return Response.accepted(delegate.createVideo(file, display, frames, dim, overlay, workingDir, profileFramelength)).build();
 	}
 
@@ -82,14 +84,14 @@ public class RESTService extends Application {
 	@POST
 	@Path("/createManualPreview")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response createManualPreview(MIFImage image) {
+	public Response createManualPreview(MIFImage image) throws MIFException {
 		return Response.accepted(delegate.createManualPreview(image)).build();
 	}
 
 	@POST
 	@Path("/createImage")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response createImage(String file, String display, float frames, String dim, int overlay, String workingDir, int framelength) throws MIFException {
+	public Response createImage(File file, String display, float frames, String dim, int overlay, String workingDir, int framelength) throws MIFException {
 		return Response.accepted(delegate.createImage(file, display, frames, dim, overlay, workingDir, framelength)).build();
 	}
 

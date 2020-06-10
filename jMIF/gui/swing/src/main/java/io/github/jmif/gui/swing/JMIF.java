@@ -119,9 +119,14 @@ public class JMIF {
 		JComboBox<String> profilesCombobox = new JComboBox<>(profiles.toArray(new String[profiles.size()]));
 		profilesCombobox.setSelectedItem(graphWrapper.getPr().getProfile());
 		profilesCombobox.addItemListener((itemEvent) -> {
+			try {
 			String item = (String)profilesCombobox.getSelectedItem();
 			graphWrapper.getPr().setProfile(item);
-			graphWrapper.getService().updateFramerate(graphWrapper.getPr());
+				graphWrapper.getService().updateFramerate(graphWrapper.getPr());
+			} catch (MIFException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			// TODO Profile-Change: Needs full refresh of all nodes, timeline etc. pp
 			// TODO Profile-Change: Change overlay
 		});
