@@ -13,6 +13,7 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.github.jmif.config.Configuration;
 import io.github.jmif.entities.MIFAudioFile;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
@@ -189,11 +190,12 @@ public class MIFProjectExecutor {
 			int count = 0;
 			for (MIFFile meltfile : this.project.getMIFFiles()) {
 				String input = project.getWorkingDir()+"scaled/"+meltfile.getFilename();
+				String extension = meltfile.getFileExtension();
 				
 				boolean useMixer = count != 0;
 				int frames = (int)((meltfile.getDuration() / 1000d) * project.getFramerate());
 				
-				if (input.endsWith("jpg") || input.endsWith("JPG")) {
+				if (Configuration.allowedImageTypes.contains(extension)) {
 					sb.append("   ").append(input).append(" in=0 out=").append(frames - 1);
 					
 					for (MeltFilter currentlyAddedFilters : meltfile.getFilters()) {
@@ -206,8 +208,11 @@ public class MIFProjectExecutor {
 						}				
 					}
 					
-				} else if (input.endsWith("mp4") || input.endsWith("MP4")) {
+				} else if (Configuration.allowedVideoTypes.contains(extension)) {
 					sb.append("   ").append(input).append(" in=0 out=").append(frames - 1);
+				} else {
+					// Exception
+					LOGGER.error("Unsupported file extension {}", extension);
 				}
 				if (useMixer && meltfile.getOverlayToPrevious() > 0) {
 					int overlay = (int)((meltfile.getOverlayToPrevious() / 1000d) * project.getFramerate());

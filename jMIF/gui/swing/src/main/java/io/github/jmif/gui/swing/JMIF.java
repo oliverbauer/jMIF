@@ -123,6 +123,7 @@ public class JMIF {
 				String item = (String)profilesCombobox.getSelectedItem();
 				graphWrapper.getPr().setProfile(item);
 				graphWrapper.getService().updateFramerate(graphWrapper.getPr());
+				graphWrapper.redrawGraph();
 			} catch (MIFException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

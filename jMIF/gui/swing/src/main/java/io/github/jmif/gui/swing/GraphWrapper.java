@@ -2,6 +2,7 @@ package io.github.jmif.gui.swing;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.io.File;
@@ -152,7 +153,7 @@ public class GraphWrapper {
 				"mp3",
 				XOFFSET,
 				YOFFSET*2 +YOFFSET/2 + 2*Configuration.timelineentryHeight,
-				pr.getFramerate()*(audioFile.getEncodeEnde()-audioFile.getEncodeStart()),
+				25*(audioFile.getEncodeEnde()-audioFile.getEncodeStart()),
 				20);
 			put(audioFile, v1);
 			
@@ -178,18 +179,18 @@ public class GraphWrapper {
 		
 		if (mifFile != null) {
 			if (!pr.getMIFFiles().isEmpty()) {
-				currentLength -= (mifFile.getOverlayToPrevious() / 1000d) * pr.getFramerate();
+				currentLength -= (mifFile.getOverlayToPrevious() / 1000d) * 25;
 			}
 
 			int x = currentLength + XOFFSET;
 			int y = pr.getMIFFiles().size() % 2 == 0 ? 0 + YOFFSET : 20 + YOFFSET;
-			int w = (int)((mifFile.getDuration() / 1000d) * pr.getFramerate());
+			int w = (int)(mifFile.getDuration()*25 / 1000d);
 			int h = 20;
 			var v1 = insertVertex(mifFile.getDisplayName(), x, y, w, h);
 			
 			put(mifFile, v1);
 			
-			currentLength += (mifFile.getDuration() / 1000d) * pr.getFramerate();
+			currentLength += (mifFile.getDuration() / 1000d) * 25;
 			
 			return mifFile;
 		}			
@@ -226,8 +227,8 @@ public class GraphWrapper {
 			if (current % 2 == 0) {
 				rec.setY(rec.getY() + 20);
 			}
-			rec.setWidth(pr.getFramerate()*(audioFile.getEncodeEnde()-audioFile.getEncodeStart()));
-			audioLength += pr.getFramerate()*(audioFile.getEncodeEnde()-audioFile.getEncodeStart());
+			rec.setWidth(25*(audioFile.getEncodeEnde()-audioFile.getEncodeStart()));
+			audioLength += 25*(audioFile.getEncodeEnde()-audioFile.getEncodeStart());
 			rec.setHeight(20);
 			resize(mxCell, rec);
 		}
@@ -244,8 +245,8 @@ public class GraphWrapper {
 
 			c.setValue(file.getDisplayName());
 
-			var frames = (file.getDuration() / 1000d) * pr.getFramerate();
-			var overlayInFrames = (file.getOverlayToPrevious() / 1000d) * pr.getFramerate();
+			var frames = (file.getDuration() / 1000d) * 25;
+			var overlayInFrames = (file.getOverlayToPrevious() / 1000d) * 25;
 			if (current > 0) {
 				currentLength -= overlayInFrames;
 			}
@@ -271,7 +272,7 @@ public class GraphWrapper {
 			MIFAudioFile audioFile = audioEntry.getValue();
 			
 			if (current > 1) {
-				audioLength -= pr.getFramerate(); // FIXME Allow Overlay in milliseconds
+				audioLength -= 25; // FIXME Allow Overlay in milliseconds
 			}
 			
 			var rec = new mxRectangle();
@@ -280,11 +281,13 @@ public class GraphWrapper {
 			if (current % 2 == 0) {
 				rec.setY(rec.getY() + 20);
 			}
-			rec.setWidth(pr.getFramerate()*(audioFile.getEncodeEnde()-audioFile.getEncodeStart()));
-			audioLength += pr.getFramerate()*(audioFile.getEncodeEnde()-audioFile.getEncodeStart());
+			rec.setWidth(25*(audioFile.getEncodeEnde()-audioFile.getEncodeStart()));
+			audioLength += 25*(audioFile.getEncodeEnde()-audioFile.getEncodeStart());
 			rec.setHeight(20);
 			resize(mxCell, rec);
 		}
+		
+		this.graphComponent.updateUI();
 	}
 	
 	public mxCell insertVertex(int x, int y, MIFFile meltFile) {
@@ -328,18 +331,18 @@ public class GraphWrapper {
 							int current = 0;
 							for (MIFFile file : pr.getMIFFiles()) {
 								if (current > 0) {
-									length -= (file.getOverlayToPrevious() / 1000d);
+									length -= (file.getOverlayToPrevious() / 1000d) * 25;
 								}
-								length += (file.getDuration() / 1000d);
+								length += (file.getDuration() / 1000d) * 25;
 								current++;
 							}
 							int audioLength = 0;
 							current = 0;
 							for (Entry<mxCell, MIFAudioFile> audioEntry : nodeToMIFAudio.entrySet()) {
 								if (current > 0) {
-									audioLength -= pr.getFramerate();
+									audioLength -= 25;
 								}
-								audioLength += pr.getFramerate()*(audioEntry.getValue().getEncodeEnde() - audioEntry.getValue().getEncodeStart());
+								audioLength += 25*(audioEntry.getValue().getEncodeEnde() - audioEntry.getValue().getEncodeStart());
 								current++;
 							}
 							
@@ -356,14 +359,18 @@ public class GraphWrapper {
 							var yOffsetTrack = 5;
 							var height = Configuration.timelineentryHeight;
 							g.setColor(new Color(237,	237, 	237  ));
-							g.fillRect(xOffsetTrack, yOffsetTrack, w + xOffsetTrack, YOFFSET + 2*height); // Track 0
+							g.fillRect(xOffsetTrack, yOffsetTrack,         w + xOffsetTrack, YOFFSET + 2*height); // Track 0
 							g.fillRect(xOffsetTrack, YOFFSET*2 + 2*height, w + xOffsetTrack, YOFFSET + 2*height); // Track 1
 							
 							
 							// 3. 
 							g.setColor(Color.DARK_GRAY);
-							for (int i = 1; i <= w / pr.getFramerate(); i++) {
-								if (i % 5 == 0) {
+							for (int i = 1; i <= w; i++) {
+								// e.g. all 25 or 50 pixels
+								if (i % 25 == 0) {
+									g.drawLine(i+XOFFSET, 50+YOFFSET, i+XOFFSET, 45+YOFFSET);
+								}
+								if (i % 125 == 0) {
 							        //creates a copy of the Graphics instance
 							        Graphics2D g2d = (Graphics2D) g.create();
 
@@ -371,18 +378,19 @@ public class GraphWrapper {
 							        BasicStroke bs2 = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 1.0f, dash2, 2f);
 							        
 							        g2d.setStroke(bs2);
-									g2d.drawLine(i*pr.getFramerate()+XOFFSET, 100+YOFFSET, i*pr.getFramerate()+XOFFSET, 5);
+							        int x1 = i+XOFFSET;
+							        int y1 = 100+YOFFSET;
+							        int x2 = i+XOFFSET;
+							        int y2 = 5;
+									g2d.drawLine(x1, y1, x2, y2);
 									
-									String t = String.valueOf(i)+"s";
-									if (i >= 60) {
+									String t = String.valueOf(i / 25)+"s";
+									if ((i/25) >= 60) {
 										t = i/60+"m "+i%60+"s";
 									}
 											
-									g.drawString(t, i*pr.getFramerate() + XOFFSET/2, 130);
-									g.drawString(String.valueOf(i*pr.getFramerate()), i*pr.getFramerate() + XOFFSET/2, 145); // framenumber
-									
-								} else {
-									g.drawLine(i*pr.getFramerate()+XOFFSET, 50+YOFFSET, i*pr.getFramerate()+XOFFSET, 45+YOFFSET);
+									g.drawString(t, i + XOFFSET/2, 130);
+									g.drawString(String.valueOf(i*pr.getFramerate()/25), i + XOFFSET/2, 145); // framenumber
 								}
 							}
 						}
@@ -429,6 +437,8 @@ public class GraphWrapper {
 		
 		graphComponent.getViewport().setOpaque(true);
 		graphComponent.getViewport().setBackground(Configuration.bgColor);
+		
+		graphComponent.setMinimumSize(new Dimension(10, 180)); // xdim ignore
 	}
 
 	private void exportFrame(int frame) {
