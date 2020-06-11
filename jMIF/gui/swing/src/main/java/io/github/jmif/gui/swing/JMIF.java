@@ -194,11 +194,11 @@ public class JMIF {
 		var file2 = project.createMIFFile(new File(project.getPr().getWorkingDir() + "2.MP4"));
 		var file3 = project.createMIFFile(new File(project.getPr().getWorkingDir() + "3.JPG"));
 		var audio = project.createMIFAudioFile(new File(project.getPr().getWorkingDir()+"audio.mp3"));
-		audio.setEncodeEnde(10);
+		audio.setEncodeEnde(10000); // [ms]
 		var file4 = project.createMIFFile(new File(project.getPr().getWorkingDir() + "4.JPG"));
 		var file5 = project.createMIFFile(new File(project.getPr().getWorkingDir() + "5.JPG"));
 		var audio2 = project.createMIFAudioFile(new File(project.getPr().getWorkingDir()+"audio2.mp3"));
-		audio2.setEncodeEnde(14);
+		audio2.setEncodeEnde(14000); // [ms]
 		
 		var executor = Executors.newWorkStealingPool();
 		executor.submit(() -> {

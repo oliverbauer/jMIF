@@ -209,7 +209,7 @@ public class DefaultProjectTests {
 		f1.setDuration(5000);
 		f1.setOverlayToPrevious(0);
 		a1.setEncodeStart(0);     // 15 sec
-		a1.setEncodeEnde(8);     // 15 sec
+		a1.setEncodeEnde(8000);   // 8 sec
 		project.getPr().setProfile("atsc_1080p_25");
 		service.updateProfile(pr);
 		project.save();
@@ -245,10 +245,10 @@ public class DefaultProjectTests {
 		f1.setDuration(1000);
 		f1.setOverlayToPrevious(0);
 		a1.setEncodeStart(0);
-		a1.setEncodeEnde(2);
+		a1.setEncodeEnde(2000); // [ms]
 		
 		a2.setEncodeStart(0);
-		a2.setEncodeEnde(2);
+		a2.setEncodeEnde(2000); // [ms]
 		project.getPr().setProfile("atsc_1080p_25");
 		service.updateProfile(pr);
 		project.save();

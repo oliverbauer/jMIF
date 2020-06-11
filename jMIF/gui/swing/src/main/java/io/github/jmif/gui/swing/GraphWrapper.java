@@ -469,7 +469,7 @@ public class GraphWrapper {
 	}
 
 	private int getPixelwidth(MIFAudioFile audioFile) {
-		return Configuration.pixelwidth_per_second * (audioFile.getEncodeEnde() - audioFile.getEncodeStart());
+		return (int)(Configuration.pixelwidth_per_second * ((audioFile.getEncodeEnde() - audioFile.getEncodeStart()) / 1000d));
 	}
 	
 	private int getPixelwidth(MIFFile mifFile) {

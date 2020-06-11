@@ -35,11 +35,11 @@ public class AudioDetailsView {
 	private JTextField fadeOut = new JTextField();
 
 	private JLabel labelFile = new JLabel("File");
-	private JLabel labelLength = new JLabel("Length");
+	private JLabel labelLength = new JLabel("Length [ms]");
 	private JLabel labelBitrate = new JLabel("Bitrate");
-	private JLabel labelEncodeStart = new JLabel("Encode from");
-	private JLabel labelEncodeEnd = new JLabel("Encode to");
-	private JLabel labelEncodeLength = new JLabel("Encode length");
+	private JLabel labelEncodeStart = new JLabel("Encode from [ms]");
+	private JLabel labelEncodeEnd = new JLabel("Encode to [ms]");
+	private JLabel labelEncodeLength = new JLabel("Encode length [ms]");
 	private JLabel labelNormalize = new JLabel("Normalize");
 	private JLabel labelFadeIn = new JLabel("FadeIn");
 	private JLabel labelFadeOut = new JLabel("FadeOut");
@@ -154,7 +154,7 @@ public class AudioDetailsView {
 		this.audioFile = audioFile;
 		
 		file.setText(audioFile.getAudiofile());
-		length.setText(String.valueOf(audioFile.getLengthOfInput())+"sec.");
+		length.setText(String.valueOf(audioFile.getLengthOfInput()));
 		bitrate.setText(String.valueOf(audioFile.getBitrate()/1000)+" kb/s");
 		encodeStart.setText(String.valueOf(audioFile.getEncodeStart()));
 		encodeEnd.setText(String.valueOf(audioFile.getEncodeEnde()));

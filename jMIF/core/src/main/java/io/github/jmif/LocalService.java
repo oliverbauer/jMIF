@@ -532,7 +532,10 @@ public class LocalService implements MIFService {
 				String durationOutput = reader.readLine();
 				String bitrateOutput = reader.readLine();
 
-				audio.setLengthOfInput(Integer.parseInt(durationOutput.substring(0, durationOutput.indexOf('.'))));
+				float f = Float.parseFloat(durationOutput);
+				f = f * 1000;
+				
+				audio.setLengthOfInput((int)f);
 				audio.setBitrate(Integer.parseInt(bitrateOutput));
 			}
 		} catch (IOException e) {

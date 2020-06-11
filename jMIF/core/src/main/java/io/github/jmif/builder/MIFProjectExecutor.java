@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,9 +104,9 @@ public class MIFProjectExecutor {
 					StringBuilder sb = new StringBuilder("ffmpeg -y -i ");
 					sb.append(input);
 					sb.append(" -ss ");
-					sb.append(audio.getEncodeStart());
+					sb.append(DurationFormatUtils.formatDuration(audio.getEncodeStart(), "HH:mm:ss"));
 					sb.append(" -t ");
-					sb.append(audio.getEncodeEnde());
+					sb.append(DurationFormatUtils.formatDuration(audio.getEncodeEnde(), "HH:mm:ss"));
 					sb.append(" ");
 					if (audio.isNormalize()) {
 						sb.append(" -filter:a loudnorm ");
@@ -124,9 +125,9 @@ public class MIFProjectExecutor {
 						StringBuilder sb2 = new StringBuilder("ffmpeg -y -i ");
 						sb2.append(tempOutput);
 						sb2.append(" -ss ");
-						sb2.append(audio.getEncodeStart());
+						sb2.append(DurationFormatUtils.formatDuration(audio.getEncodeStart(), "HH:mm:ss"));
 						sb2.append(" -t ");
-						sb2.append(audio.getEncodeEnde());
+						sb2.append(DurationFormatUtils.formatDuration(audio.getEncodeEnde(), "HH:mm:ss"));
 						sb2.append(" -filter_complex \"");
 						if (audio.getFadeIn() > 0) {
 							sb2.append("afade=d=");
@@ -151,9 +152,9 @@ public class MIFProjectExecutor {
 					StringBuilder sb = new StringBuilder("ffmpeg -y -i ");
 					sb.append(input);
 					sb.append(" -ss ");
-					sb.append(audio.getEncodeStart());
+					sb.append(DurationFormatUtils.formatDuration(audio.getEncodeStart(), "HH:mm:ss"));
 					sb.append(" -t ");
-					sb.append(audio.getEncodeEnde());
+					sb.append(DurationFormatUtils.formatDuration(audio.getEncodeEnde(), "HH:mm:ss"));
 					sb.append(" ");
 					if (audio.getFadeIn() > 0 || audio.getFadeOut() > 0) {
 						sb.append("-filter_complex \"");
@@ -226,8 +227,8 @@ public class MIFProjectExecutor {
 				sb.append(" -audio-track ");
 				for (int i=0; i<=project.getAudiotrack().getAudiofiles().size()-1; i++) {
 					MIFAudioFile mifAudioFile = project.getAudiotrack().getAudiofiles().get(i);
-					int seconds = mifAudioFile.getEncodeEnde() - mifAudioFile.getEncodeStart();
-					int frames = (seconds * project.getProfileFramerate() - 1);
+					int millis = mifAudioFile.getEncodeEnde() - mifAudioFile.getEncodeStart();
+					int frames = ((millis/1000) * project.getProfileFramerate() - 1);
 					
 					sb.append(" "+(i+1)+"_mp3.mp3 in=0 out="+frames+" "); // TODO Audio: Overlay
 				}
