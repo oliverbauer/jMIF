@@ -35,14 +35,14 @@ public class GraphView {
 	
 	private JFrame frame;
 	private GraphWrapper graphWrapper;
-	private SelectionView mifPanel;
+	private SelectionView selectionView;
 	
 	private Box graphPanel;
 	
 	public GraphView(JFrame frame, GraphWrapper graphWrapper, SelectionView mifPanel) {
 		this.frame = frame;
 		this.graphWrapper = graphWrapper;
-		this.mifPanel = mifPanel;
+		this.selectionView = mifPanel;
 	}
 	
 	public void init() {
@@ -169,9 +169,9 @@ public class GraphView {
 		removeFile.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (mifPanel.getCurrentMeltFile() != null) {
-					MIFFile currentMeltFile = mifPanel.getCurrentMeltFile();
-					mxCell cell = mifPanel.getCell();
+				if (selectionView.getCurrentMeltFile() != null) {
+					MIFFile currentMeltFile = selectionView.getCurrentMeltFile();
+					mxCell cell = selectionView.getCell();
 					remove(cell, currentMeltFile);
 				}
 			}
@@ -185,9 +185,9 @@ public class GraphView {
 		removeFile.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (mifPanel.getCurrentAudioFile() != null) {
-					MIFAudioFile currentMeltFile = mifPanel.getCurrentAudioFile();
-					mxCell cell = mifPanel.getCell();
+				if (selectionView.getCurrentAudioFile() != null) {
+					MIFAudioFile currentMeltFile = selectionView.getCurrentAudioFile();
+					mxCell cell = selectionView.getCell();
 					
 					remove(cell, currentMeltFile);
 				}
@@ -201,7 +201,7 @@ public class GraphView {
 		graphWrapper.remove(meltfile, cell);
 		graphWrapper.remove(cell);
 
-		mifPanel.clearSelection();
+		selectionView.clearSelection();
 		// Timeline etc.
 		graphWrapper.redrawGraph();
 	}
@@ -210,7 +210,7 @@ public class GraphView {
 		graphWrapper.remove(meltfile, cell);
 		graphWrapper.remove(cell);
 
-		mifPanel.clearSelection();
+		selectionView.clearSelection();
 		// Timeline etc.
 		graphWrapper.redrawGraph();
 	}

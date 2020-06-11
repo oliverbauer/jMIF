@@ -21,6 +21,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -166,7 +167,7 @@ public class GraphWrapper {
 		logger.info("Create node for {}", fileToAdd);
 		
 		var file = fileToAdd.getAbsoluteFile().getAbsolutePath();
-		var extension = file.substring(file.lastIndexOf(".")+1);
+		var extension = FilenameUtils.getExtension(file);
 
 		MIFFile mifFile = null;
 		

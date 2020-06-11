@@ -10,6 +10,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.apache.commons.io.FilenameUtils;
+
 @XmlRootElement(name = "meltfile")
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class MIFFile {
@@ -44,7 +46,7 @@ public abstract class MIFFile {
 	}
 
 	public String getFileExtension() {
-		return filename.substring(filename.lastIndexOf('.') + 1);
+		return FilenameUtils.getExtension(filename);
 	}
 	
 	public boolean isInitialized() {

@@ -16,6 +16,7 @@ import javax.imageio.ImageIO;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -357,15 +358,15 @@ public class LocalService implements MIFService {
 		var estimatedWith = (int) (aspectHeight * 1.78);
 
 		var wxh = estimatedWith + "x" + aspectHeight;
-		var withoutFileExtension = filename.substring(0, filename.lastIndexOf('.'));
-		var fileExtension = image.getFileExtension();
-		image.setImagePreviewPath(Paths.get(workingDir).resolve("preview").resolve(withoutFileExtension + "_thumb."+wxh+"."+
-				fileExtension));
-		image.setPreviewHardResizePath(Paths.get(workingDir).resolve("preview").resolve(withoutFileExtension+"_hard."+wxh+"."+fileExtension));
-		image.setPreviewFillWColorPath(Paths.get(workingDir).resolve("preview").resolve(withoutFileExtension+"_fill."+wxh+"."+
-				fileExtension));
-		image.setPreviewCropPath(Paths.get(workingDir).resolve("preview").resolve(withoutFileExtension+"_kill."+wxh+"."+fileExtension));
-		image.setPreviewManualPath(Paths.get(workingDir).resolve("preview").resolve(withoutFileExtension+"_manual."+wxh+"."+fileExtension));
+		var basename = FilenameUtils.getBaseName(image.getFilename());
+		var extension = image.getFileExtension();
+		image.setImagePreviewPath(Paths.get(workingDir).resolve("preview").resolve(basename + "_thumb."+wxh+"."+
+				extension));
+		image.setPreviewHardResizePath(Paths.get(workingDir).resolve("preview").resolve(basename+"_hard."+wxh+"."+extension));
+		image.setPreviewFillWColorPath(Paths.get(workingDir).resolve("preview").resolve(basename+"_fill."+wxh+"."+
+				extension));
+		image.setPreviewCropPath(Paths.get(workingDir).resolve("preview").resolve(basename+"_kill."+wxh+"."+extension));
+		image.setPreviewManualPath(Paths.get(workingDir).resolve("preview").resolve(basename+"_manual."+wxh+"."+extension));
 		return image;
 	}
 
