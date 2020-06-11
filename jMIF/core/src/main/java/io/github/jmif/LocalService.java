@@ -189,7 +189,7 @@ public class LocalService implements MIFService {
 
 		// set images...
 		for (int i = 1; i <= 10; i++) {
-			video.addPreviewImage(workingDir+"/preview/"+"_low_"+filename+"_"+i+".png");
+			video.addPreviewImagePath(Paths.get(workingDir).resolve("preview").resolve("_low_"+filename+"_"+i+".png"));
 		}
 
 		return video;
@@ -261,11 +261,11 @@ public class LocalService implements MIFService {
 		/*
 		 * 10 images from the video 
 		 */
-		video.getPreviewImages().clear();
+		video.getPreviewImagesPath().clear();
 		var cnt = (int) (video.getDuration() / 1000d);
 		for (int i = 1; i <= 10; i++) {
-			var image = workingDir+"/preview/_low_"+filename+"_"+i+".png";
-			if (!new File(image).exists()) {
+			var image = Paths.get(workingDir).resolve("preview").resolve("_low_"+filename+"_"+i+".png");
+			if (!Files.exists(image)) {
 				logger.info("Init: Create Preview-Video-Image {}", image);
 
 				var command = "ffmpeg -y -i " + videoLowQuality + " -vf \"select=eq(n\\," + (i * cnt) + ")\" -vframes 1 "+ videoLowQuality + "_" + i + ".png";
@@ -275,10 +275,10 @@ public class LocalService implements MIFService {
 					.redirectErrorStream(true)
 					.start()
 					.waitFor();
+					video.addPreviewImage(image, ImageIO.read(image.toFile()));
 				} catch (InterruptedException | IOException e) {
 					throw new MIFException(e);
 				}
-				video.addPreviewImage(image);
 			} else {
 				logger.debug("Init: Preview-Video-Image {} already computed", image);
 			}

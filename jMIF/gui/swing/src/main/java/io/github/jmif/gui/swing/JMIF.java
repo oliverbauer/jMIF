@@ -271,7 +271,7 @@ public class JMIF {
 		
 		if (graphWrapper.get(cell) != null) {
 			LOGGER.info("Selected {}", graphWrapper.get(cell).getDisplayName());
-			mifSelectionView.updateAudioOrVoideo(cell, graphWrapper.get(cell));
+			mifSelectionView.updateAudioOrVideo(cell, graphWrapper.get(cell));
 		} else if (graphWrapper.getAudio(cell) != null) {
 			LOGGER.info("Selected {}", graphWrapper.getAudio(cell).getAudiofile());
 			mifSelectionView.updateAudio(cell, graphWrapper.getAudio(cell), graphWrapper);
