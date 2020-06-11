@@ -224,6 +224,46 @@ public class DefaultProjectTests {
 		String videoCommand = "ffprobe -v error -select_streams v:0 -show_entries stream=TYPE -of default=noprint_wrappers=1:nokey=1 "+tempDir+"output4711.avi";
 		Assert.assertEquals("8.000000", execute(videoCommand.replace("TYPE", "duration")));
 	}
+	
+	@Test
+	public void withTwoAudiofiles() throws Exception {
+		// copy predefined example files (from src/main/resources/defaultproject) to some temp directory
+		copy(tempDir, "1.JPG");
+		copy(tempDir, "audio.mp3");
+		copy(tempDir, "audio2.mp3");
+
+		// Create a project of 2 pics, 1 video and 1 audio file
+		var project = new GraphWrapper();
+		var pr = project.getPr();
+		pr.setWorkingDir(tempDir);
+		service.createWorkingDirs(pr);
+		pr.setFileOfProject(tempDir + "project.xml");
+		pr.setOutputVideo(tempDir+"project.avi");
+		MIFFile f1 = project.createMIFFile(new File(tempDir + "1.JPG"));
+		MIFAudioFile a1 = project.createMIFAudioFile(new File(tempDir+"audio.mp3"));
+		MIFAudioFile a2 = project.createMIFAudioFile(new File(tempDir+"audio2.mp3"));
+		f1.setDuration(1000);
+		f1.setOverlayToPrevious(0);
+		a1.setEncodeStart(0);
+		a1.setEncodeEnde(2);
+		
+		a2.setEncodeStart(0);
+		a2.setEncodeEnde(2);
+		project.getPr().setProfile("atsc_1080p_25");
+		service.updateProfile(pr);
+		project.save();
+		Assert.assertTrue(new File(tempDir+"project.xml").exists());
+		
+		service.convert(pr, false);
+		// [consumer avformat] error with audio encode: -541478725 (frame 201) ?????
+		
+		Assert.assertTrue(new File(tempDir+"project.avi").exists());
+		
+		// Is the video created correctly?
+		String videoCommand = "ffprobe -v error -select_streams v:0 -show_entries stream=TYPE -of default=noprint_wrappers=1:nokey=1 "+tempDir+"project.avi";
+		Assert.assertEquals("4.000000", execute(videoCommand.replace("TYPE", "duration")));
+
+	}
 
 	
 	private String execute(String command) throws Exception {

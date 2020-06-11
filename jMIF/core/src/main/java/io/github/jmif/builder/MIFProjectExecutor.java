@@ -270,7 +270,9 @@ public class MIFProjectExecutor {
 						int w = project.getProfileWidth();  // e.g. 1920
 						int h = project.getProfileHeight(); // e.g. 1080
 						/*
-						 * Cf. https://stackoverflow.com/questions/21262466/imagemagick-how-to-minimally-crop-an-image-to-a-certain-aspect-ratio
+						 * Cf. 
+						 * https://stackoverflow.com/questions/21262466/imagemagick-how-to-minimally-crop-an-image-to-a-certain-aspect-ratio
+						 * http://www.fmwconcepts.com/imagemagick/aspectcrop/index.php
 						 */
 						execute("convert "+input+" -geometry "+w+"x"+h+"^ -gravity center -crop "+w+"x"+h+"+0+0 -quality 100 "+output);
 						break;
