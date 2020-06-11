@@ -225,7 +225,11 @@ public class MIFProjectExecutor {
 			if (!project.getAudiotrack().getAudiofiles().isEmpty()) {
 				sb.append(" -audio-track ");
 				for (int i=0; i<=project.getAudiotrack().getAudiofiles().size()-1; i++) {
-					sb.append(" "+(i+1)+"_mp3.mp3 "); // TODO Audio: Overlay
+					MIFAudioFile mifAudioFile = project.getAudiotrack().getAudiofiles().get(i);
+					int seconds = mifAudioFile.getEncodeEnde() - mifAudioFile.getEncodeStart();
+					int frames = (seconds * project.getProfileFramerate() - 1);
+					
+					sb.append(" "+(i+1)+"_mp3.mp3 in=0 out="+frames+" "); // TODO Audio: Overlay
 				}
 				sb.append(" \\\n");
 			}
@@ -265,31 +269,10 @@ public class MIFProjectExecutor {
 					case FILL:
 						int w = project.getProfileWidth();  // e.g. 1920
 						int h = project.getProfileHeight(); // e.g. 1080
-						
-						// execute("convert "+input+" -geometry 1920x -crop 1920x1080+0+180 -quality 100 "+output);
-						
-						/**
-						 * TODO must not be "width"x.... maybe it must be on height, e.g. profile svcd with 480x576....
+						/*
+						 * Cf. https://stackoverflow.com/questions/21262466/imagemagick-how-to-minimally-crop-an-image-to-a-certain-aspect-ratio
 						 */
-						String tempOutput = workingDir + "scaled/temp_" + filename;
-						execute("convert "+input+" -geometry "+w+"x --quality 100 "+tempOutput);
-
-						// TODO Image: Scale: compute the excessive part and use again a single command
-						String check = "ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "+tempOutput;
-						Process process = createProcess(check);
-						String checkOutput = null;
-						try (BufferedReader reader = new BufferedReader(
-							    new InputStreamReader(process.getInputStream()))) {
-							String line;
-							while ((line = reader.readLine()) != null) {
-								checkOutput = line;
-							}
-						}
-						
-						int excessive = Integer.valueOf(checkOutput.substring(checkOutput.indexOf('x')+1)) - h; // e.g. 1440 - 1080 => 360
-						String command = "convert "+tempOutput+" -crop "+w+"x"+h+"+"+0+"+"+excessive/2+" -quality 100 "+output;
-
-						execute(command);
+						execute("convert "+input+" -geometry "+w+"x"+h+"^ -gravity center -crop "+w+"x"+h+"+0+0 -quality 100 "+output);
 						break;
 					case MANUAL:
 						execute("convert "+input+" "+((MIFImage) f).getManualStyleCommand()+" "+output);
