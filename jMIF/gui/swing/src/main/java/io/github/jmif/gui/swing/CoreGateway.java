@@ -87,7 +87,7 @@ public class CoreGateway implements MIFService {
 	}
 
 	@Override
-	public void updateFramerate(MIFProject project) throws MIFException {
+	public void updateProfile(MIFProject project) throws MIFException {
 		final var id = service.updateFramerate(project);
 		final Waiter<Void> waiter = new Waiter<>(id);
 		try {

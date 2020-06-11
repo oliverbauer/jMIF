@@ -56,8 +56,10 @@ public class LocalService implements MIFService {
 	}
 
 	@Override
-	public void updateFramerate(MIFProject project) {
-		var framerate = project.getFramerate();
+	public void updateProfile(MIFProject project) {
+		var framerate = -1;
+		var height = -1;
+		var width = -1;
 		try {
 			Process process = new ProcessBuilder("bash", "-c", "melt -query \"profile\"="+project.getProfile()).start();
 
@@ -67,14 +69,25 @@ public class LocalService implements MIFService {
 					if (line.contains("frame_rate_num:")) {
 						framerate = Integer.parseInt(line.substring(line.indexOf(": ")+1).trim());
 					}
+					if (line.contains("width:")) {
+						width = Integer.parseInt(line.substring(line.indexOf(": ")+1).trim());
+					}
+					if (line.contains("height:")) {
+						height = Integer.parseInt(line.substring(line.indexOf(": ")+1).trim());
+					}
 				}
 			}
+			if (framerate == -1 || width == -1 || height == -1) {
+				throw new IllegalArgumentException(project.getProfile()+" not found");
+			}
+			
+			logger.info("Set profile to {} (framerate {})", project.getProfile(), framerate);
+			project.setProfileFramerate(framerate);
+			project.setProfileHeight(height);
+			project.setProfileWidth(width);
 		} catch (Exception e) {
 			logger.error("Unable to extract framerate for "+project.getProfile(), e);
 		}
-
-		logger.info("Set profile to {} (framerate {})", project.getProfile(), framerate);
-		project.setFramerate(framerate);
 	}
 
 	@Override

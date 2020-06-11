@@ -20,7 +20,7 @@ public class ProjectXmlTests {
 		var tempDir = Files.createTempDirectory("jMIF").toFile();
 
 		var project = new GraphWrapper();
-		service.updateFramerate(project.getPr());
+		service.updateProfile(project.getPr());
 		project.getPr().setWorkingDir(tempDir.getAbsolutePath());
 		service.createWorkingDirs(project.getPr());
 		project.getPr().setFileOfProject(project.getPr().getWorkingDir() + "defaultproject.xml");
@@ -37,7 +37,7 @@ public class ProjectXmlTests {
 		var tempDir = Files.createTempDirectory("jMIF").toFile();
 
 		var project = new GraphWrapper();
-		service.updateFramerate(project.getPr());
+		service.updateProfile(project.getPr());
 		project.getPr().setWorkingDir(tempDir.getAbsolutePath());
 		service.createWorkingDirs(project.getPr());
 		project.getPr().setFileOfProject(project.getPr().getWorkingDir() + "defaultproject.xml");

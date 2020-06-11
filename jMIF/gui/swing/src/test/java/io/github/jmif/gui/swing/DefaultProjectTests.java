@@ -8,6 +8,8 @@ import java.nio.file.Files;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import io.github.jmif.MIFService;
@@ -18,10 +20,107 @@ public class DefaultProjectTests {
 	
 	private final MIFService service = new CoreGateway();
 	
+	private String tempDir;
+	@Before
+	public void before() throws IOException {
+		tempDir = Files.createTempDirectory("jMIF").toFile().getAbsolutePath()+"/";
+	}
+	
+	@Test
+	public void checkProfile1080o25() throws Exception {
+		copy(tempDir, "1.JPG");
+		var project = new GraphWrapper();
+		var pr = project.getPr();
+		pr.setWorkingDir(tempDir);
+		service.createWorkingDirs(pr);
+		pr.setFileOfProject(tempDir + "defaultproject.xml");
+		pr.setOutputVideo(tempDir+"output.avi");
+		MIFFile f1 = project.createMIFFile(new File(tempDir + "1.JPG"));
+		f1.setDuration(1000);    // 5 sec
+		project.getPr().setProfile("atsc_1080p_25");
+		service.updateProfile(pr);
+		
+		project.save();
+		service.convert(pr, false);
+		Assert.assertTrue(new File(tempDir+"output.avi").exists());
+
+		// Is the image converted correctly?
+		String imageCommand = "ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "+tempDir+"/scaled/1.JPG";
+		Assert.assertEquals("1920x1080", execute(imageCommand));
+
+		// Is the video created correctly?
+		String videoCommand = "ffprobe -v error -select_streams v:0 -show_entries stream=TYPE -of default=noprint_wrappers=1:nokey=1 "+tempDir+"output.avi";
+		Assert.assertEquals("1.000000", execute(videoCommand.replace("TYPE", "duration")));
+		Assert.assertEquals("25", execute(videoCommand.replace("TYPE", "nb_frames")));
+		Assert.assertEquals("1920", execute(videoCommand.replace("TYPE", "width")));
+		Assert.assertEquals("1080", execute(videoCommand.replace("TYPE", "height")));
+	}
+	
+	@Test
+	public void checkProfile1080p50() throws Exception {
+		copy(tempDir, "1.JPG");
+		var project = new GraphWrapper();
+		var pr = project.getPr();
+		pr.setWorkingDir(tempDir);
+		service.createWorkingDirs(pr);
+		pr.setFileOfProject(tempDir + "defaultproject.xml");
+		pr.setOutputVideo(tempDir+"output.avi");
+		MIFFile f1 = project.createMIFFile(new File(tempDir + "1.JPG"));
+		f1.setDuration(1000); // 1 sec
+		project.getPr().setProfile("atsc_1080p_50");
+		service.updateProfile(pr);
+		
+		project.save();
+		service.convert(pr, false);
+		Assert.assertTrue(new File(tempDir+"output.avi").exists());
+
+		// Is the image converted correctly?
+		String imageCommand = "ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "+tempDir+"/scaled/1.JPG";
+		Assert.assertEquals("1920x1080", execute(imageCommand));
+
+		// Is the video created correctly?
+		String videoCommand = "ffprobe -v error -select_streams v:0 -show_entries stream=TYPE -of default=noprint_wrappers=1:nokey=1 "+tempDir+"output.avi";
+		Assert.assertEquals("1.000000", execute(videoCommand.replace("TYPE", "duration")));
+		Assert.assertEquals("50", execute(videoCommand.replace("TYPE", "nb_frames")));
+		Assert.assertEquals("1920", execute(videoCommand.replace("TYPE", "width")));
+		Assert.assertEquals("1080", execute(videoCommand.replace("TYPE", "height")));
+	}
+	
+	@Ignore
+	@Test
+	public void checkProfileSVCDPal() throws Exception {
+		// melt -query "profile"=svcd_pal
+		
+		copy(tempDir, "1.JPG");
+		var project = new GraphWrapper();
+		var pr = project.getPr();
+		pr.setWorkingDir(tempDir);
+		service.createWorkingDirs(pr);
+		pr.setFileOfProject(tempDir + "defaultproject.xml");
+		pr.setOutputVideo(tempDir+"output.avi");
+		MIFFile f1 = project.createMIFFile(new File(tempDir + "1.JPG"));
+		f1.setDuration(1000); // 1 sec
+		project.getPr().setProfile("svcd_pal");
+		service.updateProfile(pr);
+		
+		project.save();
+		service.convert(pr, false);
+		Assert.assertTrue(new File(tempDir+"output.avi").exists());
+
+		// Is the image converted correctly?
+		String imageCommand = "ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "+tempDir+"/scaled/1.JPG";
+		Assert.assertEquals("480x576", execute(imageCommand));
+
+		// Is the video created correctly?
+		String videoCommand = "ffprobe -v error -select_streams v:0 -show_entries stream=TYPE -of default=noprint_wrappers=1:nokey=1 "+tempDir+"output.avi";
+		Assert.assertEquals("1.000000", execute(videoCommand.replace("TYPE", "duration")));
+		Assert.assertEquals("25", execute(videoCommand.replace("TYPE", "nb_frames")));
+		Assert.assertEquals("480", execute(videoCommand.replace("TYPE", "width")));
+		Assert.assertEquals("576", execute(videoCommand.replace("TYPE", "height")));
+	}
+	
 	@Test
 	public void withoutOverlay() throws Exception {
-		var tempDir = Files.createTempDirectory("jMIF").toFile().getAbsolutePath()+"/";
-
 		// copy predefined example files (from src/main/resources/defaultproject) to some temp directory
 		copy(tempDir, "1.JPG");
 		copy(tempDir, "2.MP4");
@@ -47,6 +146,8 @@ public class DefaultProjectTests {
 		f3.setOverlayToPrevious(1000); // no overlay
 		a1.setEncodeStart(0);     // 15 sec
 		a1.setEncodeEnde(15);     // 15 sec
+		project.getPr().setProfile("atsc_1080p_50");
+		service.updateProfile(pr);
 		project.save();
 		Assert.assertTrue(new File(tempDir+"defaultproject.xml").exists());
 		
@@ -54,14 +155,12 @@ public class DefaultProjectTests {
 		
 		Assert.assertTrue(new File(tempDir+"output.avi").exists());
 		
-		String length = get("ffprobe -v quiet -of csv=p=0 -show_entries format=duration "+tempDir+"output.avi");
+		String length = execute("ffprobe -v quiet -of csv=p=0 -show_entries format=duration "+tempDir+"output.avi");
 		Assert.assertTrue(length.startsWith("15.")); // is etwas länger, warum nicht exakt?
 	}
 	
 	@Test
 	public void withOverlay() throws Exception {
-		var tempDir = Files.createTempDirectory("jMIF").toFile().getAbsolutePath()+"/";
-
 		// copy predefined example files (from src/main/resources/defaultproject) to some temp directory
 		copy(tempDir, "1.JPG");
 		copy(tempDir, "2.MP4");
@@ -82,12 +181,13 @@ public class DefaultProjectTests {
 		f1.setDuration(5000);    // 5 sec
 		f1.setOverlayToPrevious(0); // no overlay
 		f2.setDuration(5000);    // 5 sec
-		f2.setOverlayToPrevious(25); // no overlay
+		f2.setOverlayToPrevious(1000); // no overlay
 		f3.setDuration(5000);    // 5 sec
-		f3.setOverlayToPrevious(25); // no overlay
+		f3.setOverlayToPrevious(1000); // no overlay
 		a1.setEncodeStart(0);     // 13 sec
 		a1.setEncodeEnde(13);     // 13 sec
-
+		project.getPr().setProfile("atsc_1080p_50");
+		service.updateProfile(pr);
 		project.save();
 		Assert.assertTrue(new File(tempDir+"defaultproject4711.xml").exists());
 		
@@ -95,14 +195,12 @@ public class DefaultProjectTests {
 		
 		Assert.assertTrue(new File(tempDir+"output4711.avi").exists());
 		
-		String length = get("ffprobe -v quiet -of csv=p=0 -show_entries format=duration "+tempDir+"output4711.avi");
+		String length = execute("ffprobe -v quiet -of csv=p=0 -show_entries format=duration "+tempDir+"output4711.avi");
 		Assert.assertTrue(length+" should start with 13", length.startsWith("13.")); // is etwas länger, warum nicht exakt?
 	}
 
 	@Test
 	public void withLongAudio() throws Exception {
-		var tempDir = Files.createTempDirectory("jMIF").toFile().getAbsolutePath()+"/";
-
 		// copy predefined example files (from src/main/resources/defaultproject) to some temp directory
 		copy(tempDir, "1.JPG");
 		copy(tempDir, "audio.mp3");
@@ -120,7 +218,8 @@ public class DefaultProjectTests {
 		f1.setOverlayToPrevious(0);
 		a1.setEncodeStart(0);     // 15 sec
 		a1.setEncodeEnde(8);     // 15 sec
-
+		project.getPr().setProfile("atsc_1080p_50");
+		service.updateProfile(pr);
 		project.save();
 		Assert.assertTrue(new File(tempDir+"defaultproject4711.xml").exists());
 		
@@ -129,12 +228,12 @@ public class DefaultProjectTests {
 		
 		Assert.assertTrue(new File(tempDir+"output4711.avi").exists());
 		
-		String length = get("ffprobe -v quiet -of csv=p=0 -show_entries format=duration "+tempDir+"output4711.avi");
+		String length = execute("ffprobe -v quiet -of csv=p=0 -show_entries format=duration "+tempDir+"output4711.avi");
 		Assert.assertTrue(length+" should start with 8", length.startsWith("8.")); // is etwas länger, warum nicht exakt?
 	}
 
 	
-	private String get(String command) throws Exception {
+	private String execute(String command) throws Exception {
 		Process process = new ProcessBuilder("bash", "-c", command).start();
 		String output = null;
 			

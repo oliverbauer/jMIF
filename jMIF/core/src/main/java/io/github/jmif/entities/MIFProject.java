@@ -21,7 +21,9 @@ public class MIFProject {
 	private MIFAudioTrack audiotrack;
 
 	private String profile;
-	private int framerate;
+	private int profileWidth;
+	private int profileHeight;
+	private int profileFramerate;
 	
 	// TODO Consider removing this field
 	private String fileOfProject;
@@ -69,14 +71,30 @@ public class MIFProject {
 		this.profile = profile;
 	}
 
-	public int getFramerate() {
-		return framerate;
+	public int getProfileFramerate() {
+		return profileFramerate;
 	}
 
-	public void setFramerate(int framerate) {
-		this.framerate = framerate;
+	public void setProfileFramerate(int framerate) {
+		this.profileFramerate = framerate;
 	}
 	
+	public int getProfileWidth() {
+		return profileWidth;
+	}
+
+	public void setProfileWidth(int profileWidth) {
+		this.profileWidth = profileWidth;
+	}
+
+	public int getProfileHeight() {
+		return profileHeight;
+	}
+
+	public void setProfileHeight(int profileHeight) {
+		this.profileHeight = profileHeight;
+	}
+
 	public void setWorkingDir(String workingDir) {
 		this.workingDir = workingDir;
 	}

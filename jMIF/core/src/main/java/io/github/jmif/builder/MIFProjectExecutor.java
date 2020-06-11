@@ -193,7 +193,7 @@ public class MIFProjectExecutor {
 				String extension = meltfile.getFileExtension();
 				
 				boolean useMixer = count != 0;
-				int frames = (int)((meltfile.getDuration() / 1000d) * project.getFramerate());
+				int frames = (int)((meltfile.getDuration() / 1000d) * project.getProfileFramerate());
 				
 				if (Configuration.allowedImageTypes.contains(extension)) {
 					sb.append("   ").append(input).append(" in=0 out=").append(frames - 1);
@@ -215,7 +215,7 @@ public class MIFProjectExecutor {
 					LOGGER.error("Unsupported file extension {}", extension);
 				}
 				if (useMixer && meltfile.getOverlayToPrevious() > 0) {
-					int overlay = (int)((meltfile.getOverlayToPrevious() / 1000d) * project.getFramerate());
+					int overlay = (int)((meltfile.getOverlayToPrevious() / 1000d) * project.getProfileFramerate());
 					sb.append(" -mix ").append(overlay).append(" -mixer luma");
 				}
 				sb.append(" \\\n");
@@ -263,7 +263,33 @@ public class MIFProjectExecutor {
 					case HARD:
 						// TODO Image Hard convert
 					case FILL:
-						execute("convert "+input+" -geometry 1920x -crop 1920x1080+0+180 -quality 100 "+output);
+						int w = project.getProfileWidth();  // e.g. 1920
+						int h = project.getProfileHeight(); // e.g. 1080
+						
+						// execute("convert "+input+" -geometry 1920x -crop 1920x1080+0+180 -quality 100 "+output);
+						
+						/**
+						 * TODO must not be "width"x.... maybe it must be on height, e.g. profile svcd with 480x576....
+						 */
+						String tempOutput = workingDir + "scaled/temp_" + filename;
+						execute("convert "+input+" -geometry "+w+"x --quality 100 "+tempOutput);
+
+						// TODO Image: Scale: compute the excessive part and use again a single command
+						String check = "ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "+tempOutput;
+						Process process = createProcess(check);
+						String checkOutput = null;
+						try (BufferedReader reader = new BufferedReader(
+							    new InputStreamReader(process.getInputStream()))) {
+							String line;
+							while ((line = reader.readLine()) != null) {
+								checkOutput = line;
+							}
+						}
+						
+						int excessive = Integer.valueOf(checkOutput.substring(checkOutput.indexOf('x')+1)) - h; // e.g. 1440 - 1080 => 360
+						String command = "convert "+tempOutput+" -crop "+w+"x"+h+"+"+0+"+"+excessive/2+" -quality 100 "+output;
+
+						execute(command);
 						break;
 					case MANUAL:
 						execute("convert "+input+" "+((MIFImage) f).getManualStyleCommand()+" "+output);

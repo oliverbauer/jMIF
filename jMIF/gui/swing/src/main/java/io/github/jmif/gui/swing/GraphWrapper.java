@@ -388,7 +388,7 @@ public class GraphWrapper {
 									}
 											
 									g.drawString(t, i + XOFFSET/2, 130);
-									g.drawString(String.valueOf(i*pr.getFramerate()/Configuration.pixelwidth_per_second), i + XOFFSET/2, 145); // framenumber
+									g.drawString(String.valueOf(i*pr.getProfileFramerate()/Configuration.pixelwidth_per_second), i + XOFFSET/2, 145); // framenumber
 								}
 							}
 						}

@@ -122,7 +122,7 @@ public class JMIF {
 			try {
 				String item = (String)profilesCombobox.getSelectedItem();
 				graphWrapper.getPr().setProfile(item);
-				graphWrapper.getService().updateFramerate(graphWrapper.getPr());
+				graphWrapper.getService().updateProfile(graphWrapper.getPr());
 				graphWrapper.redrawGraph();
 			} catch (MIFException e) {
 				// TODO Auto-generated catch block
@@ -170,7 +170,7 @@ public class JMIF {
 
 		var project = new GraphWrapper();
 		project.getPr().setProfile(profile);
-		project.getService().updateFramerate(project.getPr());
+		project.getService().updateProfile(project.getPr());
 		project.getPr().setWorkingDir(tempDir.getAbsolutePath());
 		project.getService().createWorkingDirs(project.getPr());
 		project.getPr().setFileOfProject(project.getPr().getWorkingDir() + "defaultproject.xml");

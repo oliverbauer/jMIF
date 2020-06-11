@@ -18,7 +18,7 @@ public interface MIFService {
 
 	void convert(MIFProject pr, boolean preview) throws MIFException;
 
-	void updateFramerate(MIFProject project) throws MIFException;
+	void updateProfile(MIFProject project) throws MIFException;
 
 	void createWorkingDirs(MIFProject project) throws MIFException;
 
