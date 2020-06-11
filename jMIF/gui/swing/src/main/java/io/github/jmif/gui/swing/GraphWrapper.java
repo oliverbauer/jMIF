@@ -153,7 +153,7 @@ public class GraphWrapper {
 				"mp3",
 				XOFFSET,
 				YOFFSET*2 +YOFFSET/2 + 2*Configuration.timelineentryHeight,
-				25*(audioFile.getEncodeEnde()-audioFile.getEncodeStart()),
+				getPixelwidth(audioFile),
 				20);
 			put(audioFile, v1);
 			
@@ -184,13 +184,13 @@ public class GraphWrapper {
 
 			int x = currentLength + XOFFSET;
 			int y = pr.getMIFFiles().size() % 2 == 0 ? 0 + YOFFSET : 20 + YOFFSET;
-			int w = (int)(mifFile.getDuration()*25 / 1000d);
+			int w = getPixelwidth(mifFile);
 			int h = 20;
 			var v1 = insertVertex(mifFile.getDisplayName(), x, y, w, h);
 			
 			put(mifFile, v1);
 			
-			currentLength += (mifFile.getDuration() / 1000d) * 25;
+			currentLength += w;
 			
 			return mifFile;
 		}			
@@ -204,13 +204,13 @@ public class GraphWrapper {
 			logger.info("Adding file {}", file.getFile());
 
 			if (current > 0) {
-				currentLength -= (file.getOverlayToPrevious() / 1000d);
+				currentLength -= getOverlaywidth(file);
 			}
 			int x = currentLength + XOFFSET;
 			int y = current % 2 == 0 ? 0 + YOFFSET : 20 + YOFFSET;
 			mxCell v1 = insertVertex(x, y, file);
 			put(file, v1);
-			currentLength += (file.getDuration() / 1000d);
+			currentLength += getPixelwidth(file);
 			current++;
 		}
 		int audioLength = 0;
@@ -227,9 +227,9 @@ public class GraphWrapper {
 			if (current % 2 == 0) {
 				rec.setY(rec.getY() + 20);
 			}
-			rec.setWidth(25*(audioFile.getEncodeEnde()-audioFile.getEncodeStart()));
-			audioLength += 25*(audioFile.getEncodeEnde()-audioFile.getEncodeStart());
+			rec.setWidth(getPixelwidth(audioFile));
 			rec.setHeight(20);
+			audioLength += getPixelwidth(audioFile);
 			resize(mxCell, rec);
 		}
 		
@@ -245,10 +245,8 @@ public class GraphWrapper {
 
 			c.setValue(file.getDisplayName());
 
-			var frames = (file.getDuration() / 1000d) * 25;
-			var overlayInFrames = (file.getOverlayToPrevious() / 1000d) * 25;
 			if (current > 0) {
-				currentLength -= overlayInFrames;
+				currentLength -= getOverlaywidth(file);
 			}
 
 			// Erklären warum folgende Methode scheisse ist (benutzt preferredisze)
@@ -258,9 +256,9 @@ public class GraphWrapper {
 			rec.setX(currentLength + XOFFSET);
 			rec.setY(current % 2 == 0 ? 0 + YOFFSET : 20 + YOFFSET);
 			rec.setHeight(20);
-			rec.setWidth(frames);
+			rec.setWidth(getPixelwidth(file));
 			resize(c, rec);
-			currentLength += frames;
+			currentLength += rec.getWidth();
 			current++;
 		}
 		int audioLength = 0;
@@ -272,7 +270,7 @@ public class GraphWrapper {
 			MIFAudioFile audioFile = audioEntry.getValue();
 			
 			if (current > 1) {
-				audioLength -= 25; // FIXME Allow Overlay in milliseconds
+				audioLength -= getOverlaywidth(audioFile);
 			}
 			
 			var rec = new mxRectangle();
@@ -281,8 +279,8 @@ public class GraphWrapper {
 			if (current % 2 == 0) {
 				rec.setY(rec.getY() + 20);
 			}
-			rec.setWidth(25*(audioFile.getEncodeEnde()-audioFile.getEncodeStart()));
-			audioLength += 25*(audioFile.getEncodeEnde()-audioFile.getEncodeStart());
+			rec.setWidth(getPixelwidth(audioFile));
+			audioLength += rec.getWidth();
 			rec.setHeight(20);
 			resize(mxCell, rec);
 		}
@@ -290,14 +288,14 @@ public class GraphWrapper {
 		this.graphComponent.updateUI();
 	}
 	
-	public mxCell insertVertex(int x, int y, MIFFile meltFile) {
+	public mxCell insertVertex(int x, int y, MIFFile mifFile) {
 		return (mxCell)graph.insertVertex(
 			parent,
 			null,
-			meltFile.getDisplayName(), 
+			mifFile.getDisplayName(), 
 			x,
 			y, 
-			(meltFile.getDuration() / 1000d), 
+			getPixelwidth(mifFile), 
 			Configuration.timelineentryHeight);
 	}
 	
@@ -331,18 +329,18 @@ public class GraphWrapper {
 							int current = 0;
 							for (MIFFile file : pr.getMIFFiles()) {
 								if (current > 0) {
-									length -= (file.getOverlayToPrevious() / 1000d) * 25;
+									length -= getOverlaywidth(file);
 								}
-								length += (file.getDuration() / 1000d) * 25;
+								length += getPixelwidth(file);
 								current++;
 							}
 							int audioLength = 0;
 							current = 0;
 							for (Entry<mxCell, MIFAudioFile> audioEntry : nodeToMIFAudio.entrySet()) {
 								if (current > 0) {
-									audioLength -= 25;
+									audioLength -= getOverlaywidth(audioEntry.getValue());
 								}
-								audioLength += 25*(audioEntry.getValue().getEncodeEnde() - audioEntry.getValue().getEncodeStart());
+								audioLength += getPixelwidth(audioEntry.getValue());
 								current++;
 							}
 							
@@ -367,7 +365,7 @@ public class GraphWrapper {
 							g.setColor(Color.DARK_GRAY);
 							for (int i = 1; i <= w; i++) {
 								// e.g. all 25 or 50 pixels
-								if (i % 25 == 0) {
+								if (i % Configuration.pixelwidth_per_second == 0) {
 									g.drawLine(i+XOFFSET, 50+YOFFSET, i+XOFFSET, 45+YOFFSET);
 								}
 								if (i % 125 == 0) {
@@ -384,13 +382,13 @@ public class GraphWrapper {
 							        int y2 = 5;
 									g2d.drawLine(x1, y1, x2, y2);
 									
-									String t = String.valueOf(i / 25)+"s";
-									if ((i/25) >= 60) {
+									String t = String.valueOf(i / Configuration.pixelwidth_per_second)+"s";
+									if ((i/Configuration.pixelwidth_per_second) >= 60) {
 										t = i/60+"m "+i%60+"s";
 									}
 											
 									g.drawString(t, i + XOFFSET/2, 130);
-									g.drawString(String.valueOf(i*pr.getFramerate()/25), i + XOFFSET/2, 145); // framenumber
+									g.drawString(String.valueOf(i*pr.getFramerate()/Configuration.pixelwidth_per_second), i + XOFFSET/2, 145); // framenumber
 								}
 							}
 						}
@@ -469,6 +467,22 @@ public class GraphWrapper {
 		return (mxCell) graph.insertVertex(parent, null, label, x, y, w, h);
 	}
 
+	private int getPixelwidth(MIFAudioFile audioFile) {
+		return Configuration.pixelwidth_per_second * (audioFile.getEncodeEnde() - audioFile.getEncodeStart());
+	}
+	
+	private int getPixelwidth(MIFFile mifFile) {
+		return (int)(Configuration.pixelwidth_per_second  * (mifFile.getDuration() / 1000d));
+	}
+	
+	private int getOverlaywidth(MIFFile mifFile) {
+		return (int)(Configuration.pixelwidth_per_second * (mifFile.getOverlayToPrevious() / 1000d));
+	}
+	
+	private int getOverlaywidth(MIFAudioFile audioFiles) {
+		return 25;
+	}
+	
 	public void remove(mxCell cell) {
 		graph.removeCells(new Object[] { cell });
 	}
