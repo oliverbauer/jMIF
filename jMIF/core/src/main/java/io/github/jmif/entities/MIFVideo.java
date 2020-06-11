@@ -1,8 +1,11 @@
 package io.github.jmif.entities;
 
+import java.awt.Image;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Collection;
-import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -11,7 +14,7 @@ import javax.xml.bind.annotation.XmlTransient;
 public class MIFVideo extends MIFFile {
 
 	@XmlTransient
-	private Collection<String> previewImages = new LinkedList<>();
+	private Map<Path, Image> previewImages = new HashMap<>();
 	
 	private int fps;
 	private String videoCodec;
@@ -33,12 +36,12 @@ public class MIFVideo extends MIFFile {
 		setOverlayToPrevious(overlay);
 	}
 
-	public Collection<String> getPreviewImages() {
-		return this.previewImages;
+	public Collection<Path> getPreviewImagesPath() {
+		return this.previewImages.keySet();
 	}
 
-	public void addPreviewImage(String previewImage) {
-		this.previewImages.add(previewImage);
+	public void addPreviewImagePath(Path previewImagePath) {
+		this.previewImages.put(previewImagePath, null);
 	}
 	
 	public String getAr() {
@@ -87,6 +90,14 @@ public class MIFVideo extends MIFFile {
 
 	public void setVideoCodec(String videoCodec) {
 		this.videoCodec = videoCodec;
+	}
+
+	public void addPreviewImage(Path previewImagePath, Image previewImage) {
+		previewImages.put(previewImagePath, previewImage);
+	}
+	
+	public Collection<Image> getPreviewImages() {
+		return previewImages.values();
 	}
 
 }

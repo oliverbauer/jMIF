@@ -157,7 +157,7 @@ public class SelectionView {
 		panel.updateUI();
 	}
 	
-	public void updateAudioOrVoideo(mxCell cell, MIFFile meltFile) {
+	public void updateAudioOrVideo(mxCell cell, MIFFile meltFile) {
 		clearSelection();
 		
 		this.selectedMeltFile = meltFile;

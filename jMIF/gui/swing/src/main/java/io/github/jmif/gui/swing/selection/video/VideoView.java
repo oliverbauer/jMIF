@@ -1,7 +1,7 @@
 package io.github.jmif.gui.swing.selection.video;
 
 import java.awt.Color;
-import java.io.File;
+import java.awt.Image;
 import java.util.Collection;
 
 import javax.swing.ImageIcon;
@@ -30,16 +30,8 @@ public class VideoView {
 	    videoScrollPane.add(videoPanel);
 	}
 	
-	public void setIcons(Collection<String> p) {
+	public void setIcons(Collection<Image> p) {
 		var it = p.iterator();
-		for (int i=0; i<=9; i++) {
-			var s = it.next();
-			if (!new File(s).exists()) {
-				logger.warn("File {} does not exists", s);
-				return;
-			}
-		}
-		it = p.iterator();
 		for (int i=0; i<=9; i++) {
 			imgVideoLabel[i].setIcon(new ImageIcon(it.next()));
 			imgVideoLabel[i].setVisible(true);
