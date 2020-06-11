@@ -18,7 +18,7 @@ subprojects {
         }
     }
 
-    sourceCompatibility = '1.8'
+    sourceCompatibility = JavaVersion.VERSION_14
 
     publishing {
         publications {
