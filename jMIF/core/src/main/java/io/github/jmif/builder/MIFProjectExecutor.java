@@ -199,7 +199,7 @@ public class MIFProjectExecutor {
 					sb.append("   ").append(input).append(" in=0 out=").append(frames - 1);
 					
 					for (MeltFilter currentlyAddedFilters : meltfile.getFilters()) {
-						sb.append(" -attach-cut ");
+						sb.append(" -attach ");
 						sb.append(currentlyAddedFilters.getFiltername());
 						sb.append(" ");
 						Map<String, String> filterUsage = currentlyAddedFilters.getFilterUsage();
