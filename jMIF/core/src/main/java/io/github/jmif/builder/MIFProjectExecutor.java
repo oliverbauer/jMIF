@@ -261,25 +261,7 @@ public class MIFProjectExecutor {
 				if (!new File(output).exists()) {
 					LOGGER.info("Create {}", output);
 
-					switch (((MIFImage) f).getStyle()) {
-					case CROP:
-						// TODO Image Crop convert
-					case HARD:
-						// TODO Image Hard convert
-					case FILL:
-						int w = project.getProfileWidth();  // e.g. 1920
-						int h = project.getProfileHeight(); // e.g. 1080
-						/*
-						 * Cf. 
-						 * https://stackoverflow.com/questions/21262466/imagemagick-how-to-minimally-crop-an-image-to-a-certain-aspect-ratio
-						 * http://www.fmwconcepts.com/imagemagick/aspectcrop/index.php
-						 */
-						execute("convert "+input+" -geometry "+w+"x"+h+"^ -gravity center -crop "+w+"x"+h+"+0+0 -quality 100 "+output);
-						break;
-					case MANUAL:
-						execute("convert "+input+" "+((MIFImage) f).getManualStyleCommand()+" "+output);
-						break;
-					}
+					createFinalImageConversion((MIFImage)f, output);
 				}
 			} else if (f instanceof MIFVideo) {
 				if (!new File(output).exists()) {
@@ -288,6 +270,32 @@ public class MIFProjectExecutor {
 					execute("cp "+input+" "+output);
 				}
 			}
+		}
+	}
+	
+	public void createFinalImageConversion(MIFImage image, String output) throws IOException {
+		String workingDir = project.getWorkingDir();
+		String filename = image.getFilename();
+		String input = workingDir+"orig/"+filename;
+		
+		switch (image.getStyle()) {
+		case CROP:
+			// TODO Image Crop convert
+		case HARD:
+			// TODO Image Hard convert
+		case FILL:
+			int w = project.getProfileWidth();  // e.g. 1920
+			int h = project.getProfileHeight(); // e.g. 1080
+			/*
+			 * Cf. 
+			 * https://stackoverflow.com/questions/21262466/imagemagick-how-to-minimally-crop-an-image-to-a-certain-aspect-ratio
+			 * http://www.fmwconcepts.com/imagemagick/aspectcrop/index.php
+			 */
+			execute("convert "+input+" -geometry "+w+"x"+h+"^ -gravity center -crop "+w+"x"+h+"+0+0 -quality 100 "+output);
+			break;
+		case MANUAL:
+			execute("convert "+input+" "+image.getManualStyleCommand()+" "+output);
+			break;
 		}
 	}
 	

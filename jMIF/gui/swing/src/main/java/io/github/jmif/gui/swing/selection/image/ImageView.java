@@ -285,7 +285,7 @@ public class ImageView {
 		previewFilter = new JButton("preview");
 		previewFilter.addActionListener(e -> {
 			try {
-				graphWrapper.getService().applyFilter(selectedMeltFile, currentlySelectedFilter);
+				graphWrapper.getService().applyFilter(graphWrapper.getPr(), selectedMeltFile, currentlySelectedFilter);
 			} catch (MIFException e1) {
 				logger.error("", e1);
 			}			

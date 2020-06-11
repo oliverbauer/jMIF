@@ -763,12 +763,20 @@ public class LocalService implements MIFService {
 		return getOrLoad(melt).stream().filter(mdf -> mdf.getFiltername().contentEquals(meltFilter.getFiltername())).findAny().get();
 	}
 	
-	public void applyFilter(MIFImage mifImage, MeltFilter meltFilter) throws MIFException {
+	@Override
+	public void applyFilter(MIFProject pr, MIFImage mifImage, MeltFilter meltFilter) throws MIFException {
+		MIFProjectExecutor mifProjectExecutor = new MIFProjectExecutor(pr);
+
+		String output = "/tmp/temp.jpg";
+		
+		try {
+			mifProjectExecutor.createFinalImageConversion(mifImage, output);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 		StringBuilder sb  = new StringBuilder();
-		sb.append("melt ")
-		// TODO Filter: Preview: may be file-style has been changed to CROP, MANUAAL... 
-		.append(mifImage.getFile())
-		.append(" out=50 ");
+		sb.append("melt ").append(output).append(" out=50 ");
 		for (MeltFilter currentlyAddedFilters : mifImage.getFilters()) {
 			sb.append(" -attach-cut ");
 			sb.append(currentlyAddedFilters.getFiltername());
@@ -786,11 +794,7 @@ public class LocalService implements MIFService {
 		}
 		sb.append(" -consumer sdl2 terminate_on_pause=1");
 		try {
-			String command = sb.toString();
-
-			MIFProject temp = new MIFProject();
-			temp.setWorkingDir("/tmp/");
-			new MIFProjectExecutor(temp).execute(command);
+			mifProjectExecutor.execute(sb.toString());
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}

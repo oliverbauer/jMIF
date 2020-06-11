@@ -208,8 +208,8 @@ public class CoreGateway implements MIFService {
 	}
 
 	@Override
-	public void applyFilter(MIFImage mifImage, MeltFilter meltFilter) throws MIFException {
-		final var id = service.applyFilter(mifImage, meltFilter);
+	public void applyFilter(MIFProject pr, MIFImage mifImage, MeltFilter meltFilter) throws MIFException {
+		final var id = service.applyFilter(pr, mifImage, meltFilter);
 		final Waiter<Void> waiter = new Waiter<>(id);
 		try {
 			executor.submit(waiter).get();
