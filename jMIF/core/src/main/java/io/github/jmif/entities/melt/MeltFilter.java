@@ -1,4 +1,4 @@
-package io.github.jmif.entities;
+package io.github.jmif.entities.melt;
 
 import java.util.HashMap;
 import java.util.Map;

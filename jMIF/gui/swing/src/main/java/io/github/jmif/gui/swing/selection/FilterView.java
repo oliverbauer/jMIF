@@ -23,13 +23,13 @@ import javax.swing.ScrollPaneConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.jmif.MIFException;
+import io.github.jmif.core.MIFException;
 import io.github.jmif.entities.MIFFile;
-import io.github.jmif.entities.MeltFilter;
+import io.github.jmif.entities.melt.Melt;
+import io.github.jmif.entities.melt.MeltFilter;
+import io.github.jmif.entities.melt.MeltFilterDetails;
 import io.github.jmif.gui.swing.GraphWrapper;
 import io.github.jmif.gui.swing.selection.image.ImageView;
-import io.github.jmif.melt.Melt;
-import io.github.jmif.melt.MeltFilterDetails;
 
 public class FilterView {
 	private static final Logger logger = LoggerFactory.getLogger(FilterView.class);

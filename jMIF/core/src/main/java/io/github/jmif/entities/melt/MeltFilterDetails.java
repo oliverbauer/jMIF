@@ -1,4 +1,4 @@
-package io.github.jmif.melt;
+package io.github.jmif.entities.melt;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import io.github.jmif.melt.adapter.MapAdapter;
+import io.github.jmif.entities.melt.adapter.MapAdapter;
 
 @XmlRootElement(name = "meltfilterdetails")
 @XmlAccessorType(XmlAccessType.FIELD)

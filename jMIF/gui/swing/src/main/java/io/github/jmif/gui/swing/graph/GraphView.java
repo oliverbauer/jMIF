@@ -24,8 +24,8 @@ import org.slf4j.LoggerFactory;
 
 import com.mxgraph.model.mxCell;
 
-import io.github.jmif.MIFException;
 import io.github.jmif.config.Configuration;
+import io.github.jmif.core.MIFException;
 import io.github.jmif.entities.MIFAudioFile;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFTextFile;

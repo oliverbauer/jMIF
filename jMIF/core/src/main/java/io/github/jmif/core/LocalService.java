@@ -1,5 +1,5 @@
 
-package io.github.jmif;
+package io.github.jmif.core;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,22 +20,21 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.jmif.builder.MIFProjectExecutor;
 import io.github.jmif.entities.MIFAudioFile;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFImage.ImageResizeStyle;
+import io.github.jmif.entities.melt.Melt;
+import io.github.jmif.entities.melt.MeltFilter;
+import io.github.jmif.entities.melt.MeltFilterDetails;
 import io.github.jmif.entities.MIFProject;
 import io.github.jmif.entities.MIFTextFile;
 import io.github.jmif.entities.MIFVideo;
-import io.github.jmif.entities.MeltFilter;
-import io.github.jmif.melt.Melt;
-import io.github.jmif.melt.MeltFilterDetails;
 
 /**
  * @author thebrunner
  */
-public class LocalService implements MIFService {
+class LocalService implements MIFService {
 
 	private static final Logger logger = LoggerFactory.getLogger(LocalService.class);
 

@@ -1,4 +1,4 @@
-package io.github.jmif.melt;
+package io.github.jmif.entities.melt;
 
 public class MeltProfile {
 	private String name;

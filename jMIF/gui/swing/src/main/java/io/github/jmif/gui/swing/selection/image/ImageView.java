@@ -22,8 +22,8 @@ import org.slf4j.LoggerFactory;
 
 import com.mxgraph.model.mxCell;
 
-import io.github.jmif.MIFException;
 import io.github.jmif.config.Configuration;
+import io.github.jmif.core.MIFException;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFImage.ImageResizeStyle;
 import io.github.jmif.gui.swing.GraphWrapper;

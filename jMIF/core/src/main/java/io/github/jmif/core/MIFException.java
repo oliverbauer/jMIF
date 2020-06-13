@@ -1,7 +1,7 @@
 /**
  * 
  */
-package io.github.jmif;
+package io.github.jmif.core;
 
 /**
  * @author thebrunner

@@ -27,8 +27,8 @@ import com.mxgraph.model.mxCell;
 import com.mxgraph.util.mxEvent;
 import com.mxgraph.view.mxGraphSelectionModel;
 
-import io.github.jmif.MIFException;
 import io.github.jmif.config.Configuration;
+import io.github.jmif.core.MIFException;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.gui.swing.graph.GraphView;
 import io.github.jmif.gui.swing.listener.ProjectListener;

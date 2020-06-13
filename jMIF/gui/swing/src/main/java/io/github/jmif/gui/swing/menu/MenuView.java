@@ -15,8 +15,8 @@ import javax.swing.SwingWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.jmif.MIFException;
 import io.github.jmif.config.Configuration;
+import io.github.jmif.core.MIFException;
 import io.github.jmif.gui.swing.GraphWrapper;
 import io.github.jmif.gui.swing.listener.ProjectListener.type;
 import io.github.jmif.gui.swing.menu.util.ButtonFactory;

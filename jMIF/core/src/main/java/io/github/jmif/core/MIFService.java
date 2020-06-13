@@ -1,4 +1,4 @@
-package io.github.jmif;
+package io.github.jmif.core;
 
 import java.io.File;
 import java.util.List;
@@ -9,9 +9,9 @@ import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFProject;
 import io.github.jmif.entities.MIFTextFile;
 import io.github.jmif.entities.MIFVideo;
-import io.github.jmif.entities.MeltFilter;
-import io.github.jmif.melt.Melt;
-import io.github.jmif.melt.MeltFilterDetails;
+import io.github.jmif.entities.melt.Melt;
+import io.github.jmif.entities.melt.MeltFilter;
+import io.github.jmif.entities.melt.MeltFilterDetails;
 
 public interface MIFService {
 
