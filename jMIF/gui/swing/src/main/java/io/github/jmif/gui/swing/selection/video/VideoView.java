@@ -12,11 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class VideoView {
-	private static final Logger logger = LoggerFactory.getLogger(VideoView.class);
 	private JLabel[] imgVideoLabel;
 	private JPanel videoPanel;
 

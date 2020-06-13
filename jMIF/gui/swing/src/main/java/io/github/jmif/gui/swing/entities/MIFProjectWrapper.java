@@ -53,7 +53,6 @@ public class MIFProjectWrapper {
 		return project.getTexttrack();
 	}
 
-	@Deprecated // TODO
 	public List<MIFFileWrapper<?>> getMIFFiles() {
 		return MIFFileWrapper.wrap(project.getMIFFiles());
 	}
@@ -104,5 +103,17 @@ public class MIFProjectWrapper {
 
 	public String toString() {
 		return project.toString();
+	}
+
+	public void clearMIFFiles() {
+		project.getMIFFiles().clear();
+	}
+
+	public void addMIFFile(MIFFileWrapper<?> mifFile) {
+		project.getMIFFiles().add(mifFile.toMIFFile());
+	}
+
+	public void removeMIFFile(MIFFileWrapper<?> mifFile) {
+		project.getMIFFiles().remove(mifFile.toMIFFile());
 	}
 }

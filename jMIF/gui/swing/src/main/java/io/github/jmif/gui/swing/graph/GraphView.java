@@ -196,7 +196,7 @@ public class GraphView {
 						executor.submit(() -> {
 							try {
 								// TODO übergeben
-								graphWrapper.getService().createPreview(f.toMIFFile(), graphWrapper.getPr().getWorkingDir());
+								graphWrapper.getService().createPreview(f, graphWrapper.getPr().getWorkingDir());
 							} catch (Exception ex) {
 								logger.error("", e);
 							}

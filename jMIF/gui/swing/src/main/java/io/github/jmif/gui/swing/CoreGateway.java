@@ -16,23 +16,26 @@ import org.slf4j.LoggerFactory;
 
 import io.github.jmif.MIF;
 import io.github.jmif.core.MIFException;
-import io.github.jmif.core.MIFService;
 import io.github.jmif.core.ServiceExecutor;
 import io.github.jmif.entities.MIFAudioFile;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
-import io.github.jmif.entities.MIFProject;
 import io.github.jmif.entities.MIFTextFile;
 import io.github.jmif.entities.MIFVideo;
 import io.github.jmif.entities.melt.Melt;
 import io.github.jmif.entities.melt.MeltFilter;
 import io.github.jmif.entities.melt.MeltFilterDetails;
+import io.github.jmif.gui.swing.entities.MIFAudioFileWrapper;
+import io.github.jmif.gui.swing.entities.MIFFileWrapper;
+import io.github.jmif.gui.swing.entities.MIFImageWrapper;
+import io.github.jmif.gui.swing.entities.MIFProjectWrapper;
+import io.github.jmif.gui.swing.entities.MIFVideoWrapper;
 
 /**
  * @author thebrunner
  *
  */
-public class CoreGateway implements MIFService {
+public class CoreGateway {
 
 	private static final Logger logger = LoggerFactory.getLogger(GraphWrapper.class);
 
@@ -49,7 +52,7 @@ public class CoreGateway implements MIFService {
 		}
 
 		@SuppressWarnings("unchecked")
-		@Override
+		
 		public T call() throws Exception {
 			Future<?> result = null;
 			try {
@@ -65,9 +68,9 @@ public class CoreGateway implements MIFService {
 
 	}
 
-	@Override
-	public void exportImage(MIFProject pr, String output, int frame) throws MIFException {
-		final var id = service.exportImage(pr, output, frame);
+	
+	public void exportImage(MIFProjectWrapper pr, String output, int frame) throws MIFException {
+		final var id = service.exportImage(pr.toMIFProject(), output, frame);
 		final Waiter<Void> waiter = new Waiter<>(id);
 		try {
 			executor.submit(waiter).get();
@@ -76,9 +79,9 @@ public class CoreGateway implements MIFService {
 		}
 	}
 
-	@Override
-	public void convert(MIFProject pr, boolean preview) throws MIFException {
-		final var id = service.convert(pr, preview);
+	
+	public void convert(MIFProjectWrapper pr, boolean preview) throws MIFException {
+		final var id = service.convert(pr.toMIFProject(), preview);
 		final Waiter<Void> waiter = new Waiter<>(id);
 		try {
 			executor.submit(waiter).get();
@@ -87,9 +90,9 @@ public class CoreGateway implements MIFService {
 		}		
 	}
 
-	@Override
-	public void updateProfile(MIFProject project) throws MIFException {
-		final var id = service.updateFramerate(project);
+	
+	public void updateProfile(MIFProjectWrapper project) throws MIFException {
+		final var id = service.updateFramerate(project.toMIFProject());
 		final Waiter<Void> waiter = new Waiter<>(id);
 		try {
 			executor.submit(waiter).get();
@@ -98,9 +101,9 @@ public class CoreGateway implements MIFService {
 		}
 	}
 
-	@Override
-	public void createWorkingDirs(MIFProject project) throws MIFException {
-		final var id = service.createWorkingDirs(project);
+	
+	public void createWorkingDirs(MIFProjectWrapper project) throws MIFException {
+		final var id = service.createWorkingDirs(project.toMIFProject());
 		final Waiter<Void> waiter = new Waiter<>(id);
 		try {
 			executor.submit(waiter).get();
@@ -109,31 +112,31 @@ public class CoreGateway implements MIFService {
 		}
 	}
 
-	@Override
-	public MIFVideo createVideo(File file, String display, int frames, String dim, int overlay, String workingDir) throws MIFException {
+	
+	public MIFVideoWrapper createVideo(File file, String display, int frames, String dim, int overlay, String workingDir) throws MIFException {
 		final var id = service.createVideo(file, display, frames, dim, overlay, workingDir);
 		final Waiter<MIFVideo> waiter = new Waiter<>(id);
 		try {
-			return executor.submit(waiter).get();
+			return new MIFVideoWrapper(executor.submit(waiter).get());
 		} catch (InterruptedException | ExecutionException e) {
 			throw new MIFException(e);
 		}
 	}
 
-	@Override
-	public MIFFile createPreview(MIFFile file, String workingDir) throws MIFException {
-		final var id = service.createPreview(file, workingDir);
+	
+	public MIFFileWrapper<?> createPreview(MIFFileWrapper<?> file, String workingDir) throws MIFException {
+		final var id = service.createPreview(file.toMIFFile(), workingDir);
 		final Waiter<MIFFile> waiter = new Waiter<>(id);
 		try {
-			return executor.submit(waiter).get();
+			return MIFFileWrapper.wrap(executor.submit(waiter).get());
 		} catch (InterruptedException | ExecutionException e) {
 			throw new MIFException(e);
 		}
 	}
 
-	@Override
-	public void createManualPreview(MIFImage image) throws MIFException {
-		final var id = service.createManualPreview(image);
+	
+	public void createManualPreview(MIFImageWrapper image) throws MIFException {
+		final var id = service.createManualPreview(image.toMIFFile());
 		final Waiter<Void> waiter = new Waiter<>(id);
 		try {
 			executor.submit(waiter).get();
@@ -142,29 +145,29 @@ public class CoreGateway implements MIFService {
 		}
 	}
 
-	@Override
-	public MIFImage createImage(File file, String display, int frames, String dim, int overlay, String workingDir) throws MIFException {
+	
+	public MIFImageWrapper createImage(File file, String display, int frames, String dim, int overlay, String workingDir) throws MIFException {
 		final var id = service.createImage(file, display, frames, dim, overlay, workingDir);
 		final Waiter<MIFImage> waiter = new Waiter<>(id);
 		try {
-			return	executor.submit(waiter).get();
+			return new MIFImageWrapper(executor.submit(waiter).get());
 		} catch (InterruptedException | ExecutionException e) {
 			throw new MIFException(e);
 		}
 	}
 
-	@Override
-	public MIFAudioFile createAudio(String path) throws MIFException {
+	
+	public MIFAudioFileWrapper createAudio(String path) throws MIFException {
 		final var id = service.createAudio(path);
 		final Waiter<MIFAudioFile> waiter = new Waiter<>(id);
 		try {
-			return executor.submit(waiter).get();
+			return new MIFAudioFileWrapper(executor.submit(waiter).get());
 		} catch (InterruptedException | ExecutionException e) {
 			throw new MIFException(e);
 		}
 	}
 
-	@Override
+	
 	public List<String> getProfiles() throws MIFException {
 		final var id = service.getProfiles();
 		final Waiter<List<String>> waiter = new Waiter<>(id);
@@ -175,7 +178,7 @@ public class CoreGateway implements MIFService {
 		}
 	}
 
-	@Override
+	
 	public List<MeltFilterDetails> getMeltVideoFilterDetails(Melt melt) throws MIFException {
 		final var id = service.getMeltVideoFilterDetails(melt);
 		final Waiter<List<MeltFilterDetails>> waiter = new Waiter<>(id);
@@ -186,7 +189,7 @@ public class CoreGateway implements MIFService {
 		}
 	}
 
-	@Override
+	
 	public List<MeltFilterDetails> getMeltAudioFilterDetails(Melt melt) throws MIFException {
 		final var id = service.getMeltAudioFilterDetails(melt);
 		final Waiter<List<MeltFilterDetails>> waiter = new Waiter<>(id);
@@ -197,7 +200,7 @@ public class CoreGateway implements MIFService {
 		}
 	}
 
-	@Override
+	
 	public MeltFilterDetails getMeltFilterDetailsFor(Melt melt, MeltFilter meltFilter) throws MIFException {
 		final var id = service.getMeltFilterDetailsFor(melt, meltFilter);
 		final Waiter<MeltFilterDetails> waiter = new Waiter<>(id);
@@ -208,9 +211,9 @@ public class CoreGateway implements MIFService {
 		}
 	}
 
-	@Override
-	public void applyFilter(MIFProject pr, MIFFile mifImage, MeltFilter meltFilter) throws MIFException {
-		final var id = service.applyFilter(pr, mifImage, meltFilter);
+	
+	public void applyFilter(MIFProjectWrapper pr, MIFFileWrapper<?> mifImage, MeltFilter meltFilter) throws MIFException {
+		final var id = service.applyFilter(pr.toMIFProject(), mifImage.toMIFFile(), meltFilter);
 		final Waiter<Void> waiter = new Waiter<>(id);
 		try {
 			executor.submit(waiter).get();
@@ -219,7 +222,7 @@ public class CoreGateway implements MIFService {
 		}
 	}
 
-	@Override
+	
 	public MIFTextFile createText() throws MIFException {
 		final var id = service.createText();
 		final Waiter<MIFTextFile> waiter = new Waiter<>(id);

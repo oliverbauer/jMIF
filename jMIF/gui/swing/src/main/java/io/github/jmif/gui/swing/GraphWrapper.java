@@ -35,7 +35,6 @@ import com.mxgraph.view.mxGraph;
 
 import io.github.jmif.config.Configuration;
 import io.github.jmif.core.MIFException;
-import io.github.jmif.core.MIFService;
 import io.github.jmif.entities.MIFAudioFile;
 import io.github.jmif.entities.MIFProject;
 import io.github.jmif.entities.MIFTextFile;
@@ -50,7 +49,7 @@ import io.github.jmif.util.TimeUtil;
 public class GraphWrapper {
 	private static final Logger logger = LoggerFactory.getLogger(GraphWrapper.class);
 	
-	private final MIFService service = new CoreGateway();
+	private final CoreGateway service = new CoreGateway();
 	
 	private Map<mxCell, MIFFileWrapper<?>> nodeToMIFFile;
 	private Map<mxCell, MIFAudioFileWrapper> nodeToMIFAudio;
@@ -116,7 +115,7 @@ public class GraphWrapper {
 			MIFProjectWrapper project = new MIFProjectWrapper((MIFProject) unmarshaller.unmarshal(file));
 			getCells().clear();
 			getTextCells().clear();
-			pr.getMIFFiles().clear();
+			pr.clearMIFFiles();
 			pr.getAudiotrack().getAudiofiles().clear();
 			pr.getTexttrack().getEntries().clear();
 			
@@ -130,7 +129,7 @@ public class GraphWrapper {
 				executor.submit(() -> {
 					try {
 //						TODO übergeben
-						service.createPreview(mifFile.toMIFFile(), project.getWorkingDir());
+						service.createPreview(mifFile, project.getWorkingDir());
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -158,7 +157,7 @@ public class GraphWrapper {
 		
 		if (file.endsWith("mp3") || file.endsWith("MP3")) {
 			// TODO Service
-			var audioFile = new MIFAudioFileWrapper(service.createAudio(fileToAdd.getAbsolutePath()));
+			var audioFile = service.createAudio(fileToAdd.getAbsolutePath());
 			
 			var n = "mp3";
 			var x = currentLength + XOFFSET;
@@ -197,9 +196,9 @@ public class GraphWrapper {
 		
 		var display = file.substring(file.lastIndexOf('/') + 1);
 		if (Configuration.allowedImageTypes.contains(extension)) {
-			mifFile = MIFFileWrapper.wrap(service.createImage(fileToAdd, display, 5000, "-1x-1", 1000, pr.getWorkingDir()));
+			mifFile = service.createImage(fileToAdd, display, 5000, "-1x-1", 1000, pr.getWorkingDir());
 		} else if (Configuration.allowedVideoTypes.contains(extension)) {
-			mifFile = MIFFileWrapper.wrap(service.createVideo(fileToAdd, display, -1, "1920x1080", 1000, pr.getWorkingDir()));
+			mifFile = service.createVideo(fileToAdd, display, -1, "1920x1080", 1000, pr.getWorkingDir());
 		}
 		
 		if (mifFile != null) {
@@ -521,7 +520,7 @@ public class GraphWrapper {
 	    		
 			// TODO Use temp dir...
 			var output = pr.getWorkingDir()+"frame-"+frame+".jpg";
-			service.exportImage(pr.toMIFProject(), output, frame);
+			service.exportImage(pr, output, frame);
 	    		
 			logger.info("Created image for frame {} in {}", frame, TimeUtil.getMessage(time));
 			
@@ -543,7 +542,7 @@ public class GraphWrapper {
 		return (mxCell) graph.insertVertex(parent, null, label, x, y, w, h);
 	}
 
-	private int getPixelwidth(MIFAudioFile audioFile) {
+	private int getPixelwidth(MIFAudioFileWrapper audioFile) {
 		return (int)(Configuration.pixelwidth_per_second * ((audioFile.getEncodeEnde() - audioFile.getEncodeStart()) / 1000d));
 	}
 	
@@ -563,7 +562,7 @@ public class GraphWrapper {
 		return 0; // TODO Text: Overlay
 	}
 	
-	private int getOverlaywidth(MIFAudioFile audioFiles) {
+	private int getOverlaywidth(MIFAudioFileWrapper audioFiles) {
 		return 25;
 	}
 	
@@ -591,8 +590,8 @@ public class GraphWrapper {
 		this.listenerSingleFrameCreated.add(listener);
 	}
 	
-	public void remove(MIFFileWrapper<?> meltFile, mxCell cell) {
-		pr.getMIFFiles().remove(meltFile);
+	public void remove(MIFFileWrapper<?> mifFile, mxCell cell) {
+		pr.removeMIFFile(mifFile);
 		nodeToMIFFile.remove(cell);
 	}
 
@@ -602,7 +601,7 @@ public class GraphWrapper {
 	}
 	
 	public void put(MIFFileWrapper<?> meltFile, mxCell cell) {
-		pr.getMIFFiles().add(meltFile);
+		pr.addMIFFile(meltFile);
 		this.nodeToMIFFile.put(cell, meltFile);
 	}
 	
@@ -649,7 +648,7 @@ public class GraphWrapper {
 		return cell == singleframeSlider;
 	}
 
-	public MIFService getService() {
+	public CoreGateway getService() {
 		return service;
 	}
 }

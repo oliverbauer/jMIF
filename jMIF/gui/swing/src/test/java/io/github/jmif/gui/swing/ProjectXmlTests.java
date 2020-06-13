@@ -8,12 +8,11 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import io.github.jmif.core.MIFService;
 import io.github.jmif.entities.melt.MeltFilter;
 
 public class ProjectXmlTests {
 	
-	private final MIFService service = new CoreGateway();
+	private final CoreGateway service = new CoreGateway();
 	
 	@Test
 	public void simpleImage() throws Exception {
@@ -21,9 +20,9 @@ public class ProjectXmlTests {
 
 		var project = new GraphWrapper();
 		project.getPr().setProfile("atsc_1080p_25");
-		service.updateProfile(project.getPr().toMIFProject());
+		service.updateProfile(project.getPr());
 		project.getPr().setWorkingDir(tempDir.getAbsolutePath());
-		service.createWorkingDirs(project.getPr().toMIFProject());
+		service.createWorkingDirs(project.getPr());
 		project.getPr().setFileOfProject(project.getPr().getWorkingDir() + "defaultproject.xml");
 		project.getPr().setOutputVideo(project.getPr().getWorkingDir()+"output.avi");
 		FileUtils.copyInputStreamToFile(JMIF.class.getClassLoader().getResourceAsStream("defaultproject/1.JPG"),
@@ -39,9 +38,9 @@ public class ProjectXmlTests {
 
 		var project = new GraphWrapper();
 		project.getPr().setProfile("atsc_1080p_25");
-		service.updateProfile(project.getPr().toMIFProject());
+		service.updateProfile(project.getPr());
 		project.getPr().setWorkingDir(tempDir.getAbsolutePath());
-		service.createWorkingDirs(project.getPr().toMIFProject());
+		service.createWorkingDirs(project.getPr());
 		project.getPr().setFileOfProject(project.getPr().getWorkingDir() + "defaultproject.xml");
 		project.getPr().setOutputVideo(project.getPr().getWorkingDir()+"output.avi");
 		FileUtils.copyInputStreamToFile(JMIF.class.getClassLoader().getResourceAsStream("defaultproject/1.JPG"),

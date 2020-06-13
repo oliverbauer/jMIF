@@ -19,7 +19,7 @@ import io.github.jmif.entities.melt.MeltFilter;
  */
 public class ServiceExecutor implements MIF {
 
-	private final MIFService service = new LocalService();
+	private final LocalService service = new LocalService();
 
 	private final ThreadExecutor executor = new ThreadExecutor();
 

@@ -160,7 +160,7 @@ public class ManualSize {
 			try {
 				mifImage.setManualStyleCommand(command);
 				
-				graphWrapper.getService().createManualPreview(mifImage.toMIFFile());
+				graphWrapper.getService().createManualPreview(mifImage);
 				imageView.refreshFromManualSize();
 			} catch (MIFException e) {
 				logger.error("", e);

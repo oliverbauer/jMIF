@@ -11,11 +11,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import io.github.jmif.core.MIFService;
-
 public class DefaultProjectTests {
 	
-	private final MIFService service = new CoreGateway();
+	private final CoreGateway service = new CoreGateway();
 	
 	private String tempDir;
 	@Before
@@ -29,16 +27,16 @@ public class DefaultProjectTests {
 		var project = new GraphWrapper();
 		var pr = project.getPr();
 		pr.setWorkingDir(tempDir);
-		service.createWorkingDirs(pr.toMIFProject());
+		service.createWorkingDirs(pr);
 		pr.setFileOfProject(tempDir + "defaultproject.xml");
 		pr.setOutputVideo(tempDir+"output.avi");
 		var f1 = project.createMIFFile(new File(tempDir + "1.JPG"));
 		f1.setDuration(1000);    // 5 sec
 		project.getPr().setProfile("atsc_1080p_25");
-		service.updateProfile(pr.toMIFProject());
+		service.updateProfile(pr);
 		
 		project.save();
-		service.convert(pr.toMIFProject(), false);
+		service.convert(pr, false);
 		Assert.assertTrue(new File(tempDir+"output.avi").exists());
 
 		// Is the image converted correctly?
@@ -59,16 +57,16 @@ public class DefaultProjectTests {
 		var project = new GraphWrapper();
 		var pr = project.getPr();
 		pr.setWorkingDir(tempDir);
-		service.createWorkingDirs(pr.toMIFProject());
+		service.createWorkingDirs(pr);
 		pr.setFileOfProject(tempDir + "defaultproject.xml");
 		pr.setOutputVideo(tempDir+"output.avi");
 		var f1 = project.createMIFFile(new File(tempDir + "1.JPG"));
 		f1.setDuration(1000); // 1 sec
 		project.getPr().setProfile("atsc_1080p_50");
-		service.updateProfile(pr.toMIFProject());
+		service.updateProfile(pr);
 		
 		project.save();
-		service.convert(pr.toMIFProject(), false);
+		service.convert(pr, false);
 		Assert.assertTrue(new File(tempDir+"output.avi").exists());
 
 		// Is the image converted correctly?
@@ -91,16 +89,16 @@ public class DefaultProjectTests {
 		var project = new GraphWrapper();
 		var pr = project.getPr();
 		pr.setWorkingDir(tempDir);
-		service.createWorkingDirs(pr.toMIFProject());
+		service.createWorkingDirs(pr);
 		pr.setFileOfProject(tempDir + "defaultproject.xml");
 		pr.setOutputVideo(tempDir+"output.avi");
 		var f1 = project.createMIFFile(new File(tempDir + "1.JPG"));
 		f1.setDuration(1000); // 1 sec
 		project.getPr().setProfile("svcd_pal");
-		service.updateProfile(pr.toMIFProject());
+		service.updateProfile(pr);
 		
 		project.save();
-		service.convert(pr.toMIFProject(), false);
+		service.convert(pr, false);
 		Assert.assertTrue(new File(tempDir+"output.avi").exists());
 
 		// Is the image converted correctly?
@@ -126,7 +124,7 @@ public class DefaultProjectTests {
 		var project = new GraphWrapper();
 		var pr = project.getPr();
 		pr.setWorkingDir(tempDir);
-		service.createWorkingDirs(pr.toMIFProject());
+		service.createWorkingDirs(pr);
 		pr.setFileOfProject(tempDir + "defaultproject.xml");
 		pr.setOutputVideo(tempDir+"output.avi");
 		var f1 = project.createMIFFile(new File(tempDir + "1.JPG"));
@@ -139,11 +137,11 @@ public class DefaultProjectTests {
 		f2.setOverlayToPrevious(0);
 		f3.setOverlayToPrevious(0);
 		project.getPr().setProfile("atsc_1080p_25");
-		service.updateProfile(pr.toMIFProject());
+		service.updateProfile(pr);
 		project.save();
 		Assert.assertTrue(new File(tempDir+"defaultproject.xml").exists());
 		
-		service.convert(pr.toMIFProject(), false);
+		service.convert(pr, false);
 		
 		Assert.assertTrue(new File(tempDir+"output.avi").exists());
 		
@@ -163,7 +161,7 @@ public class DefaultProjectTests {
 		var project = new GraphWrapper();
 		var pr = project.getPr();
 		pr.setWorkingDir(tempDir);
-		service.createWorkingDirs(pr.toMIFProject());
+		service.createWorkingDirs(pr);
 		pr.setFileOfProject(tempDir + "defaultproject4711.xml");
 		pr.setOutputVideo(tempDir+"output4711.avi");
 		var f1 = project.createMIFFile(new File(tempDir + "1.JPG"));
@@ -176,11 +174,11 @@ public class DefaultProjectTests {
 		f2.setOverlayToPrevious(500); // 25 frames for 50fps
 		f3.setOverlayToPrevious(500); // 25 frames for 50fps
 		project.getPr().setProfile("atsc_1080p_50");
-		service.updateProfile(pr.toMIFProject());
+		service.updateProfile(pr);
 		project.save();
 		Assert.assertTrue(new File(tempDir+"defaultproject4711.xml").exists());
 		
-		service.convert(pr.toMIFProject(), false);
+		service.convert(pr, false);
 		
 		Assert.assertTrue(new File(tempDir+"output4711.avi").exists());
 		
@@ -199,7 +197,7 @@ public class DefaultProjectTests {
 		var project = new GraphWrapper();
 		var pr = project.getPr();
 		pr.setWorkingDir(tempDir);
-		service.createWorkingDirs(pr.toMIFProject());
+		service.createWorkingDirs(pr);
 		pr.setFileOfProject(tempDir + "defaultproject4711.xml");
 		pr.setOutputVideo(tempDir+"output4711.avi");
 		var f1 = project.createMIFFile(new File(tempDir + "1.JPG"));
@@ -208,11 +206,11 @@ public class DefaultProjectTests {
 		f1.setOverlayToPrevious(0);
 		a1.setEncodeEnde(8000);   // 8 sec
 		project.getPr().setProfile("atsc_1080p_25");
-		service.updateProfile(pr.toMIFProject());
+		service.updateProfile(pr);
 		project.save();
 		Assert.assertTrue(new File(tempDir+"defaultproject4711.xml").exists());
 		
-		service.convert(pr.toMIFProject(), false);
+		service.convert(pr, false);
 		// [consumer avformat] error with audio encode: -541478725 (frame 201) ?????
 		
 		Assert.assertTrue(new File(tempDir+"output4711.avi").exists());
@@ -233,7 +231,7 @@ public class DefaultProjectTests {
 		var project = new GraphWrapper();
 		var pr = project.getPr();
 		pr.setWorkingDir(tempDir);
-		service.createWorkingDirs(pr.toMIFProject());
+		service.createWorkingDirs(pr);
 		pr.setFileOfProject(tempDir + "project.xml");
 		pr.setOutputVideo(tempDir+"project.avi");
 		var f1 = project.createMIFFile(new File(tempDir + "1.JPG"));
@@ -245,11 +243,11 @@ public class DefaultProjectTests {
 		
 		a2.setEncodeEnde(2000); // [ms]
 		project.getPr().setProfile("atsc_1080p_25");
-		service.updateProfile(pr.toMIFProject());
+		service.updateProfile(pr);
 		project.save();
 		Assert.assertTrue(new File(tempDir+"project.xml").exists());
 		
-		service.convert(pr.toMIFProject(), false);
+		service.convert(pr, false);
 		// [consumer avformat] error with audio encode: -541478725 (frame 201) ?????
 		
 		Assert.assertTrue(new File(tempDir+"project.avi").exists());

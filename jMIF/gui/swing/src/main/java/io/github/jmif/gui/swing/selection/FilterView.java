@@ -24,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.jmif.core.MIFException;
-import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.melt.Melt;
 import io.github.jmif.entities.melt.MeltFilter;
 import io.github.jmif.entities.melt.MeltFilterDetails;
@@ -200,7 +199,7 @@ public class FilterView {
 		previewFilter = new JButton("preview");
 		previewFilter.addActionListener(e -> {
 			try {
-				graphWrapper.getService().applyFilter(graphWrapper.getPr().toMIFProject(), selectedMeltFile.toMIFFile(), currentlySelectedFilter);
+				graphWrapper.getService().applyFilter(graphWrapper.getPr(), selectedMeltFile, currentlySelectedFilter);
 			} catch (MIFException e1) {
 				logger.error("", e1);
 			}			

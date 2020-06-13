@@ -18,7 +18,6 @@ import com.mxgraph.model.mxCell;
 
 import io.github.jmif.config.Configuration;
 import io.github.jmif.core.MIFException;
-import io.github.jmif.entities.MIFAudioFile;
 import io.github.jmif.entities.MIFTextFile;
 import io.github.jmif.entities.melt.Melt;
 import io.github.jmif.entities.melt.MeltFilterDetails;
