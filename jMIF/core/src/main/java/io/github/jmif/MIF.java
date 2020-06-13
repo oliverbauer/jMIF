@@ -31,7 +31,7 @@ public interface MIF {
 
 	long getProfiles() throws MIFException;
 	
-	long applyFilter(MIFProject pr, MIFImage mifImage, MeltFilter meltFilter) throws MIFException;
+	long applyFilter(MIFProject pr, MIFFile mifImage, MeltFilter meltFilter) throws MIFException;
 
 	Future<?> get(long id) throws MIFException;
 

@@ -197,13 +197,13 @@ public class FilterView {
 			addFilter.setEnabled(false); // since now added... do not add twice...
 		});
 		previewFilter = new JButton("preview");
-//		previewFilter.addActionListener(e -> {
-//			try {
-//				graphWrapper.getService().applyFilter(graphWrapper.getPr(), selectedMeltFile, currentlySelectedFilter);
-//			} catch (MIFException e1) {
-//				logger.error("", e1);
-//			}			
-//		});
+		previewFilter.addActionListener(e -> {
+			try {
+				graphWrapper.getService().applyFilter(graphWrapper.getPr(), selectedMeltFile, currentlySelectedFilter);
+			} catch (MIFException e1) {
+				logger.error("", e1);
+			}			
+		});
 
 		dropDownBoxesBox.add(addFilter);
 		dropDownBoxesBox.add(previewFilter);

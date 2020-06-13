@@ -769,39 +769,43 @@ public class LocalService implements MIFService {
 	
 	// TODO Rename to something like previewFilterWithMelt...
 	@Override
-	public void applyFilter(MIFProject pr, MIFImage mifImage, MeltFilter meltFilter) throws MIFException {
-		MIFProjectExecutor mifProjectExecutor = new MIFProjectExecutor(pr);
-
-		String output = "/tmp/temp.jpg";
-		
-		try {
-			mifProjectExecutor.createFinalImageConversion(mifImage, output);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		StringBuilder sb  = new StringBuilder();
-		sb.append("melt ").append(output).append(" out=50 ");
-		for (MeltFilter currentlyAddedFilters : mifImage.getFilters()) {
+	public void applyFilter(MIFProject pr, MIFFile mifFile, MeltFilter meltFilter) throws MIFException {
+		if (mifFile instanceof MIFImage) {
+			MIFImage mifImage = MIFImage.class.cast(mifFile);
+			
+			MIFProjectExecutor mifProjectExecutor = new MIFProjectExecutor(pr);
+	
+			String output = "/tmp/temp.jpg";
+			
+			try {
+				mifProjectExecutor.createFinalImageConversion(mifImage, output);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			StringBuilder sb  = new StringBuilder();
+			sb.append("melt ").append(output).append(" out=50 ");
+			for (MeltFilter currentlyAddedFilters : mifImage.getFilters()) {
+				sb.append(" -attach-cut ");
+				sb.append(currentlyAddedFilters.getFiltername());
+				Map<String, String> filterUsage = currentlyAddedFilters.getFilterUsage();
+				for (String v : filterUsage.keySet()) {
+					sb.append(v).append("=").append(filterUsage.get(v)).append(" ");
+				}				
+			}
 			sb.append(" -attach-cut ");
-			sb.append(currentlyAddedFilters.getFiltername());
-			Map<String, String> filterUsage = currentlyAddedFilters.getFilterUsage();
+			sb.append(meltFilter.getFiltername())
+			.append(" ");
+			Map<String, String> filterUsage = meltFilter.getFilterUsage();
 			for (String v : filterUsage.keySet()) {
 				sb.append(v).append("=").append(filterUsage.get(v)).append(" ");
-			}				
-		}
-		sb.append(" -attach-cut ");
-		sb.append(meltFilter.getFiltername())
-		.append(" ");
-		Map<String, String> filterUsage = meltFilter.getFilterUsage();
-		for (String v : filterUsage.keySet()) {
-			sb.append(v).append("=").append(filterUsage.get(v)).append(" ");
-		}
-		sb.append(" -consumer sdl2 terminate_on_pause=1");
-		try {
-			mifProjectExecutor.execute(sb.toString());
-		} catch (IOException e1) {
-			e1.printStackTrace();
+			}
+			sb.append(" -consumer sdl2 terminate_on_pause=1");
+			try {
+				mifProjectExecutor.execute(sb.toString());
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		}
 	}
 }

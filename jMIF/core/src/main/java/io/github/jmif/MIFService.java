@@ -40,5 +40,5 @@ public interface MIFService {
 
 	MeltFilterDetails getMeltFilterDetailsFor(Melt melt, MeltFilter meltFilter) throws MIFException;
 
-	void applyFilter(MIFProject pr, MIFImage mifImage, MeltFilter meltFilter) throws MIFException;
+	void applyFilter(MIFProject pr, MIFFile mifImage, MeltFilter meltFilter) throws MIFException;
 }
