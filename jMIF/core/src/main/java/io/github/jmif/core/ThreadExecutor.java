@@ -1,7 +1,7 @@
 /**
  * 
  */
-package io.github.jmif;
+package io.github.jmif.core;
 
 import java.util.HashMap;
 import java.util.Map;

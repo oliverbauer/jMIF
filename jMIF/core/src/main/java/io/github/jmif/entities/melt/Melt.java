@@ -1,4 +1,4 @@
-package io.github.jmif.melt;
+package io.github.jmif.entities.melt;
 
 import java.util.LinkedList;
 import java.util.List;

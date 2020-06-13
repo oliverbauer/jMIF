@@ -8,8 +8,8 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import io.github.jmif.MIFService;
-import io.github.jmif.entities.MeltFilter;
+import io.github.jmif.core.MIFService;
+import io.github.jmif.entities.melt.MeltFilter;
 
 public class ProjectXmlTests {
 	

@@ -1,4 +1,4 @@
-package io.github.jmif.melt.adapter;
+package io.github.jmif.entities.melt.adapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -16,13 +16,15 @@ import org.slf4j.LoggerFactory;
 
 import com.mxgraph.model.mxCell;
 
-import io.github.jmif.MIFException;
 import io.github.jmif.config.Configuration;
+import io.github.jmif.core.MIFException;
 import io.github.jmif.entities.MIFAudioFile;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFTextFile;
 import io.github.jmif.entities.MIFVideo;
+import io.github.jmif.entities.melt.Melt;
+import io.github.jmif.entities.melt.MeltFilterDetails;
 import io.github.jmif.gui.swing.GraphWrapper;
 import io.github.jmif.gui.swing.selection.audio.AudioDetailsView;
 import io.github.jmif.gui.swing.selection.audio.AudioView;
@@ -34,8 +36,6 @@ import io.github.jmif.gui.swing.selection.text.TextDetailsView;
 import io.github.jmif.gui.swing.selection.text.TextView;
 import io.github.jmif.gui.swing.selection.video.VideoDetailsView;
 import io.github.jmif.gui.swing.selection.video.VideoView;
-import io.github.jmif.melt.Melt;
-import io.github.jmif.melt.MeltFilterDetails;
 
 public class SelectionView {
 	private static final Logger logger = LoggerFactory.getLogger(SelectionView.class);

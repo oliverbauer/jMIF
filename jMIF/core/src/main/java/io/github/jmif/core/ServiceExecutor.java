@@ -1,16 +1,17 @@
 /**
  * 
  */
-package io.github.jmif;
+package io.github.jmif.core;
 
 import java.io.File;
 import java.util.concurrent.Future;
 
+import io.github.jmif.MIF;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFProject;
-import io.github.jmif.entities.MeltFilter;
-import io.github.jmif.melt.Melt;
+import io.github.jmif.entities.melt.Melt;
+import io.github.jmif.entities.melt.MeltFilter;
 
 /**
  * @author thebrunner

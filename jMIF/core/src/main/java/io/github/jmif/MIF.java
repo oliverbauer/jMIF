@@ -3,11 +3,12 @@ package io.github.jmif;
 import java.io.File;
 import java.util.concurrent.Future;
 
+import io.github.jmif.core.MIFException;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFProject;
-import io.github.jmif.entities.MeltFilter;
-import io.github.jmif.melt.Melt;
+import io.github.jmif.entities.melt.Melt;
+import io.github.jmif.entities.melt.MeltFilter;
 
 public interface MIF {
 

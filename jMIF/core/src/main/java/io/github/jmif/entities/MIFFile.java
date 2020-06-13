@@ -12,6 +12,8 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.commons.io.FilenameUtils;
 
+import io.github.jmif.entities.melt.MeltFilter;
+
 @XmlRootElement(name = "meltfile")
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class MIFFile {

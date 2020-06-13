@@ -1,4 +1,4 @@
-package io.github.jmif.builder;
+package io.github.jmif.core;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,10 +20,10 @@ import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFProject;
 import io.github.jmif.entities.MIFVideo;
-import io.github.jmif.entities.MeltFilter;
+import io.github.jmif.entities.melt.MeltFilter;
 import io.github.jmif.util.TimeUtil;
 
-public class MIFProjectExecutor { 
+class MIFProjectExecutor { 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MIFProjectExecutor.class);
 	
 	private MIFProject project;
