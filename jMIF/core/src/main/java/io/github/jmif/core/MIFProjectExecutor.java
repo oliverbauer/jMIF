@@ -19,6 +19,7 @@ import io.github.jmif.entities.MIFAudioFile;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFProject;
+import io.github.jmif.entities.MIFTextFile;
 import io.github.jmif.entities.MIFVideo;
 import io.github.jmif.entities.melt.MeltFilter;
 import io.github.jmif.util.TimeUtil;
@@ -188,7 +189,10 @@ class MIFProjectExecutor {
 			sb.append("#/!/usr/bin/env bash\n\n");
 			sb.append("melt \\\n");
 			
+			sb.append("color:black  out=299 \\\n"); // FIXME what is the overall framelength?
+			
 			int count = 0;
+			sb.append("-track \\\n");
 			for (MIFFile meltfile : this.project.getMIFFiles()) {
 				String input = project.getWorkingDir()+"scaled/"+meltfile.getFilename();
 				String extension = meltfile.getFileExtension();
@@ -221,6 +225,25 @@ class MIFProjectExecutor {
 				count++;
 			}
 			sb.append("\\\n");
+			// Add text
+			if (!project.getTexttrack().getEntries().isEmpty()) {
+				sb.append("-track \\\n");
+				
+				for (MIFTextFile textFile : project.getTexttrack().getEntries()) {
+					sb.append(" pango: \\\n");
+					
+					sb.append(String.format(" text=\"%s\" bgcolour=%s fgcolour=%s olcolour=%s out=%s size=%s weight=%s \\\n", 
+						textFile.getText(), 
+						textFile.getBgcolour(), 
+						textFile.getFgcolour(),
+						textFile.getOlcolour(), 
+						(textFile.getLength()/1000)*project.getProfileFramerate(), 
+						textFile.getSize(), 
+						textFile.getWeight()));
+					sb.append("  -attach affine transition.valign=top transition.halign=center transition.fill=0 \\\n");
+				}
+			}
+			
 			if (!project.getAudiotrack().getAudiofiles().isEmpty()) {
 				sb.append(" -audio-track ");
 				for (int i=0; i<=project.getAudiotrack().getAudiofiles().size()-1; i++) {
@@ -232,6 +255,14 @@ class MIFProjectExecutor {
 				}
 				sb.append(" \\\n");
 			}
+			sb.append(" \\\n");
+			
+			sb.append(" -transition mix:-1 always_active=1 a_track=0 b_track=1 sum=1  \\\n");
+			sb.append(" -transition frei0r.cairoblend a_track=0 b_track=1 disable=0 \\\n");
+			if (!project.getTexttrack().getEntries().isEmpty()) {
+				sb.append(" -transition affine a_track=0 b_track=2 \\\n");
+			}
+			
 			sb.append(" -profile "+project.getProfile()+" \\\n");
 			sb.append(consumer);
 			
