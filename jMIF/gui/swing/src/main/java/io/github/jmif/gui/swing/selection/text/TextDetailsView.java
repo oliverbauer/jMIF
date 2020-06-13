@@ -10,8 +10,8 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import io.github.jmif.config.Configuration;
-import io.github.jmif.entities.MIFTextFile;
 import io.github.jmif.gui.swing.GraphWrapper;
+import io.github.jmif.gui.swing.entities.MIFTextFileWrapper;
 
 public class TextDetailsView {
 	private Box panel;
@@ -32,7 +32,7 @@ public class TextDetailsView {
 	private JTextField bgColor = new JTextField();
 	private JTextField olColor = new JTextField();
 	
-	private MIFTextFile mifText;
+	private MIFTextFileWrapper mifText;
 	
 	public TextDetailsView(GraphWrapper graphwrapper) {
 		Box box = Box.createVerticalBox();
@@ -88,7 +88,7 @@ public class TextDetailsView {
 		return panel;
 	}
 	
-	public void setDetails(MIFTextFile mifText) {
+	public void setDetails(MIFTextFileWrapper mifText) {
 		this.mifText = mifText;
 		
 		text.setText(mifText.getText());

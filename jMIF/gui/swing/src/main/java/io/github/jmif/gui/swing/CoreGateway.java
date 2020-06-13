@@ -29,6 +29,7 @@ import io.github.jmif.gui.swing.entities.MIFAudioFileWrapper;
 import io.github.jmif.gui.swing.entities.MIFFileWrapper;
 import io.github.jmif.gui.swing.entities.MIFImageWrapper;
 import io.github.jmif.gui.swing.entities.MIFProjectWrapper;
+import io.github.jmif.gui.swing.entities.MIFTextFileWrapper;
 import io.github.jmif.gui.swing.entities.MIFVideoWrapper;
 
 /**
@@ -223,11 +224,11 @@ public class CoreGateway {
 	}
 
 	
-	public MIFTextFile createText() throws MIFException {
+	public MIFTextFileWrapper createText() throws MIFException {
 		final var id = service.createText();
 		final Waiter<MIFTextFile> waiter = new Waiter<>(id);
 		try {
-			return executor.submit(waiter).get();
+			return new MIFTextFileWrapper(executor.submit(waiter).get());
 		} catch (InterruptedException | ExecutionException e) {
 			throw new MIFException(e);
 		}

@@ -5,7 +5,6 @@ package io.github.jmif.gui.swing.entities;
 
 import java.util.List;
 
-import io.github.jmif.entities.MIFAudioTrack;
 import io.github.jmif.entities.MIFProject;
 import io.github.jmif.entities.MIFTextTrack;
 
@@ -45,10 +44,7 @@ public class MIFProjectWrapper {
 		return project.getOutputVideo();
 	}
 
-	public MIFAudioTrack getAudiotrack() {
-		return project.getAudiotrack();
-	}
-
+	@Deprecated // TODO refactor
 	public MIFTextTrack getTexttrack() {
 		return project.getTexttrack();
 	}
@@ -116,4 +112,33 @@ public class MIFProjectWrapper {
 	public void removeMIFFile(MIFFileWrapper<?> mifFile) {
 		project.getMIFFiles().remove(mifFile.toMIFFile());
 	}
+
+	public void clearAudiofiles() {
+		project.getAudiotrack().getAudiofiles().clear();
+	}
+
+	public void addAudiofile(MIFAudioFileWrapper audioFile) {
+		project.getAudiotrack().getAudiofiles().add(audioFile.toMIFFile());
+	}
+
+	public void removeAudiofile(MIFAudioFileWrapper audioFile) {
+		project.getAudiotrack().getAudiofiles().remove(audioFile.toMIFFile());
+	}
+
+	public boolean isAudioFilesEmpty() {
+		return project.getAudiotrack().getAudiofiles().isEmpty();
+	}
+
+	public void clearTextfiles() {
+		project.getTexttrack().getEntries().clear();
+	}
+
+	public void addTextFile(MIFTextFileWrapper textFile) {
+		project.getTexttrack().getEntries().add(textFile.toMIFTextFile());
+	}
+	
+	public void removeTextFile(MIFTextFileWrapper textFile) {
+		project.getTexttrack().getEntries().remove(textFile.toMIFTextFile());
+	}
+
 }

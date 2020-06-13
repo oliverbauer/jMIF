@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import io.github.jmif.entities.MIFAudioFile;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFVideo;
@@ -25,6 +26,8 @@ public class MIFFileWrapper<T extends MIFFile> {
 	public static MIFFileWrapper<?> wrap(MIFFile mifFile) {
 		if (mifFile instanceof MIFImage) {
 			return new MIFImageWrapper(MIFImage.class.cast(mifFile));
+		} else if (mifFile instanceof MIFAudioFile) {
+			return new MIFAudioFileWrapper(MIFAudioFile.class.cast(mifFile));
 		}
 		return new MIFVideoWrapper(MIFVideo.class.cast(mifFile));
 	}

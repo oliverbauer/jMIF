@@ -18,13 +18,13 @@ import com.mxgraph.model.mxCell;
 
 import io.github.jmif.config.Configuration;
 import io.github.jmif.core.MIFException;
-import io.github.jmif.entities.MIFTextFile;
 import io.github.jmif.entities.melt.Melt;
 import io.github.jmif.entities.melt.MeltFilterDetails;
 import io.github.jmif.gui.swing.GraphWrapper;
 import io.github.jmif.gui.swing.entities.MIFAudioFileWrapper;
 import io.github.jmif.gui.swing.entities.MIFFileWrapper;
 import io.github.jmif.gui.swing.entities.MIFImageWrapper;
+import io.github.jmif.gui.swing.entities.MIFTextFileWrapper;
 import io.github.jmif.gui.swing.entities.MIFVideoWrapper;
 import io.github.jmif.gui.swing.selection.audio.AudioDetailsView;
 import io.github.jmif.gui.swing.selection.audio.AudioView;
@@ -44,7 +44,7 @@ public class SelectionView {
 	
 	private MIFFileWrapper<?> selectedMeltFile = null;
 	private MIFAudioFileWrapper selectedAudioFile = null;
-	private MIFTextFile selectedTextFile = null;
+	private MIFTextFileWrapper selectedTextFile = null;
 	private mxCell selectedCell;
 
 	private JTabbedPane tabPane;
@@ -189,7 +189,7 @@ public class SelectionView {
 		panel.updateUI();
 	}
 	
-	public void updateText(mxCell cell, MIFTextFile meltFile) {
+	public void updateText(mxCell cell, MIFTextFileWrapper meltFile) {
 		clearSelection();
 		
 		this.selectedTextFile = meltFile;
@@ -262,7 +262,7 @@ public class SelectionView {
 		return selectedCell;
 	}
 
-	public MIFTextFile getCurrentTextFile() {
+	public MIFTextFileWrapper getCurrentTextFile() {
 		return selectedTextFile;
 	}
 }

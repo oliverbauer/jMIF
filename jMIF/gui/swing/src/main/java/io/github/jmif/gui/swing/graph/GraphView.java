@@ -26,10 +26,10 @@ import com.mxgraph.model.mxCell;
 
 import io.github.jmif.config.Configuration;
 import io.github.jmif.core.MIFException;
-import io.github.jmif.entities.MIFAudioFile;
-import io.github.jmif.entities.MIFTextFile;
 import io.github.jmif.gui.swing.GraphWrapper;
+import io.github.jmif.gui.swing.entities.MIFAudioFileWrapper;
 import io.github.jmif.gui.swing.entities.MIFFileWrapper;
+import io.github.jmif.gui.swing.entities.MIFTextFileWrapper;
 import io.github.jmif.gui.swing.selection.SelectionView;
 
 public class GraphView {
@@ -98,7 +98,7 @@ public class GraphView {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (selectionView.getCurrentAudioFile() != null) {
-					MIFTextFile currentMeltFile = selectionView.getCurrentTextFile();
+					var currentMeltFile = selectionView.getCurrentTextFile();
 					mxCell cell = selectionView.getCell();
 					
 					remove(cell, currentMeltFile);
@@ -241,7 +241,7 @@ public class GraphView {
 		return removeFile;
 	}
 	
-	public void remove(mxCell cell, MIFTextFile meltfile) {
+	public void remove(mxCell cell, MIFTextFileWrapper meltfile) {
 		graphWrapper.remove(meltfile, cell);
 		graphWrapper.remove(cell);
 
@@ -259,7 +259,7 @@ public class GraphView {
 		graphWrapper.redrawGraph();
 	}
 	
-	public void remove(mxCell cell, MIFAudioFile meltfile) {
+	public void remove(mxCell cell, MIFAudioFileWrapper meltfile) {
 		graphWrapper.remove(meltfile, cell);
 		graphWrapper.remove(cell);
 
