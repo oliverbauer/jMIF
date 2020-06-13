@@ -155,8 +155,16 @@ public class JMIF {
 		frame.setBackground(Configuration.bgColor);
 		frame.pack();
 		frame.setLocationRelativeTo(null);
+		
+		// Select the first cell
+		if (!graphWrapper.getCells().isEmpty()) {
+			mxCell cell = graphWrapper.getCells().get(0);
+			mifSelectionView.updateAudioOrVideo(cell, graphWrapper.get(cell));
+		}
+		
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
 		frame.getRootPane().setWindowDecorationStyle(5);
 
 		graphWrapper.save();

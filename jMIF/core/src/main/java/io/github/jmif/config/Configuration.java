@@ -12,7 +12,7 @@ public class Configuration {
 	public static final List<String> allowedVideoTypes = Arrays.asList("mp4", "MP4", "mpg", "avi");
 	
 	public static int pixelwidth_per_second = 25;
-	public static int timelineentryHeight = 20;
+	public static int timelineentryHeight = 15;
 	
 	public static int transperencyOffset = 10; // 10
 	

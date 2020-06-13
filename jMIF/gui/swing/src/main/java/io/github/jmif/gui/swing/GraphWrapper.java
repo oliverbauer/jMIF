@@ -150,13 +150,13 @@ public class GraphWrapper {
 			// TODO Service
 			var audioFile = service.createAudio(fileToAdd.getAbsolutePath());
 			
-			var v1 = insertVertex(
-				"mp3",
-				XOFFSET,
-				YOFFSET*2 +YOFFSET/2 + 2*Configuration.timelineentryHeight,
-				getPixelwidth(audioFile),
-				20);
-			put(audioFile, v1);
+			var n = "mp3";
+			var x = currentLength + XOFFSET;
+			var y = YOFFSET*2 +YOFFSET/2 + 2*Configuration.timelineentryHeight;
+			var w = getPixelwidth(audioFile);
+			var h = Configuration.timelineentryHeight;
+					
+			put(audioFile, createVertex(n, x, y, w, h));
 			
 			return audioFile;
 		}
@@ -183,13 +183,13 @@ public class GraphWrapper {
 				currentLength -= (mifFile.getOverlayToPrevious() / 1000d) * 25;
 			}
 
-			int x = currentLength + XOFFSET;
-			int y = pr.getMIFFiles().size() % 2 == 0 ? 0 + YOFFSET : 20 + YOFFSET;
-			int w = getPixelwidth(mifFile);
-			int h = 20;
-			var v1 = insertVertex(mifFile.getDisplayName(), x, y, w, h);
+			var n = mifFile.getDisplayName();
+			var x = currentLength + XOFFSET;
+			var y = pr.getMIFFiles().size() % 2 == 0 ? 0 + YOFFSET : Configuration.timelineentryHeight + YOFFSET;
+			var w = getPixelwidth(mifFile);
+			var h = Configuration.timelineentryHeight;
 			
-			put(mifFile, v1);
+			put(mifFile, createVertex(n, x, y, w, h));
 			
 			currentLength += w;
 			
@@ -207,11 +207,16 @@ public class GraphWrapper {
 			if (current > 0) {
 				currentLength -= getOverlaywidth(file);
 			}
-			int x = currentLength + XOFFSET;
-			int y = current % 2 == 0 ? 0 + YOFFSET : 20 + YOFFSET;
-			mxCell v1 = insertVertex(x, y, file);
-			put(file, v1);
-			currentLength += getPixelwidth(file);
+			
+			var n = file.getDisplayName();
+			var x = currentLength + XOFFSET;
+			var y = current % 2 == 0 ? 0 + YOFFSET : Configuration.timelineentryHeight + YOFFSET;
+			var w = getPixelwidth(file);
+			var h = Configuration.timelineentryHeight;;
+
+			put(file, createVertex(n, x, y, w, h));
+			
+			currentLength += w;
 			current++;
 		}
 		int audioLength = 0;
@@ -222,16 +227,16 @@ public class GraphWrapper {
 			mxCell mxCell = audioEntry.getKey();
 			MIFAudioFile audioFile = audioEntry.getValue();
 			
-			var rec = new mxRectangle();
-			rec.setX(XOFFSET + audioLength);
-			rec.setY(YOFFSET*2 +YOFFSET/2 + 2*Configuration.timelineentryHeight);
+			var x = XOFFSET + audioLength;
+			var y = YOFFSET*2 +YOFFSET/2 + 2*Configuration.timelineentryHeight;
+			var w = getPixelwidth(audioFile);
+			var h = Configuration.timelineentryHeight;
 			if (current % 2 == 0) {
-				rec.setY(rec.getY() + 20);
+				y += + Configuration.timelineentryHeight;
 			}
-			rec.setWidth(getPixelwidth(audioFile));
-			rec.setHeight(20);
-			audioLength += getPixelwidth(audioFile);
-			resize(mxCell, rec);
+			
+			audioLength += w;
+			resize(mxCell, new mxRectangle(x, y, w, h));
 		}
 		
 		createFramePreview();
@@ -253,13 +258,14 @@ public class GraphWrapper {
 			// Erklären warum folgende Methode scheisse ist (benutzt preferredisze)
 //    		graph.updateCellSize(c);
 
-			var rec = new mxRectangle();
-			rec.setX(currentLength + XOFFSET);
-			rec.setY(current % 2 == 0 ? 0 + YOFFSET : 20 + YOFFSET);
-			rec.setHeight(20);
-			rec.setWidth(getPixelwidth(file));
-			resize(c, rec);
-			currentLength += rec.getWidth();
+			var x = currentLength + XOFFSET;
+			var y = current % 2 == 0 ? 0 + YOFFSET : Configuration.timelineentryHeight + YOFFSET;
+			var w = getPixelwidth(file);
+			var h = Configuration.timelineentryHeight;
+			
+			resize(c, new mxRectangle(x, y, w, h));
+
+			currentLength += w;
 			current++;
 		}
 		int audioLength = 0;
@@ -274,30 +280,19 @@ public class GraphWrapper {
 				audioLength -= getOverlaywidth(audioFile);
 			}
 			
-			var rec = new mxRectangle();
-			rec.setX(XOFFSET + audioLength);
-			rec.setY(YOFFSET*2 +YOFFSET/2 + 2*Configuration.timelineentryHeight);
+			var x = XOFFSET + audioLength;
+			var y = YOFFSET*2 +YOFFSET/2 + 2*Configuration.timelineentryHeight;
 			if (current % 2 == 0) {
-				rec.setY(rec.getY() + 20);
+				y += Configuration.timelineentryHeight;
 			}
-			rec.setWidth(getPixelwidth(audioFile));
-			audioLength += rec.getWidth();
-			rec.setHeight(20);
-			resize(mxCell, rec);
+			var w = getPixelwidth(audioFile);
+			var h = Configuration.timelineentryHeight;
+			
+			audioLength += w;
+			resize(mxCell, new mxRectangle(x, y, w, h));
 		}
 		
 		this.graphComponent.updateUI();
-	}
-	
-	public mxCell insertVertex(int x, int y, MIFFile mifFile) {
-		return (mxCell)graph.insertVertex(
-			parent,
-			null,
-			mifFile.getDisplayName(), 
-			x,
-			y, 
-			getPixelwidth(mifFile), 
-			Configuration.timelineentryHeight);
 	}
 	
 	@SuppressWarnings("serial")
@@ -464,7 +459,7 @@ public class GraphWrapper {
 		}
 	}
 	
-	private mxCell insertVertex(String label, int x, int y, float w, int h) {
+	private mxCell createVertex(String label, int x, int y, float w, int h) {
 		return (mxCell) graph.insertVertex(parent, null, label, x, y, w, h);
 	}
 
