@@ -131,4 +131,12 @@ public class ServiceExecutor implements MIF {
 	public Future<?> get(long id) throws MIFException {
 		return executor.get(id);
 	}
+
+	@Override
+	public long createText() throws MIFException {
+		return executor.doIt(() -> {
+			 service.createText();
+			 return null;
+		});
+	}
 }

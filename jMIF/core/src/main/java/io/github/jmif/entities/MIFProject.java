@@ -19,6 +19,7 @@ public class MIFProject {
 	private List<MIFFile> mifFiles;
 	
 	private MIFAudioTrack audiotrack;
+	private MIFTextTrack texttrack;
 
 	private String profile;
 	private int profileWidth;
@@ -33,6 +34,7 @@ public class MIFProject {
 	public MIFProject() {
 		this.mifFiles = new ArrayList<>();
 		this.audiotrack = new MIFAudioTrack();
+		this.texttrack = new MIFTextTrack();
 	}
 	
 	@XmlAttribute
@@ -56,6 +58,11 @@ public class MIFProject {
 	@XmlElementRef
 	public MIFAudioTrack getAudiotrack() {
 		return audiotrack;
+	}
+	
+	@XmlElementRef
+	public MIFTextTrack getTexttrack() {
+		return texttrack;
 	}
 	
 	public List<MIFFile> getMIFFiles() {

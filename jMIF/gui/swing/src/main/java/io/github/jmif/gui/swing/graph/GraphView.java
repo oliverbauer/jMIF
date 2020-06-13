@@ -1,6 +1,7 @@
 package io.github.jmif.gui.swing.graph;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.event.MouseAdapter;
@@ -27,6 +28,7 @@ import io.github.jmif.MIFException;
 import io.github.jmif.config.Configuration;
 import io.github.jmif.entities.MIFAudioFile;
 import io.github.jmif.entities.MIFFile;
+import io.github.jmif.entities.MIFTextFile;
 import io.github.jmif.gui.swing.GraphWrapper;
 import io.github.jmif.gui.swing.selection.SelectionView;
 
@@ -63,12 +65,19 @@ public class GraphView {
 		Box addRemoveForTracksBox = Box.createHorizontalBox();
 		Box verticalAddRemove = Box.createVerticalBox();
 		verticalAddRemove.add(Box.createVerticalStrut(20));
+		
 		verticalAddRemove.add(createAddFileLabel(frame));
 		verticalAddRemove.add(createRemoveFileLabel());
-		verticalAddRemove.add(Box.createVerticalGlue());
+		verticalAddRemove.add(Box.createVerticalStrut(20));
+		
+		verticalAddRemove.add(createAddText());
+		verticalAddRemove.add(createRemoveText());
+		verticalAddRemove.add(Box.createVerticalStrut(20));
+		
 		verticalAddRemove.add(createAddAudioLabel(frame));
 		verticalAddRemove.add(createRemoveAudioLabel());
-		verticalAddRemove.add(Box.createVerticalStrut(30));
+		verticalAddRemove.add(Box.createVerticalStrut(20));
+		
 		verticalAddRemove.setMaximumSize(new Dimension(20, 200));
 		if (Configuration.useBorders) {
 			verticalAddRemove.setBorder(BorderFactory.createLineBorder(Color.BLUE));
@@ -83,6 +92,40 @@ public class GraphView {
 		graphPanel.add(addRemoveForTracksBox);
 	}
 	
+	private Component createRemoveText() {
+		JLabel removeText = new JLabel("-");
+		removeText.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (selectionView.getCurrentAudioFile() != null) {
+					MIFTextFile currentMeltFile = selectionView.getCurrentTextFile();
+					mxCell cell = selectionView.getCell();
+					
+					remove(cell, currentMeltFile);
+				}
+			}
+		});
+
+		return removeText;
+	}
+
+	private Component createAddText() {
+		JLabel appenText = new JLabel("+");
+		appenText.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				try {
+					graphWrapper.createMIFTextfile();
+				} catch (MIFException e1) {
+					e1.printStackTrace();
+				}
+				graphWrapper.redrawGraph();
+			}
+		});
+		
+		return appenText;
+	}
+
 	public Box getGraphPanel() {
 		return graphPanel;
 	}
@@ -195,6 +238,15 @@ public class GraphView {
 		});
 
 		return removeFile;
+	}
+	
+	public void remove(mxCell cell, MIFTextFile meltfile) {
+		graphWrapper.remove(meltfile, cell);
+		graphWrapper.remove(cell);
+
+		selectionView.clearSelection();
+		// Timeline etc.
+		graphWrapper.redrawGraph();
 	}
 	
 	public void remove(mxCell cell, MIFFile meltfile) {

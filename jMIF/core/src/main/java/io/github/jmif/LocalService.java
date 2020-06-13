@@ -26,6 +26,7 @@ import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFImage.ImageResizeStyle;
 import io.github.jmif.entities.MIFProject;
+import io.github.jmif.entities.MIFTextFile;
 import io.github.jmif.entities.MIFVideo;
 import io.github.jmif.entities.MeltFilter;
 import io.github.jmif.melt.Melt;
@@ -807,5 +808,11 @@ public class LocalService implements MIFService {
 				e1.printStackTrace();
 			}
 		}
+	}
+
+	@Override
+	public MIFTextFile createText() {
+		MIFTextFile textFile = new MIFTextFile();
+		return textFile;
 	}
 }

@@ -7,6 +7,7 @@ import io.github.jmif.entities.MIFAudioFile;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFProject;
+import io.github.jmif.entities.MIFTextFile;
 import io.github.jmif.entities.MIFVideo;
 import io.github.jmif.entities.MeltFilter;
 import io.github.jmif.melt.Melt;
@@ -24,6 +25,8 @@ public interface MIFService {
 
 	MIFVideo createVideo(File file, String display, int frames, String dim, int overlay, String workingDir) throws MIFException;
 
+	MIFTextFile createText() throws MIFException;
+	
 	void createPreview(MIFFile file, String workingDir) throws MIFException;
 
 	void createManualPreview(MIFImage image) throws MIFException;

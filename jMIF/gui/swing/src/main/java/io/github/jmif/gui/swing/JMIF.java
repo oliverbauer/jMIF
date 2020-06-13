@@ -159,7 +159,7 @@ public class JMIF {
 		// Select the first cell
 		if (!graphWrapper.getCells().isEmpty()) {
 			mxCell cell = graphWrapper.getCells().get(0);
-			mifSelectionView.updateAudioOrVideo(cell, graphWrapper.get(cell));
+			mifSelectionView.updateImageOrVideo(cell, graphWrapper.get(cell));
 		}
 		
 		frame.setVisible(true);
@@ -207,6 +207,12 @@ public class JMIF {
 		var file5 = project.createMIFFile(new File(project.getPr().getWorkingDir() + "5.JPG"));
 		var audio2 = project.createMIFAudioFile(new File(project.getPr().getWorkingDir()+"audio2.mp3"));
 		audio2.setEncodeEnde(14000); // [ms]
+		
+		var text = project.createMIFTextfile();
+		text.setLength(4000); // [ms]
+		
+		var text2 = project.createMIFTextfile();
+		text2.setLength(4000); // [ms]
 		
 		var executor = Executors.newWorkStealingPool();
 		executor.submit(() -> {
@@ -279,12 +285,16 @@ public class JMIF {
 		
 		if (graphWrapper.get(cell) != null) {
 			LOGGER.info("Selected {}", graphWrapper.get(cell).getDisplayName());
-			mifSelectionView.updateAudioOrVideo(cell, graphWrapper.get(cell));
+			mifSelectionView.updateImageOrVideo(cell, graphWrapper.get(cell));
 		} else if (graphWrapper.getAudio(cell) != null) {
 			LOGGER.info("Selected {}", graphWrapper.getAudio(cell).getAudiofile());
 			mifSelectionView.updateAudio(cell, graphWrapper.getAudio(cell), graphWrapper);
 		} else if (graphWrapper.isSingleFrameNode(cell)) {
 			mifSelectionView.setSingleFrameView();
+		} else if (graphWrapper.getText(cell) != null) {
+			mifSelectionView.updateText(cell, graphWrapper.getText(cell));
+		} else {
+			LOGGER.error("Unknown element clicked");
 		}
 	}
 }

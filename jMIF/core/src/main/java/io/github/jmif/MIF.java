@@ -29,6 +29,8 @@ public interface MIF {
 
 	long createAudio(String path) throws MIFException;
 
+	long createText() throws MIFException;
+	
 	long getProfiles() throws MIFException;
 	
 	long applyFilter(MIFProject pr, MIFFile mifImage, MeltFilter meltFilter) throws MIFException;

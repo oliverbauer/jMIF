@@ -22,6 +22,7 @@ import io.github.jmif.entities.MIFAudioFile;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFProject;
+import io.github.jmif.entities.MIFTextFile;
 import io.github.jmif.entities.MIFVideo;
 import io.github.jmif.entities.MeltFilter;
 import io.github.jmif.melt.Melt;
@@ -213,6 +214,17 @@ public class CoreGateway implements MIFService {
 		final Waiter<Void> waiter = new Waiter<>(id);
 		try {
 			executor.submit(waiter).get();
+		} catch (InterruptedException | ExecutionException e) {
+			throw new MIFException(e);
+		}
+	}
+
+	@Override
+	public MIFTextFile createText() throws MIFException {
+		final var id = service.createText();
+		final Waiter<MIFTextFile> waiter = new Waiter<>(id);
+		try {
+			return executor.submit(waiter).get();
 		} catch (InterruptedException | ExecutionException e) {
 			throw new MIFException(e);
 		}

@@ -21,6 +21,7 @@ import io.github.jmif.config.Configuration;
 import io.github.jmif.entities.MIFAudioFile;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
+import io.github.jmif.entities.MIFTextFile;
 import io.github.jmif.entities.MIFVideo;
 import io.github.jmif.gui.swing.GraphWrapper;
 import io.github.jmif.gui.swing.selection.audio.AudioDetailsView;
@@ -29,6 +30,8 @@ import io.github.jmif.gui.swing.selection.frame.FrameView;
 import io.github.jmif.gui.swing.selection.image.ImageDetailsView;
 import io.github.jmif.gui.swing.selection.image.ImageView;
 import io.github.jmif.gui.swing.selection.imageLibrary.ImageLibraryView;
+import io.github.jmif.gui.swing.selection.text.TextDetailsView;
+import io.github.jmif.gui.swing.selection.text.TextView;
 import io.github.jmif.gui.swing.selection.video.VideoDetailsView;
 import io.github.jmif.gui.swing.selection.video.VideoView;
 import io.github.jmif.melt.Melt;
@@ -41,6 +44,7 @@ public class SelectionView {
 	
 	private MIFFile selectedMeltFile = null;
 	private MIFAudioFile selectedAudioFile = null;
+	private MIFTextFile selectedTextFile = null;
 	private mxCell selectedCell;
 
 	private JTabbedPane tabPane;
@@ -57,6 +61,9 @@ public class SelectionView {
 	private AudioDetailsView audioDetailsView;
 	private FilterView filterViewAudio;
 	
+	private TextView textView;
+	private TextDetailsView textDetailsView;
+	
 	private FrameView singleFrameView;
 
     public SelectionView(GraphWrapper graphWrapper) throws MIFException {
@@ -65,6 +72,7 @@ public class SelectionView {
 		imageDetailsView = new ImageDetailsView(graphWrapper);
 		videoDetailsView = new VideoDetailsView(graphWrapper);
 		audioDetailsView = new AudioDetailsView(graphWrapper);
+		textDetailsView = new TextDetailsView(graphWrapper);
 		
 		Melt melt = new Melt();
 		List<MeltFilterDetails> audioFilters = graphWrapper.getService().getMeltAudioFilterDetails(melt);
@@ -94,16 +102,25 @@ public class SelectionView {
 			singleFrameBox.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 2, true));
 		}
 		
-		tabPane.addTab("ImageView", wrap(imageDetailsView.getBox(), imageView.getJPanel(), filterViewImage.getJPanel()));
-		tabPane.addTab("VideoView", wrap(videoDetailsView.getBox(), videoPanel, filterViewVideo.getJPanel()));
+		textView = new TextView();
+		JPanel textPanel = textView.getPanel();
+		if (Configuration.useBorders) {
+			textPanel.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 2, true));
+		}
+		
+		tabPane.addTab("ImageView", wrap(imageDetailsView.getBox(), imageView.getJPanel(),       filterViewImage.getJPanel()));
+		tabPane.addTab("VideoView", wrap(videoDetailsView.getBox(), videoPanel,                  filterViewVideo.getJPanel()));
+		tabPane.addTab("TextView",  wrap(textDetailsView.getBox(),  textPanel,                   null));
 		tabPane.addTab("AudioView", wrap(audioDetailsView.getBox(), filterViewAudio.getJPanel(), null));
-		tabPane.addTab("AudioView", wrap(null,            singleFrameBox, null));
+		tabPane.addTab("FrameView", wrap(null,                      singleFrameBox,              null));
 		tabPane.addTab("ImageLibrary", wrap(new ImageLibraryView(graphWrapper).getBox(), null, null));
-		tabPane.setSelectedIndex(4);
-		tabPane.setEnabledAt(0, false);
-		tabPane.setEnabledAt(1, false);
-		tabPane.setEnabledAt(2, false);
-		tabPane.setEnabledAt(3, false);
+		tabPane.setSelectedIndex(5);
+		tabPane.setEnabledAt(0, false); // Image
+		tabPane.setEnabledAt(1, false); // Video
+		tabPane.setEnabledAt(2, false); // Text
+		tabPane.setEnabledAt(3, false); // Audio
+		tabPane.setEnabledAt(4, false); // Frame
+		tabPane.setEnabledAt(5, true);  // ImageLibrary
 		
 		panel.add(tabPane);
 		
@@ -140,10 +157,12 @@ public class SelectionView {
 	
 	public void setSingleFrameView() {
 		tabPane.setSelectedIndex(3);
-		tabPane.setEnabledAt(0, false);
-		tabPane.setEnabledAt(1, false);
-		tabPane.setEnabledAt(2, false);
-		tabPane.setEnabledAt(3, true);
+		tabPane.setEnabledAt(0, false); // Image
+		tabPane.setEnabledAt(1, false); // Video
+		tabPane.setEnabledAt(2, false); // Text
+		tabPane.setEnabledAt(3, false); // Audio
+		tabPane.setEnabledAt(3, true); // Frame
+		tabPane.setEnabledAt(5, true);  // ImageLibrary
 		
 		clearSelection();
 	}
@@ -154,12 +173,13 @@ public class SelectionView {
 		this.selectedAudioFile = audioFile;
 		this.selectedCell = cell;
 		
-		tabPane.setSelectedIndex(2);
-		tabPane.setEnabledAt(0, false);
-		tabPane.setEnabledAt(1, false);
-		tabPane.setEnabledAt(2, true);
-		tabPane.setEnabledAt(3, false);
-		
+		tabPane.setSelectedIndex(3);
+		tabPane.setEnabledAt(0, false); // Image
+		tabPane.setEnabledAt(1, false); // Video
+		tabPane.setEnabledAt(2, false); // Text
+		tabPane.setEnabledAt(3, true); // Audio
+		tabPane.setEnabledAt(3, false); // Frame
+		tabPane.setEnabledAt(5, true);  // ImageLibrary
 		
 		audioDetailsView.setDetails(audioFile);
 		audioView.setMIFAudioFile(audioFile, project);
@@ -169,7 +189,25 @@ public class SelectionView {
 		panel.updateUI();
 	}
 	
-	public void updateAudioOrVideo(mxCell cell, MIFFile meltFile) {
+	public void updateText(mxCell cell, MIFTextFile meltFile) {
+		clearSelection();
+		
+		this.selectedTextFile = meltFile;
+		this.selectedCell = cell;
+
+		tabPane.setSelectedIndex(2);
+		tabPane.setEnabledAt(0, false); // Image
+		tabPane.setEnabledAt(1, false); // Video
+		tabPane.setEnabledAt(2, true); // Text
+		tabPane.setEnabledAt(3, false); // Audio
+		tabPane.setEnabledAt(3, false); // Frame
+		tabPane.setEnabledAt(5, true);  // ImageLibrary
+		
+		panel.validate();
+		panel.updateUI();
+	}
+	
+	public void updateImageOrVideo(mxCell cell, MIFFile meltFile) {
 		clearSelection();
 		
 		this.selectedMeltFile = meltFile;
@@ -220,5 +258,9 @@ public class SelectionView {
 	
 	public mxCell getCell() {
 		return selectedCell;
+	}
+
+	public MIFTextFile getCurrentTextFile() {
+		return selectedTextFile;
 	}
 }
