@@ -1,3 +1,7 @@
 /target/
 /.project
 /.settings/
+/gradlew.bat
+/gradlew
+/gradle/
+/.gradle/
