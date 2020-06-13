@@ -126,10 +126,6 @@ public class ImageView {
 		if (Configuration.useBorders) {
 			dropDownBoxesBox.setBorder(BorderFactory.createLineBorder(Color.red));
 		}
-		Dimension dim = new Dimension(2500, 25); // max height = 50
-		dropDownBoxesBox.setMinimumSize(dim);
-		dropDownBoxesBox.setPreferredSize(dim);
-		dropDownBoxesBox.setMaximumSize(dim);
 
 		return dropDownBoxesBox;
 	}

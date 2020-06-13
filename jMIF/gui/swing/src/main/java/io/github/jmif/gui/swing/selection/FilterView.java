@@ -23,8 +23,6 @@ import javax.swing.ScrollPaneConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mxgraph.model.mxCell;
-
 import io.github.jmif.MIFException;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MeltFilter;
@@ -52,7 +50,6 @@ public class FilterView {
 	
 	private JPanel panel;
 	
-	private mxCell selectedCell;
 	private MIFFile selectedMeltFile;
 	
 	public FilterView(final GraphWrapper graphWrapper, List<MeltFilterDetails> filters) throws MIFException {
@@ -103,12 +100,7 @@ public class FilterView {
 
 		lblCurrentlyAppliedFilters = new JLabel("Currently applied filters: -");
 		box.add(lblCurrentlyAppliedFilters);
-
-		Dimension dim = new Dimension(2500, 25); // max height = 25
-		box.setMinimumSize(dim);
-		box.setPreferredSize(dim);
-		box.setMaximumSize(dim);
-
+		
 		return box;
 	}
 
@@ -216,11 +208,6 @@ public class FilterView {
 		dropDownBoxesBox.add(addFilter);
 		dropDownBoxesBox.add(previewFilter);
 		dropDownBoxesBox.add(Box.createHorizontalGlue());
-
-		Dimension dim = new Dimension(2500, 25); // max height = 25
-		dropDownBoxesBox.setMinimumSize(dim);
-		dropDownBoxesBox.setPreferredSize(dim);
-		dropDownBoxesBox.setMaximumSize(dim);
 
 		return dropDownBoxesBox;
 	}

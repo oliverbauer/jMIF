@@ -81,14 +81,10 @@ public class ImageDetailsView {
 
 	private void wrap(Box box, JComponent c1, JComponent c2) {
 	    Box boxFilename = Box.createHorizontalBox();
-	    boxFilename.add(Box.createRigidArea(new Dimension(10, 0)));
 	    c1.setMinimumSize(new Dimension(140, 20));
 	    c1.setPreferredSize(new Dimension(140, 20));
 	    boxFilename.add(c1);
-	    boxFilename.add(Box.createRigidArea(new Dimension(10, 0)));
 	    boxFilename.add(c2);
-	    c2.setPreferredSize(new Dimension(5000, 20));
-	    c2.setMaximumSize(new Dimension(5000, 20));
 	    boxFilename.add(Box.createHorizontalGlue());
 	    box.add(boxFilename);
 	}

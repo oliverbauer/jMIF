@@ -2,7 +2,6 @@ package io.github.jmif.gui.swing.selection;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -74,9 +73,7 @@ public class SelectionView {
 		filterViewImage = new FilterView(graphWrapper, imageAndVideoFilters);
 		filterViewAudio = new FilterView(graphWrapper, audioFilters);
 		
-		int w = 5500;
 		imageView = new ImageView(graphWrapper);
-		int h = 550;
 		
 		videoView = new VideoView();
 		JPanel videoPanel = videoView.getPanel();
@@ -86,9 +83,6 @@ public class SelectionView {
 		
 		audioView = new AudioView();
 		Box audioPanel = audioView.getBox();
-		audioPanel.setMinimumSize(new Dimension(w, h));
-		audioPanel.setPreferredSize(new Dimension(w, h));
-		audioPanel.setMaximumSize(new Dimension(w, h));
 		if (Configuration.useBorders) {
 			audioPanel.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 2, true));
 		}
@@ -96,9 +90,6 @@ public class SelectionView {
 		singleFrameView = new FrameView();
 		graphWrapper.addSingleFrameCreatedListener(singleFrameView);
 		Box singleFrameBox = singleFrameView.getBox();
-		singleFrameBox.setMinimumSize(new Dimension(w, h));
-		singleFrameBox.setPreferredSize(new Dimension(w, h));
-		singleFrameBox.setMaximumSize(new Dimension(w, h));
 		if (Configuration.useBorders) {
 			singleFrameBox.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 2, true));
 		}
