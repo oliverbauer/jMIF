@@ -27,7 +27,7 @@ public interface MIFService {
 
 	MIFTextFile createText() throws MIFException;
 	
-	void createPreview(MIFFile file, String workingDir) throws MIFException;
+	MIFFile createPreview(MIFFile file, String workingDir) throws MIFException;
 
 	void createManualPreview(MIFImage image) throws MIFException;
 

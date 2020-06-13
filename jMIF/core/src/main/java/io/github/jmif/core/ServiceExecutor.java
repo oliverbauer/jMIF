@@ -65,8 +65,7 @@ public class ServiceExecutor implements MIF {
 	@Override
 	public long createPreview(MIFFile file, String workingDir) throws MIFException {
 		return executor.doIt(() -> {
-			service.createPreview(file, workingDir);
-			return null;
+			return service.createPreview(file, workingDir);
 		});
 	}
 

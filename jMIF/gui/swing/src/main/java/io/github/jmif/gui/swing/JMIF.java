@@ -217,6 +217,7 @@ public class JMIF {
 		var executor = Executors.newWorkStealingPool();
 		executor.submit(() -> {
 			try {
+//				TODO übergeben
 				project.getService().createPreview(file1, project.getPr().getWorkingDir());
 				project.getService().createPreview(file2, project.getPr().getWorkingDir());
 				project.getService().createPreview(file3, project.getPr().getWorkingDir());
@@ -246,6 +247,7 @@ public class JMIF {
 					for (MIFFile f : graphWrapper.getPr().getMIFFiles()) {
 						executor.submit(() -> {
 							try {
+//								TODO übergeben
 								graphWrapper.getService().createPreview(f, graphWrapper.getPr().getWorkingDir());
 							} catch (Exception e) {
 								LOGGER.error("", e);

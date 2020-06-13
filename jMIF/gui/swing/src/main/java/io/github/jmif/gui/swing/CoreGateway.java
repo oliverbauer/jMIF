@@ -121,11 +121,11 @@ public class CoreGateway implements MIFService {
 	}
 
 	@Override
-	public void createPreview(MIFFile file, String workingDir) throws MIFException {
+	public MIFFile createPreview(MIFFile file, String workingDir) throws MIFException {
 		final var id = service.createPreview(file, workingDir);
-		final Waiter<Void> waiter = new Waiter<>(id);
+		final Waiter<MIFFile> waiter = new Waiter<>(id);
 		try {
-			executor.submit(waiter).get();
+			return executor.submit(waiter).get();
 		} catch (InterruptedException | ExecutionException e) {
 			throw new MIFException(e);
 		}

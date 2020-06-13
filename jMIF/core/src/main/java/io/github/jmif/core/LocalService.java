@@ -196,15 +196,16 @@ class LocalService implements MIFService {
 	}
 
 	@Override
-	public void createPreview(MIFFile file, String workingDir) throws MIFException {
+	public MIFFile createPreview(MIFFile file, String workingDir) throws MIFException {
 		if (file instanceof MIFImage) {
-			createPreview(MIFImage.class.cast(file), workingDir);
+			return createImagePreview(MIFImage.class.cast(file), workingDir);
 		} else if (file instanceof MIFVideo) {
-			createPreview(MIFVideo.class.cast(file), workingDir);
+			return createVideoPreview(MIFVideo.class.cast(file), workingDir);
 		}
+		throw new MIFException(new Exception("Cannot parse MIFFile"));
 	}
 
-	private void createPreview(MIFVideo video, String workingDir) throws MIFException {
+	private MIFVideo createVideoPreview(MIFVideo video, String workingDir) throws MIFException {
 		var filename = video.getFile().getName();
 		var videoFileName = workingDir+"/orig/"+filename;
 
@@ -283,6 +284,8 @@ class LocalService implements MIFService {
 				logger.debug("Init: Preview-Video-Image {} already computed", image);
 			}
 		}
+		
+		return video;
 	}
 
 	@Override
@@ -370,7 +373,7 @@ class LocalService implements MIFService {
 		return image;
 	}
 
-	private void createPreview(MIFImage image, String workingDir) throws MIFException {
+	private MIFImage createImagePreview(MIFImage image, String workingDir) throws MIFException {
 		var filename = image.getFilename();
 
 		var original = workingDir + "orig/" + filename;
@@ -506,6 +509,7 @@ class LocalService implements MIFService {
 		}
 
 		// TODO manual preview if exists
+		return image;
 	}
 
 	@Override

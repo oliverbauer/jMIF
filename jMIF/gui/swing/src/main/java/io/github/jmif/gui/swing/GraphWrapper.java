@@ -127,6 +127,7 @@ public class GraphWrapper {
 				
 				executor.submit(() -> {
 					try {
+//						TODO übergeben
 						service.createPreview(mifFile, project.getWorkingDir());
 					} catch (Exception e) {
 						e.printStackTrace();
