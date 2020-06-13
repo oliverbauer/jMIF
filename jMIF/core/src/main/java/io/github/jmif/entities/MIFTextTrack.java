@@ -7,13 +7,17 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "texttrack")
 public class MIFTextTrack {
-	private List<MIFTextFile> textEntries;
+	private List<MIFTextFile> entries;
 	
 	public MIFTextTrack() {
-		this.textEntries = new ArrayList<>();
+		this.entries = new ArrayList<>();
 	}
-	
+
 	public List<MIFTextFile> getEntries() {
-		return this.textEntries;
+		return entries;
+	}
+
+	public void setEntries(List<MIFTextFile> entries) {
+		this.entries = entries;
 	}
 }

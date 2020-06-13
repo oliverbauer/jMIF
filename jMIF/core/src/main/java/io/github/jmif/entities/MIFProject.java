@@ -21,6 +21,9 @@ public class MIFProject {
 	private MIFAudioTrack audiotrack;
 	private MIFTextTrack texttrack;
 
+	/*
+	 * TODO Jaxb: Only save the profile...
+	 */
 	private String profile;
 	private int profileWidth;
 	private int profileHeight;

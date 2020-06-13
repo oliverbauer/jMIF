@@ -13,6 +13,10 @@ public class MIFTextFile {
 
 	private int length = 1000; // [ms]
 	
+	public MIFTextFile() {
+		
+	}
+	
 	public String getText() {
 		return text;
 	}

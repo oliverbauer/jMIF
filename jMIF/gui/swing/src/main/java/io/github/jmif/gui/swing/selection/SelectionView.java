@@ -203,6 +203,8 @@ public class SelectionView {
 		tabPane.setEnabledAt(3, false); // Frame
 		tabPane.setEnabledAt(5, true);  // ImageLibrary
 		
+		textDetailsView.setDetails(selectedTextFile);
+		
 		panel.validate();
 		panel.updateUI();
 	}
