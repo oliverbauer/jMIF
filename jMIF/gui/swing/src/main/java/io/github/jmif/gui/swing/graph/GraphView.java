@@ -27,9 +27,9 @@ import com.mxgraph.model.mxCell;
 import io.github.jmif.config.Configuration;
 import io.github.jmif.core.MIFException;
 import io.github.jmif.entities.MIFAudioFile;
-import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFTextFile;
 import io.github.jmif.gui.swing.GraphWrapper;
+import io.github.jmif.gui.swing.entities.MIFFileWrapper;
 import io.github.jmif.gui.swing.selection.SelectionView;
 
 public class GraphView {
@@ -178,9 +178,9 @@ public class GraphView {
 							selectedFiles.add(fileToAdd);
 						}
 					}
-					List<MIFFile> added = new ArrayList<>();
+					List<MIFFileWrapper<?>> added = new ArrayList<>();
 					for (File fileToAdd : selectedFiles) {
-						MIFFile f;
+						MIFFileWrapper<?> f;
 						try {
 							f = graphWrapper.createMIFFile(fileToAdd);
 							added.add(f);
@@ -192,11 +192,11 @@ public class GraphView {
 					
 					// Exec background threads...
 					ExecutorService executor = Executors.newWorkStealingPool();
-					for (MIFFile f : added) {
+					for (MIFFileWrapper<?> f : added) {
 						executor.submit(() -> {
 							try {
 								// TODO übergeben
-								graphWrapper.getService().createPreview(f, graphWrapper.getPr().getWorkingDir());
+								graphWrapper.getService().createPreview(f.toMIFFile(), graphWrapper.getPr().getWorkingDir());
 							} catch (Exception ex) {
 								logger.error("", e);
 							}
@@ -214,7 +214,7 @@ public class GraphView {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (selectionView.getCurrentMeltFile() != null) {
-					MIFFile currentMeltFile = selectionView.getCurrentMeltFile();
+					MIFFileWrapper<?> currentMeltFile = selectionView.getCurrentMeltFile();
 					mxCell cell = selectionView.getCell();
 					remove(cell, currentMeltFile);
 				}
@@ -230,7 +230,7 @@ public class GraphView {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (selectionView.getCurrentAudioFile() != null) {
-					MIFAudioFile currentMeltFile = selectionView.getCurrentAudioFile();
+					var currentMeltFile = selectionView.getCurrentAudioFile();
 					mxCell cell = selectionView.getCell();
 					
 					remove(cell, currentMeltFile);
@@ -250,7 +250,7 @@ public class GraphView {
 		graphWrapper.redrawGraph();
 	}
 	
-	public void remove(mxCell cell, MIFFile meltfile) {
+	public void remove(mxCell cell, MIFFileWrapper<?> meltfile) {
 		graphWrapper.remove(meltfile, cell);
 		graphWrapper.remove(cell);
 

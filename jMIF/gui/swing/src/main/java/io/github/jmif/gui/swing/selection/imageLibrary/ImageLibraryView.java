@@ -141,7 +141,7 @@ public class ImageLibraryView {
 						try {
 							var file1 = graphWrapper.createMIFFile(f);
 							// TODO übergeben
-							graphWrapper.getService().createPreview(file1, graphWrapper.getPr().getWorkingDir());
+							graphWrapper.getService().createPreview(file1.toMIFFile(), graphWrapper.getPr().getWorkingDir());
 							graphWrapper.redrawGraph();
 						} catch (Exception ex) {
 							logger.error("", ex);

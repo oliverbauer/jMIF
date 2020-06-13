@@ -21,9 +21,9 @@ public class ProjectXmlTests {
 
 		var project = new GraphWrapper();
 		project.getPr().setProfile("atsc_1080p_25");
-		service.updateProfile(project.getPr());
+		service.updateProfile(project.getPr().toMIFProject());
 		project.getPr().setWorkingDir(tempDir.getAbsolutePath());
-		service.createWorkingDirs(project.getPr());
+		service.createWorkingDirs(project.getPr().toMIFProject());
 		project.getPr().setFileOfProject(project.getPr().getWorkingDir() + "defaultproject.xml");
 		project.getPr().setOutputVideo(project.getPr().getWorkingDir()+"output.avi");
 		FileUtils.copyInputStreamToFile(JMIF.class.getClassLoader().getResourceAsStream("defaultproject/1.JPG"),
@@ -39,9 +39,9 @@ public class ProjectXmlTests {
 
 		var project = new GraphWrapper();
 		project.getPr().setProfile("atsc_1080p_25");
-		service.updateProfile(project.getPr());
+		service.updateProfile(project.getPr().toMIFProject());
 		project.getPr().setWorkingDir(tempDir.getAbsolutePath());
-		service.createWorkingDirs(project.getPr());
+		service.createWorkingDirs(project.getPr().toMIFProject());
 		project.getPr().setFileOfProject(project.getPr().getWorkingDir() + "defaultproject.xml");
 		project.getPr().setOutputVideo(project.getPr().getWorkingDir()+"output.avi");
 		FileUtils.copyInputStreamToFile(JMIF.class.getClassLoader().getResourceAsStream("defaultproject/1.JPG"),

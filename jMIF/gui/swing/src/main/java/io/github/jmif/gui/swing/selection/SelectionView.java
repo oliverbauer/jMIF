@@ -19,13 +19,14 @@ import com.mxgraph.model.mxCell;
 import io.github.jmif.config.Configuration;
 import io.github.jmif.core.MIFException;
 import io.github.jmif.entities.MIFAudioFile;
-import io.github.jmif.entities.MIFFile;
-import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFTextFile;
-import io.github.jmif.entities.MIFVideo;
 import io.github.jmif.entities.melt.Melt;
 import io.github.jmif.entities.melt.MeltFilterDetails;
 import io.github.jmif.gui.swing.GraphWrapper;
+import io.github.jmif.gui.swing.entities.MIFAudioFileWrapper;
+import io.github.jmif.gui.swing.entities.MIFFileWrapper;
+import io.github.jmif.gui.swing.entities.MIFImageWrapper;
+import io.github.jmif.gui.swing.entities.MIFVideoWrapper;
 import io.github.jmif.gui.swing.selection.audio.AudioDetailsView;
 import io.github.jmif.gui.swing.selection.audio.AudioView;
 import io.github.jmif.gui.swing.selection.frame.FrameView;
@@ -42,8 +43,8 @@ public class SelectionView {
 	
 	private Box panel;
 	
-	private MIFFile selectedMeltFile = null;
-	private MIFAudioFile selectedAudioFile = null;
+	private MIFFileWrapper<?> selectedMeltFile = null;
+	private MIFAudioFileWrapper selectedAudioFile = null;
 	private MIFTextFile selectedTextFile = null;
 	private mxCell selectedCell;
 
@@ -167,7 +168,7 @@ public class SelectionView {
 		clearSelection();
 	}
 	
-	public void updateAudio(mxCell cell, MIFAudioFile audioFile, GraphWrapper project) {
+	public void updateAudio(mxCell cell, MIFAudioFileWrapper audioFile, GraphWrapper project) {
 		clearSelection();
 
 		this.selectedAudioFile = audioFile;
@@ -209,25 +210,25 @@ public class SelectionView {
 		panel.updateUI();
 	}
 	
-	public void updateImageOrVideo(mxCell cell, MIFFile meltFile) {
+	public void updateImageOrVideo(mxCell cell, MIFFileWrapper<?> meltFile) {
 		clearSelection();
 		
 		this.selectedMeltFile = meltFile;
 		this.selectedCell = cell;		
 		logger.trace("Update {}", meltFile.getClass());
 		
-		if (meltFile instanceof MIFImage) {
+		if (meltFile instanceof MIFImageWrapper) {
 			tabPane.setSelectedIndex(0);
 			tabPane.setEnabledAt(0, true);
 			tabPane.setEnabledAt(1, false);
 			tabPane.setEnabledAt(2, false);
 			tabPane.setEnabledAt(3, false);
 			
-			imageView.setPreviewPicture(((MIFImage)meltFile).getImagePreview());
-			imageView.update(cell, (MIFImage)meltFile);
+			imageView.setPreviewPicture(((MIFImageWrapper)meltFile).getImagePreview());
+			imageView.update(cell, (MIFImageWrapper)meltFile);
 			imageDetailsView.setDetails(meltFile);
 			filterViewImage.setDetails(meltFile);
-		} else if (meltFile instanceof MIFVideo) {
+		} else if (meltFile instanceof MIFVideoWrapper) {
 			tabPane.setSelectedIndex(1);
 			tabPane.setEnabledAt(0, false);
 			tabPane.setEnabledAt(1, true);
@@ -235,8 +236,8 @@ public class SelectionView {
 			tabPane.setEnabledAt(3, false);
 
 			
-			videoView.setIcons(((MIFVideo)meltFile).getPreviewImages());
-			videoDetailsView.setDetails( ((MIFVideo)meltFile));
+			videoView.setIcons(((MIFVideoWrapper)meltFile).getPreviewImages());
+			videoDetailsView.setDetails( ((MIFVideoWrapper)meltFile));
 			filterViewVideo.setDetails(meltFile);
 		} else {
 			logger.warn("Not supported yet...");
@@ -250,11 +251,11 @@ public class SelectionView {
 		return panel;
 	}
 	
-	public MIFFile getCurrentMeltFile() {
+	public MIFFileWrapper<?> getCurrentMeltFile() {
 		return selectedMeltFile;
 	}
 
-	public MIFAudioFile getCurrentAudioFile() {
+	public MIFAudioFileWrapper getCurrentAudioFile() {
 		return selectedAudioFile;
 	}
 	

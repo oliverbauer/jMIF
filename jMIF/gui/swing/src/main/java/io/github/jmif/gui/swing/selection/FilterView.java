@@ -29,6 +29,7 @@ import io.github.jmif.entities.melt.Melt;
 import io.github.jmif.entities.melt.MeltFilter;
 import io.github.jmif.entities.melt.MeltFilterDetails;
 import io.github.jmif.gui.swing.GraphWrapper;
+import io.github.jmif.gui.swing.entities.MIFFileWrapper;
 import io.github.jmif.gui.swing.selection.image.ImageView;
 
 public class FilterView {
@@ -50,7 +51,7 @@ public class FilterView {
 	
 	private JPanel panel;
 	
-	private MIFFile selectedMeltFile;
+	private MIFFileWrapper<?> selectedMeltFile;
 	
 	public FilterView(final GraphWrapper graphWrapper, List<MeltFilterDetails> filters) throws MIFException {
 		this.graphWrapper = graphWrapper;
@@ -199,7 +200,7 @@ public class FilterView {
 		previewFilter = new JButton("preview");
 		previewFilter.addActionListener(e -> {
 			try {
-				graphWrapper.getService().applyFilter(graphWrapper.getPr(), selectedMeltFile, currentlySelectedFilter);
+				graphWrapper.getService().applyFilter(graphWrapper.getPr().toMIFProject(), selectedMeltFile.toMIFFile(), currentlySelectedFilter);
 			} catch (MIFException e1) {
 				logger.error("", e1);
 			}			
@@ -284,7 +285,7 @@ public class FilterView {
 		}
 	}
 
-	public void setDetails(MIFFile mifVideo) {
+	public void setDetails(MIFFileWrapper<?> mifVideo) {
 		this.selectedMeltFile = mifVideo;
 		updateCurrentlyAppliedFilters();
 		this.panel.updateUI();

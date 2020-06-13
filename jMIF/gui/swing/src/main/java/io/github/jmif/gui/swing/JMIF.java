@@ -29,7 +29,7 @@ import com.mxgraph.view.mxGraphSelectionModel;
 
 import io.github.jmif.config.Configuration;
 import io.github.jmif.core.MIFException;
-import io.github.jmif.entities.MIFFile;
+import io.github.jmif.gui.swing.entities.MIFFileWrapper;
 import io.github.jmif.gui.swing.graph.GraphView;
 import io.github.jmif.gui.swing.listener.ProjectListener;
 import io.github.jmif.gui.swing.listener.ProjectListener.type;
@@ -122,7 +122,7 @@ public class JMIF {
 			try {
 				String item = (String)profilesCombobox.getSelectedItem();
 				graphWrapper.getPr().setProfile(item);
-				graphWrapper.getService().updateProfile(graphWrapper.getPr());
+				graphWrapper.getService().updateProfile(graphWrapper.getPr().toMIFProject());
 				graphWrapper.redrawGraph();
 			} catch (MIFException e) {
 				// TODO Auto-generated catch block
@@ -178,9 +178,9 @@ public class JMIF {
 
 		var project = new GraphWrapper();
 		project.getPr().setProfile(profile);
-		project.getService().updateProfile(project.getPr());
+		project.getService().updateProfile(project.getPr().toMIFProject());
 		project.getPr().setWorkingDir(tempDir.getAbsolutePath());
-		project.getService().createWorkingDirs(project.getPr());
+		project.getService().createWorkingDirs(project.getPr().toMIFProject());
 		project.getPr().setFileOfProject(project.getPr().getWorkingDir() + "defaultproject.xml");
 		project.getPr().setOutputVideo(project.getPr().getWorkingDir()+"output.avi");
 		FileUtils.copyInputStreamToFile(JMIF.class.getClassLoader().getResourceAsStream("defaultproject/1.JPG"),
@@ -218,11 +218,11 @@ public class JMIF {
 		executor.submit(() -> {
 			try {
 //				TODO übergeben
-				project.getService().createPreview(file1, project.getPr().getWorkingDir());
-				project.getService().createPreview(file2, project.getPr().getWorkingDir());
-				project.getService().createPreview(file3, project.getPr().getWorkingDir());
-				project.getService().createPreview(file4, project.getPr().getWorkingDir());
-				project.getService().createPreview(file5, project.getPr().getWorkingDir());
+				project.getService().createPreview(file1.toMIFFile(), project.getPr().getWorkingDir());
+				project.getService().createPreview(file2.toMIFFile(), project.getPr().getWorkingDir());
+				project.getService().createPreview(file3.toMIFFile(), project.getPr().getWorkingDir());
+				project.getService().createPreview(file4.toMIFFile(), project.getPr().getWorkingDir());
+				project.getService().createPreview(file5.toMIFFile(), project.getPr().getWorkingDir());
 			} catch (Exception e) {
 				LOGGER.error("", e);
 			}
@@ -244,11 +244,11 @@ public class JMIF {
 
 					// Exec background threads...
 					ExecutorService executor = Executors.newWorkStealingPool();
-					for (MIFFile f : graphWrapper.getPr().getMIFFiles()) {
+					for (MIFFileWrapper<?> f : graphWrapper.getPr().getMIFFiles()) {
 						executor.submit(() -> {
 							try {
 //								TODO übergeben
-								graphWrapper.getService().createPreview(f, graphWrapper.getPr().getWorkingDir());
+								graphWrapper.getService().createPreview(f.toMIFFile(), graphWrapper.getPr().getWorkingDir());
 							} catch (Exception e) {
 								LOGGER.error("", e);
 							}

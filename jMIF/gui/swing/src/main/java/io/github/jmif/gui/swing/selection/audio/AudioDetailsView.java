@@ -14,13 +14,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.jmif.config.Configuration;
-import io.github.jmif.entities.MIFAudioFile;
 import io.github.jmif.gui.swing.GraphWrapper;
+import io.github.jmif.gui.swing.entities.MIFAudioFileWrapper;
 
 public class AudioDetailsView {
 	private static final Logger logger = LoggerFactory.getLogger(AudioDetailsView.class);
 	
-	private MIFAudioFile audioFile;
+	private MIFAudioFileWrapper audioFile;
 
 	private Box panel;
 	
@@ -150,7 +150,7 @@ public class AudioDetailsView {
 	}
 	
 
-	public void setDetails(MIFAudioFile audioFile) {
+	public void setDetails(MIFAudioFileWrapper audioFile) {
 		this.audioFile = audioFile;
 		
 		file.setText(audioFile.getAudiofile());

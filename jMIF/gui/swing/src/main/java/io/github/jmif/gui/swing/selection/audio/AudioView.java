@@ -10,8 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.jmif.config.Configuration;
-import io.github.jmif.entities.MIFAudioFile;
 import io.github.jmif.gui.swing.GraphWrapper;
+import io.github.jmif.gui.swing.entities.MIFAudioFileWrapper;
 
 public class AudioView {
 	private static final Logger logger = LoggerFactory.getLogger(AudioView.class);
@@ -30,7 +30,7 @@ public class AudioView {
 		return this.box;
 	}
 
-	public void setMIFAudioFile(MIFAudioFile audioFile, GraphWrapper project) {
+	public void setMIFAudioFile(MIFAudioFileWrapper audioFile, GraphWrapper project) {
 		logger.info("TODO process {} {} - not yet implemented", audioFile, project);
 	}
 }

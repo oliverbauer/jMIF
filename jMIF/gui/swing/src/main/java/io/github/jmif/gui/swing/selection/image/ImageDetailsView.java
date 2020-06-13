@@ -10,8 +10,8 @@ import javax.swing.JTextField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.jmif.entities.MIFFile;
 import io.github.jmif.gui.swing.GraphWrapper;
+import io.github.jmif.gui.swing.entities.MIFFileWrapper;
 
 public class ImageDetailsView {
 	private static final Logger logger = LoggerFactory.getLogger(ImageDetailsView.class);
@@ -28,7 +28,7 @@ public class ImageDetailsView {
 	private JLabel labelDimension = new JLabel("Dimension (wxh)");
 	private JLabel labelOVerlay = new JLabel("Overlay [ms]");
 
-	private MIFFile meltFile;
+	private MIFFileWrapper<?> meltFile;
 	private Box box;
 	
 	public ImageDetailsView(GraphWrapper mifProject) {
@@ -110,7 +110,7 @@ public class ImageDetailsView {
 		box.updateUI();
 	}
 
-	public void setDetails(MIFFile meltFile) {
+	public void setDetails(MIFFileWrapper<?> meltFile) {
 		this.meltFile = meltFile;
 		filename.setText(meltFile.getFile().getName());
 		displayName.setText(meltFile.getDisplayName());

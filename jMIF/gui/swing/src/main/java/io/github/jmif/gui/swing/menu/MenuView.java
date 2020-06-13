@@ -95,7 +95,7 @@ public class MenuView {
 				@Override
 			    public Void doInBackground() {
 		        	try {
-		        		graphWrapper.getService().convert(graphWrapper.getPr(), true);
+		        		graphWrapper.getService().convert(graphWrapper.getPr().toMIFProject(), true);
 		        	} catch (Exception e1) {
 		        		logger.error("Unable to create preview video", e1);
 		        	}
@@ -116,7 +116,7 @@ public class MenuView {
 				@Override
 			    public Void doInBackground() {
 		        	try {
-		        		graphWrapper.getService().convert(graphWrapper.getPr(), false);
+		        		graphWrapper.getService().convert(graphWrapper.getPr().toMIFProject(), false);
 		        	} catch (Exception e1) {
 		        		logger.error("Unable to render project", e1);
 		        	}
