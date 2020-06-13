@@ -227,18 +227,20 @@ public class ImageView {
 	}
 
 	public void setPreviewPicture(Image imagePreview) {
-		imgPicture[0].setVisible(true);
-		imgPicture[1].setVisible(true);
-		manualExtraction.setVisible(true);
+		if (Objects.nonNull(imagePreview)) {
+			imgPicture[0].setVisible(true);
+			imgPicture[1].setVisible(true);
+			manualExtraction.setVisible(true);
 
-		imgPicture[0].setIcon(new ImageIcon(imagePreview));
+			imgPicture[0].setIcon(new ImageIcon(imagePreview));
 
-		resizeStyleLabel.setVisible(true);
-		resizeStyle.setVisible(true);
-		resizeStyleDetailsLabel.setVisible(true);
-		resizeStyleDetails.setVisible(true);
+			resizeStyleLabel.setVisible(true);
+			resizeStyle.setVisible(true);
+			resizeStyleDetailsLabel.setVisible(true);
+			resizeStyleDetails.setVisible(true);
 
-		panel.updateUI();
+			panel.updateUI();
+		}
 	}
 
 	public void setSelectedPicture(Image previewCrop) {
