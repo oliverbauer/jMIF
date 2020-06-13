@@ -767,6 +767,7 @@ public class LocalService implements MIFService {
 		return getOrLoad(melt).stream().filter(mdf -> mdf.getFiltername().contentEquals(meltFilter.getFiltername())).findAny().get();
 	}
 	
+	// TODO Rename to something like previewFilterWithMelt...
 	@Override
 	public void applyFilter(MIFProject pr, MIFImage mifImage, MeltFilter meltFilter) throws MIFException {
 		MIFProjectExecutor mifProjectExecutor = new MIFProjectExecutor(pr);

@@ -3,11 +3,13 @@ package io.github.jmif.gui.swing.selection;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
 import org.slf4j.Logger;
@@ -30,6 +32,8 @@ import io.github.jmif.gui.swing.selection.image.ImageView;
 import io.github.jmif.gui.swing.selection.imageLibrary.ImageLibraryView;
 import io.github.jmif.gui.swing.selection.video.VideoDetailsView;
 import io.github.jmif.gui.swing.selection.video.VideoView;
+import io.github.jmif.melt.Melt;
+import io.github.jmif.melt.MeltFilterDetails;
 
 public class SelectionView {
 	private static final Logger logger = LoggerFactory.getLogger(SelectionView.class);
@@ -44,12 +48,15 @@ public class SelectionView {
 	
 	private ImageView imageView;
 	private ImageDetailsView imageDetailsView;
+	private FilterView filterViewImage;
 	
 	private VideoView videoView;
 	private VideoDetailsView videoDetailsView;
+	private FilterView filterViewVideo;
 	
 	private AudioView audioView;
 	private AudioDetailsView audioDetailsView;
+	private FilterView filterViewAudio;
 	
 	private FrameView singleFrameView;
 
@@ -60,15 +67,19 @@ public class SelectionView {
 		videoDetailsView = new VideoDetailsView(graphWrapper);
 		audioDetailsView = new AudioDetailsView(graphWrapper);
 		
+		Melt melt = new Melt();
+		List<MeltFilterDetails> audioFilters = graphWrapper.getService().getMeltAudioFilterDetails(melt);
+		List<MeltFilterDetails> imageAndVideoFilters = graphWrapper.getService().getMeltVideoFilterDetails(melt);
+		filterViewVideo = new FilterView(graphWrapper, imageAndVideoFilters);
+		filterViewImage = new FilterView(graphWrapper, imageAndVideoFilters);
+		filterViewAudio = new FilterView(graphWrapper, audioFilters);
+		
 		int w = 5500;
 		imageView = new ImageView(graphWrapper);
 		int h = 550;
 		
 		videoView = new VideoView();
 		JPanel videoPanel = videoView.getPanel();
-		videoPanel.setMinimumSize(new Dimension(w, h));
-		videoPanel.setPreferredSize(new Dimension(w, h));
-		videoPanel.setMaximumSize(new Dimension(w, h));
 		if (Configuration.useBorders) {
 			videoPanel.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 2, true));
 		}
@@ -92,11 +103,11 @@ public class SelectionView {
 			singleFrameBox.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 2, true));
 		}
 		
-		tabPane.addTab("ImageView", wrap(imageDetailsView.getBox(), imageView.getJPanel()));
-		tabPane.addTab("VideoView", wrap(videoDetailsView.getBox(), videoPanel));
-		tabPane.addTab("AudioView", wrap(audioDetailsView.getBox(), null));
-		tabPane.addTab("FrameView", wrap(null,                     singleFrameBox));
-		tabPane.addTab("ImageLibrary", wrap(new ImageLibraryView(graphWrapper).getBox(), null));
+		tabPane.addTab("ImageView", wrap(imageDetailsView.getBox(), imageView.getJPanel(), filterViewImage.getJPanel()));
+		tabPane.addTab("VideoView", wrap(videoDetailsView.getBox(), videoPanel, filterViewVideo.getJPanel()));
+		tabPane.addTab("AudioView", wrap(audioDetailsView.getBox(), filterViewAudio.getJPanel(), null));
+		tabPane.addTab("AudioView", wrap(null,            singleFrameBox, null));
+		tabPane.addTab("ImageLibrary", wrap(new ImageLibraryView(graphWrapper).getBox(), null, null));
 		tabPane.setSelectedIndex(4);
 		tabPane.setEnabledAt(0, false);
 		tabPane.setEnabledAt(1, false);
@@ -110,13 +121,22 @@ public class SelectionView {
 		}
 	}
     
-    private JPanel wrap(JComponent c1, JComponent c2) {
+    private JPanel wrap(JComponent c1, JComponent c2, JComponent c3) {
 		JPanel panel = new JPanel(new BorderLayout());
 		if (c1 != null) {
 			panel.add(c1, BorderLayout.NORTH);
 		}
-		if (c2 != null) {
+		if (c2 != null && c3 == null) {
 			panel.add(c2, BorderLayout.CENTER);
+		} else if (c2 != null && c3 != null) {
+			
+			JPanel p = new JPanel(new BorderLayout());
+			p.add(c2, BorderLayout.NORTH);
+			p.add(c3, BorderLayout.CENTER);
+			
+			JScrollPane scrollBar = new JScrollPane(p);
+			panel.add(scrollBar, BorderLayout.CENTER);
+			
 		}
 		return panel;
     }
@@ -152,6 +172,7 @@ public class SelectionView {
 		
 		audioDetailsView.setDetails(audioFile);
 		audioView.setMIFAudioFile(audioFile, project);
+		filterViewAudio.setDetails(audioFile);
 		
 		panel.validate();
 		panel.updateUI();
@@ -174,7 +195,8 @@ public class SelectionView {
 			imageView.setPreviewPicture(((MIFImage)meltFile).getImagePreview());
 			imageView.update(cell, (MIFImage)meltFile);
 			imageDetailsView.setDetails(meltFile);
-		} else {
+			filterViewImage.setDetails(meltFile);
+		} else if (meltFile instanceof MIFVideo) {
 			tabPane.setSelectedIndex(1);
 			tabPane.setEnabledAt(0, false);
 			tabPane.setEnabledAt(1, true);
@@ -184,6 +206,9 @@ public class SelectionView {
 			
 			videoView.setIcons(((MIFVideo)meltFile).getPreviewImages());
 			videoDetailsView.setDetails( ((MIFVideo)meltFile));
+			filterViewVideo.setDetails(meltFile);
+		} else {
+			logger.warn("Not supported yet...");
 		}
 
 		panel.validate();

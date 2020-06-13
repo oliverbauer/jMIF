@@ -196,7 +196,7 @@ public class MIFProjectExecutor {
 				boolean useMixer = count != 0;
 				int frames = (int)((meltfile.getDuration() / 1000d) * project.getProfileFramerate());
 				
-				if (Configuration.allowedImageTypes.contains(extension)) {
+				if (Configuration.allowedImageTypes.contains(extension) || Configuration.allowedVideoTypes.contains(extension)) {
 					sb.append("   ").append(input).append(" in=0 out=").append(frames - 1);
 					
 					for (MeltFilter currentlyAddedFilters : meltfile.getFilters()) {
@@ -209,8 +209,6 @@ public class MIFProjectExecutor {
 						}				
 					}
 					
-				} else if (Configuration.allowedVideoTypes.contains(extension)) {
-					sb.append("   ").append(input).append(" in=0 out=").append(frames - 1);
 				} else {
 					// Exception
 					LOGGER.error("Unsupported file extension {}", extension);

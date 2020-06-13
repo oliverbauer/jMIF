@@ -13,7 +13,6 @@ import io.github.jmif.config.Configuration;
 import io.github.jmif.entities.MIFAudioFile;
 import io.github.jmif.gui.swing.GraphWrapper;
 
-// TODO Audio: Show audio filters
 public class AudioView {
 	private static final Logger logger = LoggerFactory.getLogger(AudioView.class);
 	

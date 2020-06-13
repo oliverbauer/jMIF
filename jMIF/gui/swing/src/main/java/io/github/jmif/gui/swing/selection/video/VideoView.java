@@ -1,6 +1,8 @@
 package io.github.jmif.gui.swing.selection.video;
 
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.util.Collection;
 
@@ -15,9 +17,12 @@ import org.slf4j.LoggerFactory;
 public class VideoView {
 	private static final Logger logger = LoggerFactory.getLogger(VideoView.class);
 	private JLabel[] imgVideoLabel;
-	private JPanel videoPanel = new JPanel();
+	private JPanel videoPanel;
 
 	public VideoView() {
+		videoPanel = new JPanel(new GridLayout(1, 10));
+//		videoPanel.setMaximumSize(new Dimension(2000, 200)); // width does not matter
+		
 		JScrollPane videoScrollPane = new JScrollPane(videoPanel);
         
 		videoPanel.setBackground(new Color(1.0f, 1.0f, 1.0f, 0.0f));
@@ -28,6 +33,7 @@ public class VideoView {
 	    	videoPanel.add(imgVideoLabel[i]);
 	    }
 	    videoScrollPane.add(videoPanel);
+//	    videoScrollPane.setMaximumSize(new Dimension(2000, 200)); // width does not matter
 	}
 	
 	public void setIcons(Collection<Image> p) {
@@ -35,6 +41,7 @@ public class VideoView {
 		for (int i=0; i<=9; i++) {
 			imgVideoLabel[i].setIcon(new ImageIcon(it.next()));
 			imgVideoLabel[i].setVisible(true);
+			imgVideoLabel[i].setMaximumSize(new Dimension(200, 200));
 		}
 		videoPanel.updateUI();
 	}

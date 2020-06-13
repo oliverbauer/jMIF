@@ -3,7 +3,7 @@ package io.github.jmif.entities;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "audiofile")
-public class MIFAudioFile {
+public class MIFAudioFile extends MIFFile {
 	
 	private String audiofile;
 	private int lengthOfInput = -1;
