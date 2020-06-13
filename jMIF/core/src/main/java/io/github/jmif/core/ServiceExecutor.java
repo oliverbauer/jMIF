@@ -136,8 +136,7 @@ public class ServiceExecutor implements MIF {
 	@Override
 	public long createText() throws MIFException {
 		return executor.doIt(() -> {
-			 service.createText();
-			 return null;
+			 return service.createText();
 		});
 	}
 }
