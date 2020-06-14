@@ -34,11 +34,10 @@ import io.github.jmif.entities.MIFVideo;
 /**
  * @author thebrunner
  */
-public class LocalService implements MIFService {
+class LocalService {
 
 	private static final Logger logger = LoggerFactory.getLogger(LocalService.class);
 
-	@Override
 	public void exportImage(MIFProject pr, String output, int frame) throws MIFException {
 		try {
 			new MIFProjectExecutor(pr).exportImage(output, frame);
@@ -47,7 +46,7 @@ public class LocalService implements MIFService {
 		}
 	}
 
-	@Override
+	
 	public void convert(MIFProject pr, boolean preview) throws MIFException {
 		try {
 			new MIFProjectExecutor(pr).convert(preview);
@@ -56,7 +55,7 @@ public class LocalService implements MIFService {
 		}
 	}
 
-	@Override
+	
 	public void updateProfile(MIFProject project) {
 		var framerate = -1;
 		var height = -1;
@@ -91,7 +90,7 @@ public class LocalService implements MIFService {
 		}
 	}
 
-	@Override
+	
 	public void createWorkingDirs(MIFProject project) {
 		if (!project.getWorkingDir().endsWith("/")) {
 			project.setWorkingDir(project.getWorkingDir()+"/");
@@ -115,7 +114,7 @@ public class LocalService implements MIFService {
 		}
 	}
 
-	@Override
+	
 	public MIFVideo createVideo(File file, String display, int frames, String dim, int overlay, String workingDir) throws MIFException {
 		var video = new MIFVideo(file, display, frames, dim, overlay);
 		updateFile(video);
@@ -195,16 +194,17 @@ public class LocalService implements MIFService {
 		return video;
 	}
 
-	@Override
-	public void createPreview(MIFFile file, String workingDir) throws MIFException {
+	
+	public MIFFile createPreview(MIFFile file, String workingDir) throws MIFException {
 		if (file instanceof MIFImage) {
-			createPreview(MIFImage.class.cast(file), workingDir);
+			return createImagePreview(MIFImage.class.cast(file), workingDir);
 		} else if (file instanceof MIFVideo) {
-			createPreview(MIFVideo.class.cast(file), workingDir);
+			return createVideoPreview(MIFVideo.class.cast(file), workingDir);
 		}
+		throw new MIFException(new Exception("Cannot parse MIFFile"));
 	}
 
-	private void createPreview(MIFVideo video, String workingDir) throws MIFException {
+	private MIFVideo createVideoPreview(MIFVideo video, String workingDir) throws MIFException {
 		var filename = video.getFile().getName();
 		var videoFileName = workingDir+"/orig/"+filename;
 
@@ -283,9 +283,11 @@ public class LocalService implements MIFService {
 				logger.debug("Init: Preview-Video-Image {} already computed", image);
 			}
 		}
+		
+		return video;
 	}
 
-	@Override
+	
 	public void createManualPreview(MIFImage image) {
 		image.setStyle(ImageResizeStyle.MANUAL);
 		Process process;
@@ -314,7 +316,7 @@ public class LocalService implements MIFService {
 		}
 	}
 
-	@Override
+	
 	public MIFImage createImage(File file, String display, int frames, String dim, int overlay, String workingDir) throws MIFException {
 		var image = new MIFImage(file, display, frames, dim, overlay);
 		updateFile(image);
@@ -370,7 +372,7 @@ public class LocalService implements MIFService {
 		return image;
 	}
 
-	private void createPreview(MIFImage image, String workingDir) throws MIFException {
+	private MIFImage createImagePreview(MIFImage image, String workingDir) throws MIFException {
 		var filename = image.getFilename();
 
 		var original = workingDir + "orig/" + filename;
@@ -506,9 +508,10 @@ public class LocalService implements MIFService {
 		}
 
 		// TODO manual preview if exists
+		return image;
 	}
 
-	@Override
+	
 	public MIFAudioFile createAudio(String path) throws MIFException {
 		var audioFile = new MIFAudioFile();
 		audioFile.setAudiofile(path);
@@ -569,7 +572,7 @@ public class LocalService implements MIFService {
 		}
 	}
 	
-	@Override
+	
 	public List<String> getProfiles() throws MIFException {
 		try {
 			List<String> profiles = new ArrayList<>();
@@ -744,7 +747,7 @@ public class LocalService implements MIFService {
 		}
 	}
 	
-	@Override
+	
 	public List<MeltFilterDetails> getMeltVideoFilterDetails(Melt melt) throws MIFException {
 		return getOrLoad(melt)
 			.stream()
@@ -753,7 +756,7 @@ public class LocalService implements MIFService {
 			.collect(Collectors.toList());
 	}
 	
-	@Override
+	
 	public List<MeltFilterDetails> getMeltAudioFilterDetails(Melt melt) throws MIFException {
 		return getOrLoad(melt)
 			.stream()
@@ -762,13 +765,13 @@ public class LocalService implements MIFService {
 			.collect(Collectors.toList());
 	}
 	
-	@Override
+	
 	public MeltFilterDetails getMeltFilterDetailsFor(Melt melt, MeltFilter meltFilter) throws MIFException {
 		return getOrLoad(melt).stream().filter(mdf -> mdf.getFiltername().contentEquals(meltFilter.getFiltername())).findAny().get();
 	}
 	
 	// TODO Rename to something like previewFilterWithMelt...
-	@Override
+	
 	public void applyFilter(MIFProject pr, MIFFile mifFile, MeltFilter meltFilter) throws MIFException {
 		if (mifFile instanceof MIFImage) {
 			MIFImage mifImage = MIFImage.class.cast(mifFile);
@@ -809,7 +812,7 @@ public class LocalService implements MIFService {
 		}
 	}
 
-	@Override
+	
 	public MIFTextFile createText() {
 		MIFTextFile textFile = new MIFTextFile();
 		return textFile;

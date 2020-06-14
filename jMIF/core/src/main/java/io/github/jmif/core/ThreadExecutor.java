@@ -15,7 +15,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
  */
 public class ThreadExecutor {
 
-	private final static int MAX_THREADS = 100;
+	private final static int MAX_THREADS = Math.max(1, Runtime.getRuntime().availableProcessors() - 1);
 	
 	private final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(MAX_THREADS);
 	

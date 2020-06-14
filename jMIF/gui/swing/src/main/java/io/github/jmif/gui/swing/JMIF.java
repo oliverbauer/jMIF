@@ -29,7 +29,7 @@ import com.mxgraph.view.mxGraphSelectionModel;
 
 import io.github.jmif.config.Configuration;
 import io.github.jmif.core.MIFException;
-import io.github.jmif.entities.MIFFile;
+import io.github.jmif.gui.swing.entities.MIFFileWrapper;
 import io.github.jmif.gui.swing.graph.GraphView;
 import io.github.jmif.gui.swing.listener.ProjectListener;
 import io.github.jmif.gui.swing.listener.ProjectListener.type;
@@ -217,6 +217,7 @@ public class JMIF {
 		var executor = Executors.newWorkStealingPool();
 		executor.submit(() -> {
 			try {
+//				TODO übergeben
 				project.getService().createPreview(file1, project.getPr().getWorkingDir());
 				project.getService().createPreview(file2, project.getPr().getWorkingDir());
 				project.getService().createPreview(file3, project.getPr().getWorkingDir());
@@ -243,9 +244,10 @@ public class JMIF {
 
 					// Exec background threads...
 					ExecutorService executor = Executors.newWorkStealingPool();
-					for (MIFFile f : graphWrapper.getPr().getMIFFiles()) {
+					for (MIFFileWrapper<?> f : graphWrapper.getPr().getMIFFiles()) {
 						executor.submit(() -> {
 							try {
+//								TODO übergeben
 								graphWrapper.getService().createPreview(f, graphWrapper.getPr().getWorkingDir());
 							} catch (Exception e) {
 								LOGGER.error("", e);

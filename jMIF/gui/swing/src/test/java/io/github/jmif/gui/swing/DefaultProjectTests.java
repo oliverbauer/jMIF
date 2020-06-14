@@ -11,13 +11,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import io.github.jmif.core.MIFService;
-import io.github.jmif.entities.MIFAudioFile;
-import io.github.jmif.entities.MIFFile;
-
 public class DefaultProjectTests {
 	
-	private final MIFService service = new CoreGateway();
+	private final CoreGateway service = new CoreGateway();
 	
 	private String tempDir;
 	@Before
@@ -34,7 +30,7 @@ public class DefaultProjectTests {
 		service.createWorkingDirs(pr);
 		pr.setFileOfProject(tempDir + "defaultproject.xml");
 		pr.setOutputVideo(tempDir+"output.avi");
-		MIFFile f1 = project.createMIFFile(new File(tempDir + "1.JPG"));
+		var f1 = project.createMIFFile(new File(tempDir + "1.JPG"));
 		f1.setDuration(1000);    // 5 sec
 		project.getPr().setProfile("atsc_1080p_25");
 		service.updateProfile(pr);
@@ -64,7 +60,7 @@ public class DefaultProjectTests {
 		service.createWorkingDirs(pr);
 		pr.setFileOfProject(tempDir + "defaultproject.xml");
 		pr.setOutputVideo(tempDir+"output.avi");
-		MIFFile f1 = project.createMIFFile(new File(tempDir + "1.JPG"));
+		var f1 = project.createMIFFile(new File(tempDir + "1.JPG"));
 		f1.setDuration(1000); // 1 sec
 		project.getPr().setProfile("atsc_1080p_50");
 		service.updateProfile(pr);
@@ -96,7 +92,7 @@ public class DefaultProjectTests {
 		service.createWorkingDirs(pr);
 		pr.setFileOfProject(tempDir + "defaultproject.xml");
 		pr.setOutputVideo(tempDir+"output.avi");
-		MIFFile f1 = project.createMIFFile(new File(tempDir + "1.JPG"));
+		var f1 = project.createMIFFile(new File(tempDir + "1.JPG"));
 		f1.setDuration(1000); // 1 sec
 		project.getPr().setProfile("svcd_pal");
 		service.updateProfile(pr);
@@ -131,9 +127,9 @@ public class DefaultProjectTests {
 		service.createWorkingDirs(pr);
 		pr.setFileOfProject(tempDir + "defaultproject.xml");
 		pr.setOutputVideo(tempDir+"output.avi");
-		MIFFile f1 = project.createMIFFile(new File(tempDir + "1.JPG"));
-		MIFFile f2 = project.createMIFFile(new File(tempDir + "2.MP4"));
-		MIFFile f3 = project.createMIFFile(new File(tempDir + "3.JPG"));
+		var f1 = project.createMIFFile(new File(tempDir + "1.JPG"));
+		var f2 = project.createMIFFile(new File(tempDir + "2.MP4"));
+		var f3 = project.createMIFFile(new File(tempDir + "3.JPG"));
 		f1.setDuration(1000);
 		f2.setDuration(1000);
 		f3.setDuration(1000);
@@ -168,9 +164,9 @@ public class DefaultProjectTests {
 		service.createWorkingDirs(pr);
 		pr.setFileOfProject(tempDir + "defaultproject4711.xml");
 		pr.setOutputVideo(tempDir+"output4711.avi");
-		MIFFile f1 = project.createMIFFile(new File(tempDir + "1.JPG"));
-		MIFFile f2 = project.createMIFFile(new File(tempDir + "2.MP4"));
-		MIFFile f3 = project.createMIFFile(new File(tempDir + "3.JPG"));
+		var f1 = project.createMIFFile(new File(tempDir + "1.JPG"));
+		var f2 = project.createMIFFile(new File(tempDir + "2.MP4"));
+		var f3 = project.createMIFFile(new File(tempDir + "3.JPG"));
 		f1.setDuration(1000);
 		f2.setDuration(1000);
 		f3.setDuration(1000);
@@ -204,11 +200,10 @@ public class DefaultProjectTests {
 		service.createWorkingDirs(pr);
 		pr.setFileOfProject(tempDir + "defaultproject4711.xml");
 		pr.setOutputVideo(tempDir+"output4711.avi");
-		MIFFile f1 = project.createMIFFile(new File(tempDir + "1.JPG"));
-		MIFAudioFile a1 = project.createMIFAudioFile(new File(tempDir+"audio.mp3"));
+		var f1 = project.createMIFFile(new File(tempDir + "1.JPG"));
+		var a1 = project.createMIFAudioFile(new File(tempDir+"audio.mp3"));
 		f1.setDuration(5000);
 		f1.setOverlayToPrevious(0);
-		a1.setEncodeStart(0);     // 15 sec
 		a1.setEncodeEnde(8000);   // 8 sec
 		project.getPr().setProfile("atsc_1080p_25");
 		service.updateProfile(pr);
@@ -239,15 +234,13 @@ public class DefaultProjectTests {
 		service.createWorkingDirs(pr);
 		pr.setFileOfProject(tempDir + "project.xml");
 		pr.setOutputVideo(tempDir+"project.avi");
-		MIFFile f1 = project.createMIFFile(new File(tempDir + "1.JPG"));
-		MIFAudioFile a1 = project.createMIFAudioFile(new File(tempDir+"audio.mp3"));
-		MIFAudioFile a2 = project.createMIFAudioFile(new File(tempDir+"audio2.mp3"));
+		var f1 = project.createMIFFile(new File(tempDir + "1.JPG"));
+		var a1 = project.createMIFAudioFile(new File(tempDir+"audio.mp3"));
+		var a2 = project.createMIFAudioFile(new File(tempDir+"audio2.mp3"));
 		f1.setDuration(1000);
 		f1.setOverlayToPrevious(0);
-		a1.setEncodeStart(0);
 		a1.setEncodeEnde(2000); // [ms]
 		
-		a2.setEncodeStart(0);
 		a2.setEncodeEnde(2000); // [ms]
 		project.getPr().setProfile("atsc_1080p_25");
 		service.updateProfile(pr);

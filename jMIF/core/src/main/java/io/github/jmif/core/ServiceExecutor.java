@@ -19,7 +19,7 @@ import io.github.jmif.entities.melt.MeltFilter;
  */
 public class ServiceExecutor implements MIF {
 
-	private final MIFService service = new LocalService();
+	private final LocalService service = new LocalService();
 
 	private final ThreadExecutor executor = new ThreadExecutor();
 
@@ -65,8 +65,7 @@ public class ServiceExecutor implements MIF {
 	@Override
 	public long createPreview(MIFFile file, String workingDir) throws MIFException {
 		return executor.doIt(() -> {
-			service.createPreview(file, workingDir);
-			return null;
+			return service.createPreview(file, workingDir);
 		});
 	}
 
@@ -136,8 +135,7 @@ public class ServiceExecutor implements MIF {
 	@Override
 	public long createText() throws MIFException {
 		return executor.doIt(() -> {
-			 service.createText();
-			 return null;
+			 return service.createText();
 		});
 	}
 }

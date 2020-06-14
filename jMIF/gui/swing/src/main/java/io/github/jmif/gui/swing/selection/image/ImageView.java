@@ -24,9 +24,9 @@ import com.mxgraph.model.mxCell;
 
 import io.github.jmif.config.Configuration;
 import io.github.jmif.core.MIFException;
-import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFImage.ImageResizeStyle;
 import io.github.jmif.gui.swing.GraphWrapper;
+import io.github.jmif.gui.swing.entities.MIFImageWrapper;
 
 public class ImageView {
 	private static final Logger logger = LoggerFactory.getLogger(ImageView.class);
@@ -44,7 +44,7 @@ public class ImageView {
 	private JPanel panel;
 
 	private mxCell selectedCell;
-	private MIFImage selectedMeltFile;
+	private MIFImageWrapper selectedMeltFile;
 
 	public ImageView(final GraphWrapper graphWrapper) throws MIFException {
 
@@ -118,7 +118,7 @@ public class ImageView {
 		dropDownBoxesBox.add(Box.createHorizontalStrut(10));
 		manualExtraction.addActionListener(e -> {
 			ManualSize manualSize = new ManualSize();
-			manualSize.showFrame(graphWrapper, (MIFImage)selectedMeltFile, this);
+			manualSize.showFrame(graphWrapper, (MIFImageWrapper)selectedMeltFile, this);
 		});
 		dropDownBoxesBox.add(manualExtraction);
 
@@ -134,7 +134,7 @@ public class ImageView {
 		update(selectedCell, selectedMeltFile);
 	}
 
-	public void update(mxCell cell, MIFImage meltFile) {
+	public void update(mxCell cell, MIFImageWrapper meltFile) {
 		this.selectedMeltFile = meltFile;
 		this.selectedCell = cell;
 
@@ -172,10 +172,10 @@ public class ImageView {
 		return e -> {
 			if (e.getStateChange() == ItemEvent.SELECTED && selectedMeltFile != null) {
 				ImageResizeStyle item = (ImageResizeStyle) e.getItem();
-				((MIFImage) selectedMeltFile).setStyle(item);
+				((MIFImageWrapper) selectedMeltFile).setStyle(item);
 
 				logger.info("Switching over '{}'", item);
-				var mifImage = MIFImage.class.cast(selectedMeltFile);
+				var mifImage = MIFImageWrapper.class.cast(selectedMeltFile);
 				final var previewCrop = mifImage.getPreviewCrop();
 				switch (item) {
 				case HARD:
@@ -227,18 +227,20 @@ public class ImageView {
 	}
 
 	public void setPreviewPicture(Image imagePreview) {
-		imgPicture[0].setVisible(true);
-		imgPicture[1].setVisible(true);
-		manualExtraction.setVisible(true);
+		if (Objects.nonNull(imagePreview)) {
+			imgPicture[0].setVisible(true);
+			imgPicture[1].setVisible(true);
+			manualExtraction.setVisible(true);
 
-		imgPicture[0].setIcon(new ImageIcon(imagePreview));
+			imgPicture[0].setIcon(new ImageIcon(imagePreview));
 
-		resizeStyleLabel.setVisible(true);
-		resizeStyle.setVisible(true);
-		resizeStyleDetailsLabel.setVisible(true);
-		resizeStyleDetails.setVisible(true);
+			resizeStyleLabel.setVisible(true);
+			resizeStyle.setVisible(true);
+			resizeStyleDetailsLabel.setVisible(true);
+			resizeStyleDetails.setVisible(true);
 
-		panel.updateUI();
+			panel.updateUI();
+		}
 	}
 
 	public void setSelectedPicture(Image previewCrop) {

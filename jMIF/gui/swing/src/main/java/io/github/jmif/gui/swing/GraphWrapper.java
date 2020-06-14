@@ -34,13 +34,12 @@ import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxGraph;
 
 import io.github.jmif.config.Configuration;
-import io.github.jmif.core.LocalService;
 import io.github.jmif.core.MIFException;
-import io.github.jmif.core.MIFService;
-import io.github.jmif.entities.MIFAudioFile;
-import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFProject;
-import io.github.jmif.entities.MIFTextFile;
+import io.github.jmif.gui.swing.entities.MIFAudioFileWrapper;
+import io.github.jmif.gui.swing.entities.MIFFileWrapper;
+import io.github.jmif.gui.swing.entities.MIFProjectWrapper;
+import io.github.jmif.gui.swing.entities.MIFTextFileWrapper;
 import io.github.jmif.gui.swing.listener.ProjectListener;
 import io.github.jmif.gui.swing.listener.ProjectListener.type;
 import io.github.jmif.gui.swing.listener.SingleFrameCreatedListener;
@@ -49,11 +48,11 @@ import io.github.jmif.util.TimeUtil;
 public class GraphWrapper {
 	private static final Logger logger = LoggerFactory.getLogger(GraphWrapper.class);
 	
-	private final MIFService service = new LocalService();
+	private final CoreGateway service = new CoreGateway();
 	
-	private Map<mxCell, MIFFile> nodeToMIFFile;
-	private Map<mxCell, MIFAudioFile> nodeToMIFAudio;
-	private Map<mxCell, MIFTextFile> nodeToMIFText;
+	private Map<mxCell, MIFFileWrapper<?>> nodeToMIFFile;
+	private Map<mxCell, MIFAudioFileWrapper> nodeToMIFAudio;
+	private Map<mxCell, MIFTextFileWrapper> nodeToMIFText;
 
 	private List<ProjectListener> listenerProjectChanged;
 	private List<SingleFrameCreatedListener> listenerSingleFrameCreated;
@@ -68,10 +67,10 @@ public class GraphWrapper {
 	private Object parent;
 
 	private mxCell singleframeSlider;
-	private MIFProject pr;
+	private MIFProjectWrapper pr;
 	
 	public GraphWrapper() {
-		pr = new MIFProject();
+		pr = new MIFProjectWrapper(new MIFProject());
 		this.nodeToMIFFile = new LinkedHashMap<>();
 		this.nodeToMIFAudio = new LinkedHashMap<>();
 		this.nodeToMIFText = new LinkedHashMap<>();
@@ -84,7 +83,7 @@ public class GraphWrapper {
 		initGraph();
 	}
 
-	public MIFProject getPr() {
+	public MIFProjectWrapper getPr() {
 		return this.pr;
 	}
 	
@@ -112,22 +111,23 @@ public class GraphWrapper {
 			var context = JAXBContext.newInstance(MIFProject.class);
 			var unmarshaller = context.createUnmarshaller();
 
-			MIFProject project = (MIFProject) unmarshaller.unmarshal(file);
+			MIFProjectWrapper project = new MIFProjectWrapper((MIFProject) unmarshaller.unmarshal(file));
 			getCells().clear();
 			getTextCells().clear();
-			pr.getMIFFiles().clear();
-			pr.getAudiotrack().getAudiofiles().clear();
-			pr.getTexttrack().getEntries().clear();
+			pr.clearMIFFiles();
+			pr.clearAudiofiles();
+			pr.clearTextfiles();
 			
 			// TODO Add Audio or Text????
 			
 			var executor = Executors.newWorkStealingPool();
-			for (MIFFile f : project.getMIFFiles()) {
-				MIFFile mifFile = createMIFFile(f.getFile());
+			for (MIFFileWrapper<?> f : project.getMIFFiles()) {
+				MIFFileWrapper<?> mifFile = createMIFFile(f.toMIFFile().getFile());
 				mifFile.getFilters().addAll(f.getFilters());
 				
 				executor.submit(() -> {
 					try {
+//						TODO übergeben
 						service.createPreview(mifFile, project.getWorkingDir());
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -151,7 +151,7 @@ public class GraphWrapper {
 		listenerProjectChanged.stream().forEach(c -> c.projectChanged(t));
 	}
 	
-	public MIFAudioFile createMIFAudioFile(File fileToAdd) throws MIFException {
+	public MIFAudioFileWrapper createMIFAudioFile(File fileToAdd) throws MIFException {
 		var file = fileToAdd.getAbsoluteFile().getAbsolutePath();
 		
 		if (file.endsWith("mp3") || file.endsWith("MP3")) {
@@ -171,8 +171,8 @@ public class GraphWrapper {
 		return null;
 	}
 	
-	public MIFTextFile createMIFTextfile() throws MIFException {
-		MIFTextFile textFile = service.createText();
+	public MIFTextFileWrapper createMIFTextfile() throws MIFException {
+		var textFile = service.createText();
 
 		var n = "text";
 		var x = currentLength + XOFFSET;
@@ -185,13 +185,13 @@ public class GraphWrapper {
 		return textFile;
 	}
 	
-	public MIFFile createMIFFile(File fileToAdd) throws MIFException, InterruptedException, IOException {
+	public MIFFileWrapper<?> createMIFFile(File fileToAdd) throws MIFException, InterruptedException, IOException {
 		logger.info("Create node for {}", fileToAdd);
 		
 		var file = fileToAdd.getAbsoluteFile().getAbsolutePath();
 		var extension = FilenameUtils.getExtension(file);
 
-		MIFFile mifFile = null;
+		MIFFileWrapper<?> mifFile = null;
 		
 		var display = file.substring(file.lastIndexOf('/') + 1);
 		if (Configuration.allowedImageTypes.contains(extension)) {
@@ -223,7 +223,7 @@ public class GraphWrapper {
 	
 	public void initializeProject() {
 		int current = 0;
-		for (MIFFile file : pr.getMIFFiles()) {
+		for (MIFFileWrapper<?> file : pr.getMIFFiles()) {
 			logger.info("Adding file {}", file.getFile());
 
 			if (current > 0) {
@@ -243,11 +243,11 @@ public class GraphWrapper {
 		}
 		int audioLength = 0;
 		current = 0;
-		for (Entry<mxCell, MIFAudioFile> audioEntry : nodeToMIFAudio.entrySet()) {
+		for (Entry<mxCell, MIFAudioFileWrapper> audioEntry : nodeToMIFAudio.entrySet()) {
 			current++;
 			
 			mxCell mxCell = audioEntry.getKey();
-			MIFAudioFile audioFile = audioEntry.getValue();
+			MIFAudioFileWrapper audioFile = audioEntry.getValue();
 			
 			var x = XOFFSET + audioLength;
 			var y = YOFFSET*2 +YOFFSET/2 + 2*Configuration.timelineentryHeight;
@@ -263,11 +263,11 @@ public class GraphWrapper {
 		
 		int textLength = 0;
 		current = 0;
-		for (Entry<mxCell, MIFTextFile> textEntry : nodeToMIFText.entrySet()) {
+		for (Entry<mxCell, MIFTextFileWrapper> textEntry : nodeToMIFText.entrySet()) {
 			current++;
 			
 			mxCell mxCell = textEntry.getKey();
-			MIFTextFile textFile = textEntry.getValue();
+			MIFTextFileWrapper textFile = textEntry.getValue();
 			
 			var x = XOFFSET + textLength;
 			var y = YOFFSET*4 +YOFFSET/2 + 4*Configuration.timelineentryHeight;
@@ -312,11 +312,11 @@ public class GraphWrapper {
 		}
 		int audioLength = 0;
 		current = 0;
-		for (Entry<mxCell, MIFAudioFile> audioEntry : nodeToMIFAudio.entrySet()) {
+		for (Entry<mxCell, MIFAudioFileWrapper> audioEntry : nodeToMIFAudio.entrySet()) {
 			current++;
 			
 			mxCell mxCell = audioEntry.getKey();
-			MIFAudioFile audioFile = audioEntry.getValue();
+			MIFAudioFileWrapper audioFile = audioEntry.getValue();
 			
 			if (current > 1) {
 				audioLength -= getOverlaywidth(audioFile);
@@ -336,11 +336,11 @@ public class GraphWrapper {
 		
 		int textLength = 0;
 		current = 0;
-		for (Entry<mxCell, MIFTextFile> textEntry : nodeToMIFText.entrySet()) {
+		for (Entry<mxCell, MIFTextFileWrapper> textEntry : nodeToMIFText.entrySet()) {
 			current++;
 			
 			mxCell mxCell = textEntry.getKey();
-			MIFTextFile textFile = textEntry.getValue();
+			var textFile = textEntry.getValue();
 			
 			if (current > 1) {
 				textLength -= getOverlaywidth(textFile);
@@ -386,11 +386,11 @@ public class GraphWrapper {
 				return new mxGraphControl() {
 					@Override
 					public void paintComponent(Graphics g) {
-						if (!pr.getMIFFiles().isEmpty() || !pr.getAudiotrack().getAudiofiles().isEmpty()) {
+						if (!pr.getMIFFiles().isEmpty() || !pr.isAudioFilesEmpty()) {
 							// 1. Timeline
 							int length = 0;
 							int current = 0;
-							for (MIFFile file : pr.getMIFFiles()) {
+							for (MIFFileWrapper<?> file : pr.getMIFFiles()) {
 								if (current > 0) {
 									length -= getOverlaywidth(file);
 								}
@@ -399,7 +399,7 @@ public class GraphWrapper {
 							}
 							int audioLength = 0;
 							current = 0;
-							for (Entry<mxCell, MIFAudioFile> audioEntry : nodeToMIFAudio.entrySet()) {
+							for (Entry<mxCell, MIFAudioFileWrapper> audioEntry : nodeToMIFAudio.entrySet()) {
 								if (current > 0) {
 									audioLength -= getOverlaywidth(audioEntry.getValue());
 								}
@@ -408,7 +408,7 @@ public class GraphWrapper {
 							}
 							int textLength = 0;
 							current = 0;
-							for (Entry<mxCell, MIFTextFile> textEntry : nodeToMIFText.entrySet()) {
+							for (Entry<mxCell, MIFTextFileWrapper> textEntry : nodeToMIFText.entrySet()) {
 								if (current > 0) {
 									textLength -= getOverlaywidth(textEntry.getValue());
 								}
@@ -541,27 +541,27 @@ public class GraphWrapper {
 		return (mxCell) graph.insertVertex(parent, null, label, x, y, w, h);
 	}
 
-	private int getPixelwidth(MIFAudioFile audioFile) {
+	private int getPixelwidth(MIFAudioFileWrapper audioFile) {
 		return (int)(Configuration.pixelwidth_per_second * ((audioFile.getEncodeEnde() - audioFile.getEncodeStart()) / 1000d));
 	}
 	
-	private int getPixelwidth(MIFTextFile textFile) {
+	private int getPixelwidth(MIFTextFileWrapper textFile) {
 		return (int)(Configuration.pixelwidth_per_second * (textFile.getLength() / 1000d));
 	}
 	
-	private int getPixelwidth(MIFFile mifFile) {
+	private int getPixelwidth(MIFFileWrapper<?> mifFile) {
 		return (int)(Configuration.pixelwidth_per_second  * (mifFile.getDuration() / 1000d));
 	}
 	
-	private int getOverlaywidth(MIFFile mifFile) {
+	private int getOverlaywidth(MIFFileWrapper<?> mifFile) {
 		return (int)(Configuration.pixelwidth_per_second * (mifFile.getOverlayToPrevious() / 1000d));
 	}
 	
-	private int getOverlaywidth(MIFTextFile textfield) {
+	private int getOverlaywidth(MIFTextFileWrapper textfield) {
 		return 0; // TODO Text: Overlay
 	}
 	
-	private int getOverlaywidth(MIFAudioFile audioFiles) {
+	private int getOverlaywidth(MIFAudioFileWrapper audioFiles) {
 		return 25;
 	}
 	
@@ -589,27 +589,27 @@ public class GraphWrapper {
 		this.listenerSingleFrameCreated.add(listener);
 	}
 	
-	public void remove(MIFFile meltFile, mxCell cell) {
-		pr.getMIFFiles().remove(meltFile);
+	public void remove(MIFFileWrapper<?> mifFile, mxCell cell) {
+		pr.removeMIFFile(mifFile);
 		nodeToMIFFile.remove(cell);
 	}
 
-	public void remove(MIFTextFile meltFile, mxCell cell) {
-		pr.getTexttrack().getEntries().remove(meltFile);
+	public void remove(MIFTextFileWrapper meltFile, mxCell cell) {
+		pr.removeTextFile(meltFile);
 		nodeToMIFFile.remove(cell);
 	}
 	
-	public void put(MIFFile meltFile, mxCell cell) {
-		pr.getMIFFiles().add(meltFile);
+	public void put(MIFFileWrapper<?> meltFile, mxCell cell) {
+		pr.addMIFFile(meltFile);
 		this.nodeToMIFFile.put(cell, meltFile);
 	}
 	
-	public void put(MIFTextFile textFile, mxCell cell) {
-		pr.getTexttrack().getEntries().add(textFile);
+	public void put(MIFTextFileWrapper textFile, mxCell cell) {
+		pr.addTextFile(textFile);
 		nodeToMIFText.put(cell, textFile);
 	}
 
-	public MIFFile get(mxCell cell) {
+	public MIFFileWrapper<?> get(mxCell cell) {
 		return this.nodeToMIFFile.get(cell);
 	}
 
@@ -617,21 +617,21 @@ public class GraphWrapper {
 		return new ArrayList<>(this.nodeToMIFFile.keySet());
 	}
 	
-	public void remove(MIFAudioFile audioFile, mxCell cell) {
-		pr.getAudiotrack().getAudiofiles().remove(audioFile);
+	public void remove(MIFAudioFileWrapper audioFile, mxCell cell) {
+		pr.removeAudiofile(audioFile);
 		nodeToMIFAudio.remove(cell);
 	}
 
-	public void put(MIFAudioFile audioFile, mxCell cell) {
-		pr.getAudiotrack().getAudiofiles().add(audioFile);
+	public void put(MIFAudioFileWrapper audioFile, mxCell cell) {
+		pr.addAudiofile(audioFile);
 		this.nodeToMIFAudio.put(cell, audioFile);
 	}
 
-	public MIFAudioFile getAudio(mxCell cell) {
+	public MIFAudioFileWrapper getAudio(mxCell cell) {
 		return this.nodeToMIFAudio.get(cell);
 	}
 	
-	public MIFTextFile getText(mxCell cell) {
+	public MIFTextFileWrapper getText(mxCell cell) {
 		return this.nodeToMIFText.get(cell);
 	}
 
@@ -647,7 +647,7 @@ public class GraphWrapper {
 		return cell == singleframeSlider;
 	}
 
-	public MIFService getService() {
+	public CoreGateway getService() {
 		return service;
 	}
 }

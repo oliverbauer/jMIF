@@ -18,10 +18,9 @@ import org.slf4j.LoggerFactory;
 import com.mxgraph.model.mxCell;
 
 import io.github.jmif.config.Configuration;
-import io.github.jmif.entities.MIFFile;
-import io.github.jmif.entities.MIFImage;
-import io.github.jmif.entities.MIFTextFile;
 import io.github.jmif.gui.swing.GraphWrapper;
+import io.github.jmif.gui.swing.entities.MIFImageWrapper;
+import io.github.jmif.gui.swing.entities.MIFTextFileWrapper;
 
 public class TextDetailsView {
 	private static final Logger logger = LoggerFactory.getLogger(TextDetailsView.class);
@@ -50,7 +49,7 @@ public class TextDetailsView {
 	private JComboBox<String> halign;
 	
 	private PangoColorChooser chooser;
-	private MIFTextFile mifText;
+	private MIFTextFileWrapper mifText;
 	
 	public TextDetailsView(GraphWrapper graphwrapper) {
 		Box box = Box.createVerticalBox();
@@ -102,8 +101,8 @@ public class TextDetailsView {
 		
 		File file = null;
 		for (mxCell c : graphwrapper.getCells()) {
-			MIFFile f = graphwrapper.get(c);
-			if (f instanceof MIFImage) {
+			var f = graphwrapper.get(c);
+			if (f instanceof MIFImageWrapper) {
 				file = f.getFile();
 				break;
 			}
@@ -173,7 +172,7 @@ public class TextDetailsView {
 		return panel;
 	}
 	
-	public void setDetails(MIFTextFile mifText) {
+	public void setDetails(MIFTextFileWrapper mifText) {
 		this.mifText = mifText;
 		chooser.setMIFTextFile(mifText);
 		chooser.setTextDetailsView(this);

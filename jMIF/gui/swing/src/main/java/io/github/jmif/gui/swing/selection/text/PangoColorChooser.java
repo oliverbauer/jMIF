@@ -17,12 +17,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 
-import io.github.jmif.entities.MIFTextFile;
+import io.github.jmif.gui.swing.entities.MIFTextFileWrapper;
 
 public class PangoColorChooser extends Box {
 	private static final long serialVersionUID = 5368430354551770709L;
 	private File backgroundImage;
-	private MIFTextFile mifText;
+	private MIFTextFileWrapper mifText;
 	private TextDetailsView textDetailsView;
 	
 	// Just text to indicate RGBA
@@ -159,7 +159,7 @@ public class PangoColorChooser extends Box {
 	    return resizedImg;
 	}
 	
-	public PangoColorChooser(File backgroundImage, MIFTextFile mifText) {
+	public PangoColorChooser(File backgroundImage, MIFTextFileWrapper mifText) {
 		super(BoxLayout.X_AXIS);
 		
 		this.backgroundImage = backgroundImage;
@@ -378,7 +378,7 @@ public class PangoColorChooser extends Box {
 		}
 	}
 
-	public void setMIFTextFile(MIFTextFile mifText2) {
+	public void setMIFTextFile(MIFTextFileWrapper mifText2) {
 		this.mifText = mifText2;
 		
 		String bgcolour = mifText2.getBgcolour(); // E.g. 0xff000080
