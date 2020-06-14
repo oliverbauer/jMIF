@@ -49,4 +49,5 @@ public class MIFImageWrapper extends MIFFileWrapper<MIFImage> {
 	public Image getImagePreview() {
 		return toMIFFile().getImagePreview();
 	}
+	
 }

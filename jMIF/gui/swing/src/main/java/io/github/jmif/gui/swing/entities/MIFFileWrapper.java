@@ -76,4 +76,17 @@ public class MIFFileWrapper<T extends MIFFile> {
 		return mifFile.getFilters();
 	}
 
+	public void setFile(File file) {
+		mifFile.setFile(file);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return hashCode() == obj.hashCode();
+	}
+	
+	@Override
+	public int hashCode() {
+		return getFile().hashCode();
+	}
 }

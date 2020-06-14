@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.swing.BorderFactory;
@@ -35,11 +36,15 @@ import com.mxgraph.view.mxGraph;
 
 import io.github.jmif.config.Configuration;
 import io.github.jmif.core.MIFException;
+import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFProject;
+import io.github.jmif.entities.MIFVideo;
 import io.github.jmif.gui.swing.entities.MIFAudioFileWrapper;
 import io.github.jmif.gui.swing.entities.MIFFileWrapper;
+import io.github.jmif.gui.swing.entities.MIFImageWrapper;
 import io.github.jmif.gui.swing.entities.MIFProjectWrapper;
 import io.github.jmif.gui.swing.entities.MIFTextFileWrapper;
+import io.github.jmif.gui.swing.entities.MIFVideoWrapper;
 import io.github.jmif.gui.swing.listener.ProjectListener;
 import io.github.jmif.gui.swing.listener.ProjectListener.type;
 import io.github.jmif.gui.swing.listener.SingleFrameCreatedListener;
@@ -49,6 +54,8 @@ public class GraphWrapper {
 	private static final Logger logger = LoggerFactory.getLogger(GraphWrapper.class);
 	
 	private final CoreGateway service = new CoreGateway();
+	
+	private final ExecutorService executor = Executors.newWorkStealingPool();
 	
 	private Map<mxCell, MIFFileWrapper<?>> nodeToMIFFile;
 	private Map<mxCell, MIFAudioFileWrapper> nodeToMIFAudio;
@@ -120,19 +127,8 @@ public class GraphWrapper {
 			
 			// TODO Add Audio or Text????
 			
-			var executor = Executors.newWorkStealingPool();
 			for (MIFFileWrapper<?> f : project.getMIFFiles()) {
-				MIFFileWrapper<?> mifFile = createMIFFile(f.toMIFFile().getFile());
-				mifFile.getFilters().addAll(f.getFilters());
-				
-				executor.submit(() -> {
-					try {
-//						TODO übergeben
-						service.createPreview(mifFile, project.getWorkingDir());
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				});
+				createMIFFile(f.toMIFFile().getFile()).getFilters().addAll(f.getFilters());
 			}
 			
 			redrawGraph();
@@ -195,9 +191,80 @@ public class GraphWrapper {
 		
 		var display = file.substring(file.lastIndexOf('/') + 1);
 		if (Configuration.allowedImageTypes.contains(extension)) {
-			mifFile = service.createImage(fileToAdd, display, 5000, "-1x-1", 1000, pr.getWorkingDir());
+			mifFile = new MIFImageWrapper(new MIFImage());
+			mifFile.setFile(fileToAdd);
+			executor.submit(() -> {
+					try {
+						var result = service.createImage(fileToAdd, display, 5000, "-1x-1", 1000, pr.getWorkingDir());
+						var found = nodeToMIFFile.entrySet().stream().filter(es -> es.getValue().equals(result)).map(Map.Entry::getKey).findFirst();
+						if (found.isPresent()) {
+							var cell = found.get();
+							nodeToMIFFile.put(cell, result);
+							var x = 0;
+							var y = -1;
+							var w = getPixelwidth(result);
+							var h = Configuration.timelineentryHeight;
+							
+							resize(cell, new mxRectangle(x, y, w, h));
+						} else {
+							if (!pr.getMIFFiles().isEmpty()) {
+								currentLength -= (result.getOverlayToPrevious() / 1000d) * 25;
+							}
+
+							var n = result.getDisplayName();
+							var x = currentLength + XOFFSET;
+							var y = pr.getMIFFiles().size() % 2 == 0 ? 0 + YOFFSET : Configuration.timelineentryHeight + YOFFSET;
+							var w = getPixelwidth(result);
+							var h = Configuration.timelineentryHeight;
+							
+							put(result, createVertex(n, x, y, w, h));
+						}
+						executor.submit(() -> {
+							try {
+								service.createPreview(result, getPr().getWorkingDir());
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						});
+						redrawGraph();
+					} catch (MIFException e) {
+						logger.error("", e);
+					}
+			});
 		} else if (Configuration.allowedVideoTypes.contains(extension)) {
-			mifFile = service.createVideo(fileToAdd, display, -1, "1920x1080", 1000, pr.getWorkingDir());
+			mifFile = new MIFVideoWrapper(new MIFVideo());
+			mifFile.setFile(fileToAdd);
+			executor.submit(() -> {
+				try {
+					var result = service.createVideo(fileToAdd, display, -1, "1920x1080", 1000, pr.getWorkingDir());
+					var found = nodeToMIFFile.entrySet().stream().filter(es -> es.getValue().equals(result)).map(Map.Entry::getKey).findFirst();
+					if (found.isPresent()) {
+						var cell = found.get();
+						nodeToMIFFile.put(cell, result);
+						var x = 0;
+						var y = -1;
+						var w = getPixelwidth(result);
+						var h = Configuration.timelineentryHeight;
+						
+						resize(cell, new mxRectangle(x, y, w, h));
+					} else {
+						if (!pr.getMIFFiles().isEmpty()) {
+							currentLength -= (result.getOverlayToPrevious() / 1000d) * 25;
+						}
+
+						var n = result.getDisplayName();
+						var x = currentLength + XOFFSET;
+						var y = pr.getMIFFiles().size() % 2 == 0 ? 0 + YOFFSET : Configuration.timelineentryHeight + YOFFSET;
+						var w = getPixelwidth(result);
+						var h = Configuration.timelineentryHeight;
+						
+						put(result, createVertex(n, x, y, w, h));
+					}
+					redrawGraph();
+				} catch (MIFException e) {
+					logger.error("", e);
+				}
+		});
 		}
 		
 		if (mifFile != null) {
