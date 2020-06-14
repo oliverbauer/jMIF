@@ -188,5 +188,7 @@ public class TextDetailsView {
 		olColor.setText(mifText.getOlcolour());
 		valign.setSelectedItem(mifText.getValign());
 		halign.setSelectedItem(mifText.getHalign());
+		
+		panel.updateUI();
 	}
 }

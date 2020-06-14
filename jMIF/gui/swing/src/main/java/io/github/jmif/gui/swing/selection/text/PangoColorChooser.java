@@ -16,12 +16,10 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import io.github.jmif.entities.MIFTextFile;
 
-public class PangoColorChooser extends Box implements ChangeListener {
+public class PangoColorChooser extends Box {
 	private static final long serialVersionUID = 5368430354551770709L;
 	private File backgroundImage;
 	private MIFTextFile mifText;
@@ -189,16 +187,16 @@ public class PangoColorChooser extends Box implements ChangeListener {
 		bgTextBox.add(Box.createHorizontalGlue());
 		bgSliderR.setValue(bgColor.getRed());
 		bgValueR.setText(String.valueOf(bgColor.getRed()));
-		bgSliderR.addChangeListener(this);
 		bgSliderG.setValue(bgColor.getGreen());
 		bgValueG.setText(String.valueOf(bgColor.getGreen()));
-		bgSliderG.addChangeListener(this);
 		bgSliderB.setValue(bgColor.getBlue());
 		bgValueB.setText(String.valueOf(bgColor.getBlue()));
-		bgSliderB.addChangeListener(this);
 		bgSliderA.setValue(bgColor.getAlpha());
 		bgValueA.setText(String.valueOf(bgColor.getAlpha()));
-		bgSliderA.addChangeListener(this);
+		bgSliderR.addChangeListener(e -> updateBgColorStateChanged());
+		bgSliderG.addChangeListener(e -> updateBgColorStateChanged());
+		bgSliderB.addChangeListener(e -> updateBgColorStateChanged());
+		bgSliderA.addChangeListener(e -> updateBgColorStateChanged());
 
 		// Foreground
 		Box fgRedBox = Box.createHorizontalBox();
@@ -222,16 +220,17 @@ public class PangoColorChooser extends Box implements ChangeListener {
 		fgTextBox.add(Box.createHorizontalGlue());
 		fgSliderR.setValue(fgColor.getRed());
 		fgValueR.setText(String.valueOf(fgColor.getRed()));
-		fgSliderR.addChangeListener(this);
 		fgSliderG.setValue(fgColor.getGreen());
 		fgValueG.setText(String.valueOf(fgColor.getGreen()));
-		fgSliderG.addChangeListener(this);
 		fgSliderB.setValue(fgColor.getBlue());
 		fgValueB.setText(String.valueOf(fgColor.getBlue()));
-		fgSliderB.addChangeListener(this);
 		fgSliderA.setValue(fgColor.getAlpha());
 		fgValueA.setText(String.valueOf(fgColor.getAlpha()));
-		fgSliderA.addChangeListener(this);
+		fgSliderR.addChangeListener(e -> updateFgColorStateChanged());
+		fgSliderG.addChangeListener(e -> updateFgColorStateChanged());
+		fgSliderB.addChangeListener(e -> updateFgColorStateChanged());
+		fgSliderA.addChangeListener(e -> updateFgColorStateChanged());
+
 
 		// Outline
 		Box olRedBox = Box.createHorizontalBox();
@@ -255,16 +254,17 @@ public class PangoColorChooser extends Box implements ChangeListener {
 		olTextBox.add(Box.createHorizontalGlue());
 		olSliderR.setValue(olColor.getRed());
 		olValueR.setText(String.valueOf(olColor.getRed()));
-		olSliderR.addChangeListener(this);
 		olSliderG.setValue(olColor.getGreen());
 		olValueG.setText(String.valueOf(olColor.getGreen()));
-		olSliderG.addChangeListener(this);
 		olSliderB.setValue(olColor.getBlue());
 		olValueB.setText(String.valueOf(olColor.getBlue()));
-		olSliderB.addChangeListener(this);
 		olSliderA.setValue(olColor.getAlpha());
 		olValueA.setText(String.valueOf(olColor.getAlpha()));
-		olSliderA.addChangeListener(this);
+		olSliderR.addChangeListener(e -> updateOlColorStateChanged());
+		olSliderG.addChangeListener(e -> updateOlColorStateChanged());
+		olSliderB.addChangeListener(e -> updateOlColorStateChanged());
+		olSliderA.addChangeListener(e -> updateOlColorStateChanged());
+
 
 		box = Box.createVerticalBox();
 		box.add(bgTextBox);
@@ -354,15 +354,27 @@ public class PangoColorChooser extends Box implements ChangeListener {
 		mifText.setOlcolour("0x"+r+g+b+a);
 	}
 	
-	@Override
-	public void stateChanged(ChangeEvent e) {
+	private void updateBgColorStateChanged() {
 		updateBgColor();
-		updateFgColor();
-		updateOlColor();
-		
 		imagePreview.repaint();
 		if (textDetailsView != null) {
-			textDetailsView.getBox().updateUI();
+			textDetailsView.setDetails(mifText);
+		}
+	}
+	
+	private void updateFgColorStateChanged() {
+		updateFgColor();
+		imagePreview.repaint();
+		if (textDetailsView != null) {
+			textDetailsView.setDetails(mifText);
+		}
+	}
+	
+	private void updateOlColorStateChanged() {
+		updateOlColor();
+		imagePreview.repaint();
+		if (textDetailsView != null) {
+			textDetailsView.setDetails(mifText);
 		}
 	}
 
@@ -381,6 +393,7 @@ public class PangoColorChooser extends Box implements ChangeListener {
 		bgSliderA.setValue(bgA);
 		updateBgColor();
 		
+		// Initial: 0x000000ff
 		String fgcolour = mifText2.getFgcolour();
 		fgcolour = fgcolour.substring(2);
 		int fgR = Integer.parseInt(fgcolour.substring(0, 2), 16);
