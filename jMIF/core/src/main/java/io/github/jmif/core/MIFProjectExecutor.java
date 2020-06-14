@@ -190,7 +190,7 @@ class MIFProjectExecutor {
 			sb.append("#/!/usr/bin/env bash\n\n");
 			sb.append("melt \\\n");
 			
-			sb.append("color:black  out=299 \\\n"); // FIXME what is the overall framelength?
+			sb.append("color:black out=1 \\\n"); // FIXME what is the overall framelength?
 			
 			int count = 0;
 			sb.append("-track \\\n");
