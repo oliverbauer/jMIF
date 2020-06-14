@@ -34,6 +34,7 @@ import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxGraph;
 
 import io.github.jmif.config.Configuration;
+import io.github.jmif.core.LocalService;
 import io.github.jmif.core.MIFException;
 import io.github.jmif.core.MIFService;
 import io.github.jmif.entities.MIFAudioFile;
@@ -48,7 +49,7 @@ import io.github.jmif.util.TimeUtil;
 public class GraphWrapper {
 	private static final Logger logger = LoggerFactory.getLogger(GraphWrapper.class);
 	
-	private final MIFService service = new CoreGateway();
+	private final MIFService service = new LocalService();
 	
 	private Map<mxCell, MIFFile> nodeToMIFFile;
 	private Map<mxCell, MIFAudioFile> nodeToMIFAudio;

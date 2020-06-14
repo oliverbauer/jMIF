@@ -2,9 +2,11 @@ package io.github.jmif.gui.swing.selection.text;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.util.Arrays;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -24,6 +26,9 @@ public class TextDetailsView {
 	private JLabel labelBgColor = new JLabel("Background color");
 	private JLabel labelOlColor = new JLabel("Outline color");
 	
+	private JLabel labelVAlign = new JLabel("Vertical alignment");
+	private JLabel labelHAlign = new JLabel("Horizontal alignment");
+	
 	private JTextField text = new JTextField();
 	private JTextField length = new JTextField();
 	private JTextField size = new JTextField();
@@ -31,6 +36,8 @@ public class TextDetailsView {
 	private JTextField fgColor = new JTextField();
 	private JTextField bgColor = new JTextField();
 	private JTextField olColor = new JTextField();
+	private JComboBox<String> valign;
+	private JComboBox<String> halign;
 	
 	private MIFTextFile mifText;
 	
@@ -44,6 +51,24 @@ public class TextDetailsView {
 	    wrap(box, labelFgColor, fgColor);
 	    wrap(box, labelBgColor, bgColor);
 	    wrap(box, labelOlColor, olColor);
+	    
+	    // -attach affine transition.valign=top transition.halign=center
+		String[] valignValues = Arrays.asList("top", "middle", "bottom").toArray(new String[3]);
+		valign = new JComboBox<>(valignValues);
+		valign.addItemListener(e -> {
+			String value = (String)valign.getSelectedItem();
+			mifText.setValign(value);
+		});
+		wrap(box, labelVAlign, valign);
+		
+		// -attach affine transition.valign=top transition.halign=center
+		String[] halignValues = Arrays.asList("left", "center", "right").toArray(new String[3]);
+		halign = new JComboBox<>(halignValues);
+		halign.addItemListener(e -> {
+			String value = (String)halign.getSelectedItem();
+			mifText.setHalign(value);
+		});
+		wrap(box, labelHAlign, halign);
 	    
 	    text.addActionListener(e -> { mifText.setText(text.getText()); });
 	    length.addActionListener(e -> { mifText.setLength(Integer.parseInt(length.getText())); graphwrapper.redrawGraph();});
@@ -98,5 +123,7 @@ public class TextDetailsView {
 		fgColor.setText(mifText.getFgcolour());
 		bgColor.setText(mifText.getBgcolour());
 		olColor.setText(mifText.getOlcolour());
+		valign.setSelectedItem(mifText.getValign());
+		halign.setSelectedItem(mifText.getHalign());
 	}
 }
