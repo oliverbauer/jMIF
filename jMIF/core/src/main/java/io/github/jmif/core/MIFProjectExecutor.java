@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -194,8 +195,9 @@ class MIFProjectExecutor {
 			int count = 0;
 			sb.append("-track \\\n");
 			for (MIFFile meltfile : this.project.getMIFFiles()) {
-				String input = project.getWorkingDir()+"scaled/"+meltfile.getFilename();
-				String extension = meltfile.getFileExtension();
+				File file = meltfile.getFile();
+				String input = project.getWorkingDir()+"scaled/"+file.getName();
+				String extension = FilenameUtils.getExtension(file.getName());
 				
 				boolean useMixer = count != 0;
 				int frames = (int)((meltfile.getDuration() / 1000d) * project.getProfileFramerate());
@@ -283,7 +285,7 @@ class MIFProjectExecutor {
 		
 		String workingDir = project.getWorkingDir();
 		for (MIFFile f : project.getMIFFiles()) {
-			String filename = f.getFilename();
+			String filename = f.getFile().getName();
 			String input = workingDir+"orig/"+filename;
 			String output = workingDir + "scaled/" + filename;
 
@@ -305,7 +307,7 @@ class MIFProjectExecutor {
 	
 	public void createFinalImageConversion(MIFImage image, String output) throws IOException {
 		String workingDir = project.getWorkingDir();
-		String filename = image.getFilename();
+		String filename = image.getFile().getName();
 		String input = workingDir+"orig/"+filename;
 		
 		switch (image.getStyle()) {

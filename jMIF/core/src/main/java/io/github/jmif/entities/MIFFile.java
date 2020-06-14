@@ -18,7 +18,6 @@ import io.github.jmif.entities.melt.MeltFilter;
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class MIFFile {
 	private File file;
-	private String filename;
 	protected String displayName;
 
 	// TODO Overlay: Depends on #9 Configuration: Create properties-file
@@ -33,22 +32,11 @@ public abstract class MIFFile {
 	@XmlTransient
 	protected boolean initialized = false;
 
-	@XmlTransient
-	protected boolean fileExists = true;
-	
 	@XmlElement(name = "mifFilters")
 	private List<MeltFilter> meltFilter = new ArrayList<>();
 	
-	public String getFilename() {
-		return filename;
-	}
-
-	public void setFilename(String filename) {
-		this.filename = filename;
-	}
-
 	public String getFileExtension() {
-		return FilenameUtils.getExtension(filename);
+		return FilenameUtils.getExtension(file.getName());
 	}
 	
 	public boolean isInitialized() {
@@ -109,10 +97,6 @@ public abstract class MIFFile {
 
 	public boolean isPicture() {
 		return getClass() == MIFImage.class;
-	}
-
-	public void setFileExists(boolean fileExists) {
-		this.fileExists = fileExists;
 	}
 
 	public void addFilter(MeltFilter currentlySelectedFilter) {

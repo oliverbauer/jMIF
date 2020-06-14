@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Configuration {
-	public static boolean showSplashscreen = true;
+	public static boolean showSplashscreen = false;
 	public static final int splashSleepTime = 10;
 	
 	public static final List<String> allowedImageTypes = Arrays.asList("jpg", "JPG", "png", "PNG");

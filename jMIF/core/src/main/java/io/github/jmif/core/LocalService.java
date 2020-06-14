@@ -117,9 +117,8 @@ public class LocalService {
 	
 	public MIFVideo createVideo(File file, String display, int frames, String dim, int overlay, String workingDir) throws MIFException {
 		var video = new MIFVideo(file, display, frames, dim, overlay);
-		updateFile(video);
 		copy(video, workingDir);
-		var filename = video.getFilename();
+		var filename = video.getFile().getName();
 
 		logger.info("Init: Video {}", filename);
 		Process process;
@@ -319,9 +318,8 @@ public class LocalService {
 	
 	public MIFImage createImage(File file, String display, int frames, String dim, int overlay, String workingDir) throws MIFException {
 		var image = new MIFImage(file, display, frames, dim, overlay);
-		updateFile(image);
 		copy(image, workingDir);
-		var filename = image.getFilename();
+		var filename = image.getFile().getName();
 
 		var copy = workingDir + "orig/" + filename;
 
@@ -360,7 +358,7 @@ public class LocalService {
 		var estimatedWith = (int) (aspectHeight * 1.78);
 
 		var wxh = estimatedWith + "x" + aspectHeight;
-		var basename = FilenameUtils.getBaseName(image.getFilename());
+		var basename = FilenameUtils.getBaseName(image.getFile().getName());
 		var extension = image.getFileExtension();
 		image.setImagePreviewPath(Paths.get(workingDir).resolve("preview").resolve(basename + "_thumb."+wxh+"."+
 				extension));
@@ -373,7 +371,7 @@ public class LocalService {
 	}
 
 	private MIFImage createImagePreview(MIFImage image, String workingDir) throws MIFException {
-		var filename = image.getFilename();
+		var filename = image.getFile().getName();
 
 		var original = workingDir + "orig/" + filename;
 
@@ -548,18 +546,13 @@ public class LocalService {
 		}
 	}
 
-	private void updateFile(MIFFile file) {
-		file.setFileExists(file.getFile().exists());
-		file.setFilename(file.getFile().getName());
-	}
-	
 	private void copy(MIFFile file, String workingDir) throws MIFException {
-		var target = workingDir+"orig/"+file.getFilename();
+		var target = workingDir+"orig/"+file.getFile().getName();
 		var command = "cp "+file.getFile()+" "+target;
 		
 		// Copy to working dir... make sure each file has different name...
 		if (!new File(target).exists()) {
-			logger.info("Copy to {} ({})", file.getFilename(), command);
+			logger.info("Copy to {} ({})", file.getFile().getName(), command);
 			try {
 				new ProcessBuilder("bash", "-c", command)
 					.directory(new File(workingDir))
