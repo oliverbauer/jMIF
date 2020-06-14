@@ -95,7 +95,7 @@ public class GraphWrapper {
 			var context = JAXBContext.newInstance(MIFProject.class);
 			var marshaller = context.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			marshaller.marshal(pr, file);
+			marshaller.marshal(pr.toMIFProject(), file);
 
 			logger.info("Successfully saved project {} in {}", pr.getFileOfProject(), TimeUtil.getMessage(time));
 		} catch (JAXBException ex) {
