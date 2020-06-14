@@ -70,5 +70,19 @@ public class MIFTextFileWrapper {
 		textFile.setLength(length);
 	}
 	
+	public String getValign() {
+		return textFile.getValign();
+	}
 
+	public String getHalign() {
+		return textFile.getHalign();
+	}
+	
+	public void setValign(String valign) {
+		textFile.setValign(valign);
+	}
+
+	public void setHalign(String halign) {
+		textFile.setHalign(halign);
+	}
 }

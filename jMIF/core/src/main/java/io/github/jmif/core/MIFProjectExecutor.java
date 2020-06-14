@@ -240,7 +240,7 @@ class MIFProjectExecutor {
 						(textFile.getLength()/1000)*project.getProfileFramerate(), 
 						textFile.getSize(), 
 						textFile.getWeight()));
-					sb.append("  -attach affine transition.valign=top transition.halign=center transition.fill=0 \\\n");
+					sb.append("  -attach affine transition.valign="+textFile.getValign()+" transition.halign="+textFile.getHalign()+" transition.fill=0 \\\n");
 				}
 			}
 			

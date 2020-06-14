@@ -13,10 +13,31 @@ public class MIFTextFile {
 
 	private int length = 1000; // [ms]
 	
+	//left, center, right
+	private String halign = "center";
+	// top, middle, bottom
+	private String valign = "bottom";
+	
 	public MIFTextFile() {
 		
 	}
 	
+	public String getHalign() {
+		return halign;
+	}
+
+	public void setHalign(String halign) {
+		this.halign = halign;
+	}
+
+	public String getValign() {
+		return valign;
+	}
+
+	public void setValign(String valign) {
+		this.valign = valign;
+	}
+
 	public String getText() {
 		return text;
 	}
