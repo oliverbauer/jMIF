@@ -198,13 +198,13 @@ public class JMIF {
 		FileUtils.copyInputStreamToFile(JMIF.class.getClassLoader().getResourceAsStream("defaultproject/5.JPG"),
 				new File(project.getPr().getWorkingDir() + "5.JPG"));
 		
-		var file1 = project.createMIFFile(new File(project.getPr().getWorkingDir() + "1.JPG"));
-		var file2 = project.createMIFFile(new File(project.getPr().getWorkingDir() + "2.MP4"));
-		var file3 = project.createMIFFile(new File(project.getPr().getWorkingDir() + "3.JPG"));
+		project.createMIFFile(new File(project.getPr().getWorkingDir() + "1.JPG"));
+		project.createMIFFile(new File(project.getPr().getWorkingDir() + "2.MP4"));
+		project.createMIFFile(new File(project.getPr().getWorkingDir() + "3.JPG"));
 		var audio = project.createMIFAudioFile(new File(project.getPr().getWorkingDir()+"audio.mp3"));
 		audio.setEncodeEnde(10000); // [ms]
-		var file4 = project.createMIFFile(new File(project.getPr().getWorkingDir() + "4.JPG"));
-		var file5 = project.createMIFFile(new File(project.getPr().getWorkingDir() + "5.JPG"));
+		project.createMIFFile(new File(project.getPr().getWorkingDir() + "4.JPG"));
+		project.createMIFFile(new File(project.getPr().getWorkingDir() + "5.JPG"));
 		var audio2 = project.createMIFAudioFile(new File(project.getPr().getWorkingDir()+"audio2.mp3"));
 		audio2.setEncodeEnde(14000); // [ms]
 		
@@ -214,20 +214,6 @@ public class JMIF {
 		var text2 = project.createMIFTextfile();
 		text2.setLength(4000); // [ms]
 		
-		var executor = Executors.newWorkStealingPool();
-		executor.submit(() -> {
-			try {
-//				TODO übergeben
-				project.getService().createPreview(file1, project.getPr().getWorkingDir());
-				project.getService().createPreview(file2, project.getPr().getWorkingDir());
-				project.getService().createPreview(file3, project.getPr().getWorkingDir());
-				project.getService().createPreview(file4, project.getPr().getWorkingDir());
-				project.getService().createPreview(file5, project.getPr().getWorkingDir());
-			} catch (Exception e) {
-				LOGGER.error("", e);
-			}
-		});
-
 		project.redrawGraph();
 		project.createFramePreview();
 
