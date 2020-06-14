@@ -55,4 +55,9 @@ public class MIFAudioFileWrapper extends MIFFileWrapper<MIFAudioFile> {
 	public boolean isNormalize() {
 		return toMIFFile().isNormalize();
 	}
+	
+	@Override
+	public int hashCode() {
+		return getAudiofile().hashCode();
+	}
 }

@@ -50,4 +50,8 @@ public class MIFImageWrapper extends MIFFileWrapper<MIFImage> {
 		return toMIFFile().getImagePreview();
 	}
 	
+	@Override
+	public int hashCode() {
+		return getFile().hashCode();
+	}
 }

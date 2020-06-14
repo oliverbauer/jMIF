@@ -84,9 +84,4 @@ public class MIFFileWrapper<T extends MIFFile> {
 	public boolean equals(Object obj) {
 		return hashCode() == obj.hashCode();
 	}
-	
-	@Override
-	public int hashCode() {
-		return getFile().hashCode();
-	}
 }

@@ -38,4 +38,9 @@ public class MIFVideoWrapper extends MIFFileWrapper<MIFVideo> {
 	public Collection<Image> getPreviewImages() {
 		return toMIFFile().getPreviewImages();
 	}
+	
+	@Override
+	public int hashCode() {
+		return getFile().hashCode();
+	}
 }
