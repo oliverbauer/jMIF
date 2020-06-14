@@ -156,12 +156,12 @@ public class SelectionView {
 	}
 	
 	public void setSingleFrameView() {
-		tabPane.setSelectedIndex(3);
+		tabPane.setSelectedIndex(4);
 		tabPane.setEnabledAt(0, false); // Image
 		tabPane.setEnabledAt(1, false); // Video
 		tabPane.setEnabledAt(2, false); // Text
 		tabPane.setEnabledAt(3, false); // Audio
-		tabPane.setEnabledAt(3, true); // Frame
+		tabPane.setEnabledAt(4, true); // Frame
 		tabPane.setEnabledAt(5, true);  // ImageLibrary
 		
 		clearSelection();
