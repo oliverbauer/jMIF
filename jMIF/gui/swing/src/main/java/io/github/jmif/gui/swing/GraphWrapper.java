@@ -260,6 +260,13 @@ public class GraphWrapper {
 						
 						put(result, createVertex(n, x, y, w, h));
 					}
+					executor.submit(() -> {
+						try {
+							service.createPreview(result, getPr().getWorkingDir());
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					});
 					redrawGraph();
 				} catch (MIFException e) {
 					logger.error("", e);
