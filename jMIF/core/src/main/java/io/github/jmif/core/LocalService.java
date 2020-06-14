@@ -34,7 +34,7 @@ import io.github.jmif.entities.MIFVideo;
 /**
  * @author thebrunner
  */
-class LocalService {
+public class LocalService {
 
 	private static final Logger logger = LoggerFactory.getLogger(LocalService.class);
 

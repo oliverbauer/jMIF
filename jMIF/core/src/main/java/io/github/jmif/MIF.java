@@ -16,7 +16,7 @@ public interface MIF {
 
 	long convert(MIFProject pr, boolean preview) throws MIFException;
 
-	long updateFramerate(MIFProject project) throws MIFException;
+	long updateProfile(MIFProject project) throws MIFException;
 
 	long createWorkingDirs(MIFProject project) throws MIFException;
 
