@@ -40,7 +40,7 @@ public class ServiceExecutor implements MIF {
 	}
 
 	@Override
-	public long updateFramerate(MIFProject project) throws MIFException {
+	public long updateProfile(MIFProject project) throws MIFException {
 		return executor.doIt(() -> {
 			service.updateProfile(project);
 			return null;

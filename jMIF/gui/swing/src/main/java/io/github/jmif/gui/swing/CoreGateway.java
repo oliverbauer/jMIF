@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.github.jmif.MIF;
 import io.github.jmif.core.MIFException;
 import io.github.jmif.core.ServiceExecutor;
@@ -34,8 +31,6 @@ import io.github.jmif.gui.swing.entities.MIFVideoWrapper;
  *
  */
 public class CoreGateway {
-
-	private static final Logger logger = LoggerFactory.getLogger(GraphWrapper.class);
 
 	private final MIF service = new ServiceExecutor();
 
@@ -64,7 +59,7 @@ public class CoreGateway {
 
 
 	public void updateProfile(MIFProjectWrapper project) throws MIFException {
-		final var id = service.updateFramerate(project.toMIFProject());
+		final var id = service.updateProfile(project.toMIFProject());
 		try {
 			executor.submit(() -> service.get(id)).get().get();
 		} catch (InterruptedException | ExecutionException e) {

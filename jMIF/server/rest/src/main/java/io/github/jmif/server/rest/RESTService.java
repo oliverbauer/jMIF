@@ -57,7 +57,7 @@ public class RESTService extends Application {
 	@Path("/updateFramerate")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateFramerate(MIFProject project) throws MIFException {
-		return Response.accepted(delegate.updateFramerate(project)).build();
+		return Response.accepted(delegate.updateProfile(project)).build();
 	}
 
 	@POST
