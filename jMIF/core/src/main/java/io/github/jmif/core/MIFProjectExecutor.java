@@ -121,7 +121,7 @@ class MIFProjectExecutor {
 					
 					String command = sb.toString();
 					LOGGER.info("Execute {}",command);
-					execute(command);
+					execute(command, false);
 					
 					if (audio.getFadeIn() > 0 || audio.getFadeOut() > 0) {
 						StringBuilder sb2 = new StringBuilder("ffmpeg -y -i ");
@@ -148,7 +148,7 @@ class MIFProjectExecutor {
 						
 						String command2 = sb2.toString();
 						LOGGER.info("Execute {}",command2);
-						execute(command2);
+						execute(command2, false);
 					}
 				} else {
 					StringBuilder sb = new StringBuilder("ffmpeg -y -i ");
@@ -178,7 +178,7 @@ class MIFProjectExecutor {
 					
 					String command = sb.toString();
 					LOGGER.info("Execute {}",command);
-					execute(command);
+					execute(command, false);
 				}
 			}
 		}
