@@ -103,6 +103,8 @@ class MIFProjectExecutor {
 					 * Filtergraph 'loudnorm' was specified through the -vf/-af/-filter option for output stream 0:0, which is fed from a complex filtergraph.
 					 * -vf/-af/-filter and -filter_complex cannot be used together for the same stream.
 					 */
+					
+					// TODO Audio: Allow with milliseconds
 					StringBuilder sb = new StringBuilder("ffmpeg -y -i ");
 					sb.append(input);
 					sb.append(" -ss ");
@@ -119,11 +121,10 @@ class MIFProjectExecutor {
 					}
 					sb.append(tempOutput);
 					
-					String command = sb.toString();
-					LOGGER.info("Execute {}",command);
-					execute(command, false);
+					execute(sb.toString(), false);
 					
 					if (audio.getFadeIn() > 0 || audio.getFadeOut() > 0) {
+						// TODO Audio: Allow with milliseconds
 						StringBuilder sb2 = new StringBuilder("ffmpeg -y -i ");
 						sb2.append(tempOutput);
 						sb2.append(" -ss ");
@@ -146,11 +147,10 @@ class MIFProjectExecutor {
 						sb2.append("\" ");
 						sb2.append(output);
 						
-						String command2 = sb2.toString();
-						LOGGER.info("Execute {}",command2);
-						execute(command2, false);
+						execute(sb2.toString(), false);
 					}
 				} else {
+					// TODO Audio: Allow with milliseconds
 					StringBuilder sb = new StringBuilder("ffmpeg -y -i ");
 					sb.append(input);
 					sb.append(" -ss ");
@@ -176,9 +176,7 @@ class MIFProjectExecutor {
 					}
 					sb.append(output);
 					
-					String command = sb.toString();
-					LOGGER.info("Execute {}",command);
-					execute(command, false);
+					execute(sb.toString(), false);
 				}
 			}
 		}
@@ -281,8 +279,6 @@ class MIFProjectExecutor {
 	}
 	
 	private void adjustImagesIfNecessary() throws IOException {
-		LOGGER.info("Start adjusting images (if necessary)...");
-		
 		String workingDir = project.getWorkingDir();
 		for (MIFFile f : project.getMIFFiles()) {
 			String filename = f.getFile().getName();
@@ -291,14 +287,10 @@ class MIFProjectExecutor {
 
 			if (f instanceof MIFImage) {
 				if (!new File(output).exists()) {
-					LOGGER.info("Create {}", output);
-
 					createFinalImageConversion((MIFImage)f, output);
 				}
 			} else if (f instanceof MIFVideo) {
 				if (!new File(output).exists()) {
-					LOGGER.info("Create {}", output);
-					
 					execute("cp "+input+" "+output);
 				}
 			}
@@ -310,14 +302,16 @@ class MIFProjectExecutor {
 		String filename = image.getFile().getName();
 		String input = workingDir+"orig/"+filename;
 		
+		int w = project.getProfileWidth();  // e.g. 1920
+		int h = project.getProfileHeight(); // e.g. 1080
+
 		switch (image.getStyle()) {
-		case CROP:
-			// TODO Image Crop convert
-		case HARD:
-			// TODO Image Hard convert
 		case FILL:
-			int w = project.getProfileWidth();  // e.g. 1920
-			int h = project.getProfileHeight(); // e.g. 1080
+			// TODO Image Fill convert
+		case HARD:
+			execute("convert "+input+" -geometry "+w+"x"+h+"! -quality 100 "+output);
+			break;
+		case CROP:
 			/*
 			 * Cf. 
 			 * https://stackoverflow.com/questions/21262466/imagemagick-how-to-minimally-crop-an-image-to-a-certain-aspect-ratio
@@ -332,6 +326,7 @@ class MIFProjectExecutor {
 	}
 	
 	public void execute(String command) throws IOException {
+		LOGGER.info("Execute: {}", command);
 		execute(command, true);
 	}
 	
@@ -378,6 +373,8 @@ class MIFProjectExecutor {
 	}
 	
 	private void execute(String command, boolean logOutput) throws IOException {
+		LOGGER.info("Execute: {}", command);
+		
 		Process process = createProcess(command);
 		
 		if (logOutput) {
