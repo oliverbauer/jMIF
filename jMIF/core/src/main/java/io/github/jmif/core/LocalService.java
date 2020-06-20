@@ -393,7 +393,12 @@ public class LocalService {
 		var aspectHeight = origHeight / 16;
 		var estimatedWith = (int) (aspectHeight * 1.78);
 
-		if (!Files.exists(image.getImagePreviewPath())) {
+		if (image.getImagePreviewPath() == null) {
+			logger.error("Something went wrong with Threads....");
+			return image;
+		}
+		
+		if (image.getImagePreviewPath() == null || !Files.exists(image.getImagePreviewPath())) {
 			// Create preview: convert -thumbnail 200 abc.png thumb.abc.png
 			logger.info("Init: Create Preview-Image {}", image.getImagePreviewPath());
 			var command = "convert -geometry " + image.getPreviewWidth() + "x " + original + " " + image.getImagePreviewPath();

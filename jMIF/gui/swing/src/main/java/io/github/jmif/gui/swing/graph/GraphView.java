@@ -29,7 +29,7 @@ import io.github.jmif.gui.swing.entities.MIFFileWrapper;
 import io.github.jmif.gui.swing.entities.MIFTextFileWrapper;
 import io.github.jmif.gui.swing.selection.SelectionView;
 
-public class GraphView {
+public class GraphView implements AddRemoveListener {
 	private static final Logger logger = LoggerFactory.getLogger(GraphView.class);
 	
 	private JFrame frame;
@@ -42,206 +42,17 @@ public class GraphView {
 		this.frame = frame;
 		this.graphWrapper = graphWrapper;
 		this.selectionView = mifPanel;
+		
+		this.graphWrapper.setAddRemoveActionListener(this);
 	}
 	
 	public void init() {
-		var zoom = new JLabel("Zoom: ");
-		var plus = new JLabel("+");
-		var minus = new JLabel("-");
-		var horizontalZoomBox = Box.createHorizontalBox();
-		horizontalZoomBox.add(Box.createHorizontalGlue());
-		horizontalZoomBox.add(Box.createRigidArea(new Dimension(10, 0)));
-		horizontalZoomBox.add(zoom);
-		horizontalZoomBox.add(plus);
-		horizontalZoomBox.add(minus);
-		horizontalZoomBox.add(Box.createRigidArea(new Dimension(10, 0)));
-		
 		graphPanel = Box.createVerticalBox();
-		graphPanel.setBackground(Configuration.bgColor);
-		graphPanel.add(horizontalZoomBox);
-		var addRemoveForTracksBox = Box.createHorizontalBox();
-		var verticalAddRemove = Box.createVerticalBox();
-		verticalAddRemove.add(Box.createVerticalStrut(20));
-		
-		verticalAddRemove.add(createAddFileLabel(frame));
-		verticalAddRemove.add(createRemoveFileLabel());
-		verticalAddRemove.add(Box.createVerticalStrut(20));
-		
-		verticalAddRemove.add(createAddText());
-		verticalAddRemove.add(createRemoveText());
-		verticalAddRemove.add(Box.createVerticalStrut(20));
-		
-		verticalAddRemove.add(createAddAudioLabel(frame));
-		verticalAddRemove.add(createRemoveAudioLabel());
-		verticalAddRemove.add(Box.createVerticalStrut(20));
-		
-		verticalAddRemove.setMaximumSize(new Dimension(20, 200));
-		
-		addRemoveForTracksBox.add(Box.createHorizontalStrut(5));
-		addRemoveForTracksBox.add(verticalAddRemove);
-		addRemoveForTracksBox.add(Box.createHorizontalStrut(5));
-		
-		addRemoveForTracksBox.add(graphWrapper.getGraphComponent());
-		addRemoveForTracksBox.add(Box.createHorizontalStrut(10));
-		graphPanel.add(addRemoveForTracksBox);
+		graphPanel.add(graphWrapper.getGraphComponent());
 	}
 	
-	private Component createRemoveText() {
-		var removeText = new JLabel("-");
-		removeText.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if (selectionView.getCurrentAudioFile() != null) {
-					var currentMeltFile = selectionView.getCurrentTextFile();
-					var cell = selectionView.getCell();
-					
-					remove(cell, currentMeltFile);
-				}
-			}
-		});
-
-		return removeText;
-	}
-
-	private Component createAddText() {
-		var appenText = new JLabel("+");
-		appenText.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				try {
-					graphWrapper.createMIFTextfile();
-				} catch (MIFException e1) {
-					e1.printStackTrace();
-				}
-				graphWrapper.redrawGraph();
-			}
-		});
-		
-		return appenText;
-	}
-
 	public Box getGraphPanel() {
 		return graphPanel;
-	}
-	
-	private JLabel createAddAudioLabel(JFrame frame) {
-		var appendAudio = new JLabel("+");
-		appendAudio.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				try {
-					var c = new JFileChooser();
-					
-					var returnVal = c.showOpenDialog(frame);
-					if (returnVal == JFileChooser.APPROVE_OPTION) {
-						graphWrapper.createMIFAudioFile(c.getSelectedFile());
-						graphWrapper.redrawGraph();
-					}
-				} catch (HeadlessException | MIFException e1) {
-					e1.printStackTrace();
-				}
-			}
-		});
-		return appendAudio;
-	}
-	
-	private JLabel createAddFileLabel(JFrame frame) {
-		var appendFile = new JLabel("+");
-		appendFile.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				var c = new JFileChooser();
-				c.setMultiSelectionEnabled(true);
-				c.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-				
-				var returnVal = c.showOpenDialog(frame);
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
-
-					var filesToAdd = c.getSelectedFiles();
-					
-					List<File> selectedFiles = new ArrayList<>();
-					for (File fileToAdd : filesToAdd) {
-						if (fileToAdd.isDirectory()) {
-							for (File f : fileToAdd.listFiles()) {
-								// No sub dires.
-								if (!f.isDirectory()) {
-									selectedFiles.add(f);
-								}
-							}
-						} else {
-							selectedFiles.add(fileToAdd);
-						}
-					}
-					List<MIFFileWrapper<?>> added = new ArrayList<>();
-					for (File fileToAdd : selectedFiles) {
-						MIFFileWrapper<?> f;
-						try {
-							f = graphWrapper.createMIFFile(fileToAdd);
-							added.add(f);
-						} catch (MIFException | IOException | InterruptedException e1) {
-							logger.error("Unable to create file", e1);
-						}
-					}
-					graphWrapper.redrawGraph();
-					
-					// Exec background threads...
-					var executor = Executors.newWorkStealingPool();
-					for (MIFFileWrapper<?> f : added) {
-						executor.submit(() -> {
-							try {
-								// TODO übergeben
-								graphWrapper.getService().createPreview(f, graphWrapper.getPr().getWorkingDir());
-							} catch (Exception ex) {
-								logger.error("", e);
-							}
-						});
-					}
-				}
-			}
-		});
-		return appendFile;
-	}
-	
-	private JLabel createRemoveFileLabel() {
-		var removeFile = new JLabel("-");
-		removeFile.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if (selectionView.getCurrentMeltFile() != null) {
-					MIFFileWrapper<?> currentMeltFile = selectionView.getCurrentMeltFile();
-					var cell = selectionView.getCell();
-					remove(cell, currentMeltFile);
-				}
-			}
-		});
-
-		return removeFile;
-	}
-
-	private JLabel createRemoveAudioLabel() {
-		var removeFile = new JLabel("-");
-		removeFile.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if (selectionView.getCurrentAudioFile() != null) {
-					var currentMeltFile = selectionView.getCurrentAudioFile();
-					var cell = selectionView.getCell();
-					
-					remove(cell, currentMeltFile);
-				}
-			}
-		});
-
-		return removeFile;
-	}
-	
-	public void remove(mxCell cell, MIFTextFileWrapper meltfile) {
-		graphWrapper.remove(meltfile, cell);
-		graphWrapper.remove(cell);
-
-		selectionView.clearSelection();
-		// Timeline etc.
-		graphWrapper.redrawGraph();
 	}
 	
 	public void remove(mxCell cell, MIFFileWrapper<?> meltfile) {
@@ -259,6 +70,116 @@ public class GraphView {
 
 		selectionView.clearSelection();
 		// Timeline etc.
+		graphWrapper.redrawGraph();
+	}
+
+	@Override
+	public void onRemoveFile() {
+		if (selectionView.getCurrentMeltFile() != null) {
+			MIFFileWrapper<?> currentMeltFile = selectionView.getCurrentMeltFile();
+			var cell = selectionView.getCell();
+			remove(cell, currentMeltFile);
+		}
+	}
+
+	@Override
+	public void onRemoveAudio() {
+		if (selectionView.getCurrentAudioFile() != null) {
+			var currentMeltFile = selectionView.getCurrentAudioFile();
+			var cell = selectionView.getCell();
+			
+			remove(cell, currentMeltFile);
+		}
+	}
+
+	@Override
+	public void onRemoveText() {
+		if (selectionView.getCurrentAudioFile() != null) {
+			var currentMeltFile = selectionView.getCurrentTextFile();
+			var cell = selectionView.getCell();
+			
+			graphWrapper.remove(currentMeltFile, cell);
+			graphWrapper.remove(cell);
+
+			selectionView.clearSelection();
+			// Timeline etc.
+			graphWrapper.redrawGraph();
+		}
+	}
+
+	@Override
+	public void onAddFile() {
+		var c = new JFileChooser();
+		c.setMultiSelectionEnabled(true);
+		c.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+		
+		var returnVal = c.showOpenDialog(frame);
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+
+			var filesToAdd = c.getSelectedFiles();
+			
+			List<File> selectedFiles = new ArrayList<>();
+			for (File fileToAdd : filesToAdd) {
+				if (fileToAdd.isDirectory()) {
+					for (File f : fileToAdd.listFiles()) {
+						// No sub dires.
+						if (!f.isDirectory()) {
+							selectedFiles.add(f);
+						}
+					}
+				} else {
+					selectedFiles.add(fileToAdd);
+				}
+			}
+			List<MIFFileWrapper<?>> added = new ArrayList<>();
+			for (File fileToAdd : selectedFiles) {
+				MIFFileWrapper<?> f;
+				try {
+					f = graphWrapper.createMIFFile(fileToAdd);
+					added.add(f);
+				} catch (MIFException | IOException | InterruptedException e1) {
+					logger.error("Unable to create file", e1);
+				}
+			}
+			graphWrapper.redrawGraph();
+			
+			// Exec background threads...
+			var executor = Executors.newWorkStealingPool();
+			for (MIFFileWrapper<?> f : added) {
+				executor.submit(() -> {
+					try {
+						// TODO übergeben
+						graphWrapper.getService().createPreview(f, graphWrapper.getPr().getWorkingDir());
+					} catch (Exception ex) {
+						logger.error("", ex);
+					}
+				});
+			}
+		}
+	}
+
+	@Override
+	public void onAddAudio() {
+		try {
+			var c = new JFileChooser();
+			
+			var returnVal = c.showOpenDialog(frame);
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				graphWrapper.createMIFAudioFile(c.getSelectedFile());
+				graphWrapper.redrawGraph();
+			}
+		} catch (HeadlessException | MIFException e1) {
+			e1.printStackTrace();
+		}
+	}
+
+	@Override
+	public void onAddText() {
+		try {
+			graphWrapper.createMIFTextfile();
+		} catch (MIFException e1) {
+			e1.printStackTrace();
+		}
 		graphWrapper.redrawGraph();
 	}
 }

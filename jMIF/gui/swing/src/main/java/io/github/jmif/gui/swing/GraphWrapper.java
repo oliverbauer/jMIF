@@ -45,6 +45,7 @@ import io.github.jmif.gui.swing.entities.MIFImageWrapper;
 import io.github.jmif.gui.swing.entities.MIFProjectWrapper;
 import io.github.jmif.gui.swing.entities.MIFTextFileWrapper;
 import io.github.jmif.gui.swing.entities.MIFVideoWrapper;
+import io.github.jmif.gui.swing.graph.AddRemoveListener;
 import io.github.jmif.gui.swing.listener.ProjectListener;
 import io.github.jmif.gui.swing.listener.ProjectListener.type;
 import io.github.jmif.gui.swing.listener.SingleFrameCreatedListener;
@@ -83,6 +84,8 @@ public class GraphWrapper {
 	private mxCell addText;
 	private mxCell removeText;
 	
+	private AddRemoveListener addRemoveListener;
+	
 	public GraphWrapper() {
 		pr = new MIFProjectWrapper(new MIFProject());
 		this.nodeToMIFFile = new LinkedHashMap<>();
@@ -97,6 +100,10 @@ public class GraphWrapper {
 		initGraph();
 	}
 
+	public void setAddRemoveActionListener(AddRemoveListener l) {
+		this.addRemoveListener = l;
+	}
+	
 	public MIFProjectWrapper getPr() {
 		return this.pr;
 	}
@@ -600,11 +607,23 @@ public class GraphWrapper {
 		removeText = (mxCell)graph.insertVertex(parent, null, "-", 10, YOFFSET + 7*height, 15, height);
 		
 		graph.getSelectionModel().addListener(mxEvent.CHANGE, (sender, evt) -> {
-			var sm = (mxGraphSelectionModel) sender;
-			var cell = (mxCell) sm.getCell();
-			
-			if (cell == addFile) {
+			if (addRemoveListener != null) {
+				var sm = (mxGraphSelectionModel) sender;
+				var cell = (mxCell) sm.getCell();
 				
+				if (cell == addFile) {
+					addRemoveListener.onAddFile();
+				} else if (cell == addAudio) {
+					addRemoveListener.onAddAudio();
+				} else if (cell == addText) {
+					addRemoveListener.onAddText();
+				} else if (cell == removeFile) {
+					addRemoveListener.onRemoveFile();
+				} else if (cell == removeAudio) {
+					addRemoveListener.onRemoveAudio();
+				} else if (cell == removeText) {
+					addRemoveListener.onRemoveText();
+				}
 			}
 		});
 		
