@@ -46,7 +46,6 @@ import io.github.jmif.util.TimeUtil;
  * TODO Config-Button (store config in HOME-Dir) 
  * TODO Menu: About (Used Software etc.) 
  * TODO Menu: How to Install/Use 
- * TODO Switch to Gradle 
  * TODO Config: Allow in-memory-preview (byte-arrays of pictures - needs more RAM) or hd-preview (copy files - needs more HD/Time for IO) 
  * 
  * TODO Audio: "audiowaveform -i 001.mp3 -o test.png -w 1000 -h 200 -s 0 -e ${seconds} --no-axis-labels" (or (better?) use Sox).. needs optional check in SplashScreen 
@@ -125,11 +124,8 @@ public class JMIF {
 				graphWrapper.getService().updateProfile(graphWrapper.getPr());
 				graphWrapper.redrawGraph();
 			} catch (MIFException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOGGER.error("Unable to change profile", e);
 			}
-			// TODO Profile-Change: Needs full refresh of all nodes, timeline etc. pp
-			// TODO Profile-Change: Change overlay
 		});
 		profilesCombobox.setMaximumSize(new Dimension(300,30));
 

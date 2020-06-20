@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 
 import com.mxgraph.model.mxCell;
 
-import io.github.jmif.config.Configuration;
 import io.github.jmif.core.MIFException;
 import io.github.jmif.entities.MIFImage.ImageResizeStyle;
 import io.github.jmif.gui.swing.GraphWrapper;
@@ -123,9 +122,6 @@ public class ImageView {
 		dropDownBoxesBox.add(manualExtraction);
 
 		dropDownBoxesBox.add(Box.createHorizontalGlue()); // Alignment of content starts left
-		if (Configuration.useBorders) {
-			dropDownBoxesBox.setBorder(BorderFactory.createLineBorder(Color.red));
-		}
 
 		return dropDownBoxesBox;
 	}

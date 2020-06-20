@@ -1,11 +1,9 @@
 package io.github.jmif.gui.swing.selection.text;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.io.File;
 import java.util.Arrays;
 
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -145,14 +143,6 @@ public class TextDetailsView {
 		panel.add(box);
 		panel.setBackground(Configuration.bgColor);
 		panel.add(Box.createHorizontalGlue());
-		if (Configuration.useBorders) {
-			panel.setBorder(BorderFactory.createLineBorder(Color.RED, 2, true));
-		}
-//		
-//		Dimension dim = new Dimension(5200, 200);
-//		panel.setPreferredSize(dim);
-//		panel.setMinimumSize(dim);
-//		panel.setMaximumSize(dim);
 	}
 
 	private void wrap(Box box, JComponent c1, JComponent c2) {

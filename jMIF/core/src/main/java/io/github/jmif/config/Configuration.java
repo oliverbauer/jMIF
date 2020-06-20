@@ -19,6 +19,5 @@ public class Configuration {
 	public static Color bgColor = new Color(1.0f, 1.0f, 1.0f, 1.0f); // 1.0f
 //	public static Color bgColor = new Color(0f, 0f, 0f, 1.0f); // 1.0f
 	
-	public static boolean useBorders = false;
 	public static Color menubarBackground = new Color(135, 206, 250);
 }

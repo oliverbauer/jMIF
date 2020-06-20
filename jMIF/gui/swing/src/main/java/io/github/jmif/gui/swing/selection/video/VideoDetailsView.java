@@ -1,9 +1,7 @@
 package io.github.jmif.gui.swing.selection.video;
 
-import java.awt.Color;
 import java.awt.Dimension;
 
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -108,9 +106,6 @@ public class VideoDetailsView {
 		panel.add(box);
 		panel.setBackground(Configuration.bgColor);
 		panel.add(Box.createHorizontalGlue());
-		if (Configuration.useBorders) {
-			panel.setBorder(BorderFactory.createLineBorder(Color.RED, 2, true));
-		}
 		
 		Dimension dim = new Dimension(5200, 200);
 		panel.setPreferredSize(dim);

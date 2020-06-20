@@ -1,10 +1,8 @@
 package io.github.jmif.gui.swing.selection;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.util.List;
 
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -16,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import com.mxgraph.model.mxCell;
 
-import io.github.jmif.config.Configuration;
 import io.github.jmif.core.MIFException;
 import io.github.jmif.entities.melt.Melt;
 import io.github.jmif.entities.melt.MeltFilterDetails;
@@ -27,7 +24,6 @@ import io.github.jmif.gui.swing.entities.MIFImageWrapper;
 import io.github.jmif.gui.swing.entities.MIFTextFileWrapper;
 import io.github.jmif.gui.swing.entities.MIFVideoWrapper;
 import io.github.jmif.gui.swing.selection.audio.AudioDetailsView;
-import io.github.jmif.gui.swing.selection.audio.AudioView;
 import io.github.jmif.gui.swing.selection.frame.FrameView;
 import io.github.jmif.gui.swing.selection.image.ImageDetailsView;
 import io.github.jmif.gui.swing.selection.image.ImageView;
@@ -57,7 +53,6 @@ public class SelectionView {
 	private VideoDetailsView videoDetailsView;
 	private FilterView filterViewVideo;
 	
-	private AudioView audioView;
 	private AudioDetailsView audioDetailsView;
 	private FilterView filterViewAudio;
 	
@@ -85,28 +80,13 @@ public class SelectionView {
 		
 		videoView = new VideoView();
 		JPanel videoPanel = videoView.getPanel();
-		if (Configuration.useBorders) {
-			videoPanel.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 2, true));
-		}
-		
-		audioView = new AudioView();
-		Box audioPanel = audioView.getBox();
-		if (Configuration.useBorders) {
-			audioPanel.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 2, true));
-		}
 		
 		singleFrameView = new FrameView();
 		graphWrapper.addSingleFrameCreatedListener(singleFrameView);
 		Box singleFrameBox = singleFrameView.getBox();
-		if (Configuration.useBorders) {
-			singleFrameBox.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 2, true));
-		}
 		
 		textView = new TextView();
 		JPanel textPanel = textView.getPanel();
-		if (Configuration.useBorders) {
-			textPanel.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 2, true));
-		}
 		
 		tabPane.addTab("ImageView", wrap(imageDetailsView.getBox(), imageView.getJPanel(),       filterViewImage.getJPanel()));
 		tabPane.addTab("VideoView", wrap(videoDetailsView.getBox(), videoPanel,                  filterViewVideo.getJPanel()));
@@ -123,10 +103,6 @@ public class SelectionView {
 		tabPane.setEnabledAt(5, true);  // ImageLibrary
 		
 		panel.add(tabPane);
-		
-		if (Configuration.useBorders) {
-			panel.setBorder(BorderFactory.createLineBorder(Color.GREEN, 2, true));
-		}
 	}
     
     private JPanel wrap(JComponent c1, JComponent c2, JComponent c3) {
@@ -182,7 +158,6 @@ public class SelectionView {
 		tabPane.setEnabledAt(5, true);  // ImageLibrary
 		
 		audioDetailsView.setDetails(audioFile);
-		audioView.setMIFAudioFile(audioFile, project);
 		filterViewAudio.setDetails(audioFile);
 		
 		panel.validate();

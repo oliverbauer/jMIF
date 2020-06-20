@@ -1,9 +1,7 @@
 package io.github.jmif.gui.swing.selection.audio;
 
-import java.awt.Color;
 import java.awt.Dimension;
 
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -130,9 +128,6 @@ public class AudioDetailsView {
 		panel.add(box);
 		panel.setBackground(Configuration.bgColor);
 		panel.add(Box.createHorizontalGlue());
-		if (Configuration.useBorders) {
-			panel.setBorder(BorderFactory.createLineBorder(Color.RED, 2, true));
-		}
 	}
 	
 	private void wrap(Box box, JComponent c1, JComponent c2) {

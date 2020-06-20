@@ -15,7 +15,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.swing.BorderFactory;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingWorker;
 import javax.xml.bind.JAXBContext;
@@ -546,10 +545,6 @@ public class GraphWrapper {
 				};
 			}
 		};
-		
-		if (Configuration.useBorders) {
-			graphComponent.setBorder(BorderFactory.createLineBorder(Color.RED));
-		}
 		
 		graph.addListener(mxEvent.CELLS_MOVED, (sender, evt) -> {
 			Object[] c = (Object[])evt.getProperties().get("cells");

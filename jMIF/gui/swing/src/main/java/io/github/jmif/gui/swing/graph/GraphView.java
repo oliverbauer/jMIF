@@ -1,6 +1,5 @@
 package io.github.jmif.gui.swing.graph;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
@@ -13,7 +12,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -79,9 +77,6 @@ public class GraphView {
 		verticalAddRemove.add(Box.createVerticalStrut(20));
 		
 		verticalAddRemove.setMaximumSize(new Dimension(20, 200));
-		if (Configuration.useBorders) {
-			verticalAddRemove.setBorder(BorderFactory.createLineBorder(Color.BLUE));
-		}
 		
 		addRemoveForTracksBox.add(Box.createHorizontalStrut(5));
 		addRemoveForTracksBox.add(verticalAddRemove);
