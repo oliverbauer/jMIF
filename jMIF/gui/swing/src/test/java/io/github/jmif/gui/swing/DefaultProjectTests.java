@@ -22,7 +22,7 @@ public class DefaultProjectTests {
 	}
 	
 	@Test
-	public void checkProfile1080o25() throws Exception {
+	public void convertCheckProfile1080o25() throws Exception {
 		copy(tempDir, "1.JPG");
 		var project = new GraphWrapper();
 		var pr = project.getPr();
@@ -52,7 +52,7 @@ public class DefaultProjectTests {
 	}
 	
 	@Test
-	public void checkProfile1080p50() throws Exception {
+	public void convertCheckProfile1080p50() throws Exception {
 		copy(tempDir, "1.JPG");
 		var project = new GraphWrapper();
 		var pr = project.getPr();
@@ -82,7 +82,7 @@ public class DefaultProjectTests {
 	}
 	
 	@Test
-	public void checkProfileSVCDPal() throws Exception {
+	public void convertCheckProfileSVCDPal() throws Exception {
 		// melt -query "profile"=svcd_pal
 		
 		copy(tempDir, "1.JPG");
@@ -114,7 +114,7 @@ public class DefaultProjectTests {
 	}
 	
 	@Test
-	public void withoutOverlay() throws Exception {
+	public void convertWithoutOverlay() throws Exception {
 		// copy predefined example files (from src/main/resources/defaultproject) to some temp directory
 		copy(tempDir, "1.JPG");
 		copy(tempDir, "2.MP4");
@@ -151,7 +151,7 @@ public class DefaultProjectTests {
 	}
 	
 	@Test
-	public void withOverlay() throws Exception {
+	public void convertWithOverlay() throws Exception {
 		// copy predefined example files (from src/main/resources/defaultproject) to some temp directory
 		copy(tempDir, "1.JPG");
 		copy(tempDir, "2.MP4");
@@ -188,7 +188,7 @@ public class DefaultProjectTests {
 	}
 
 	@Test
-	public void withLongAudio() throws Exception {
+	public void convertWithLongAudio() throws Exception {
 		// copy predefined example files (from src/main/resources/defaultproject) to some temp directory
 		copy(tempDir, "1.JPG");
 		copy(tempDir, "audio.mp3");
@@ -221,7 +221,7 @@ public class DefaultProjectTests {
 	}
 	
 	@Test
-	public void withTwoAudiofiles() throws Exception {
+	public void convertWithTwoAudiofiles() throws Exception {
 		// copy predefined example files (from src/main/resources/defaultproject) to some temp directory
 		copy(tempDir, "1.JPG");
 		copy(tempDir, "audio.mp3");

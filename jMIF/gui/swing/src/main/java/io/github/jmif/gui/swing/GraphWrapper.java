@@ -37,6 +37,7 @@ import io.github.jmif.config.Configuration;
 import io.github.jmif.core.MIFException;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFProject;
+import io.github.jmif.entities.MIFTextFile;
 import io.github.jmif.entities.MIFVideo;
 import io.github.jmif.gui.swing.entities.MIFAudioFileWrapper;
 import io.github.jmif.gui.swing.entities.MIFFileWrapper;
@@ -118,6 +119,7 @@ public class GraphWrapper {
 			var unmarshaller = context.createUnmarshaller();
 
 			MIFProjectWrapper project = new MIFProjectWrapper((MIFProject) unmarshaller.unmarshal(file));
+			// FIXME jaxb: textfiles not loaded, but they exists in projectfile.xml!
 			getCells().clear();
 			getTextCells().clear();
 			pr.clearMIFFiles();
@@ -128,6 +130,20 @@ public class GraphWrapper {
 			
 			for (MIFFileWrapper<?> f : project.getMIFFiles()) {
 				createMIFFile(f.toMIFFile().getFile()).getFilters().addAll(f.getFilters());
+			}
+			
+			// TODO jaxb: textfiles not loaded, but they exists in projectfile.xml!
+			for (MIFTextFile t : project.getTexttrack().getEntries()) {
+				MIFTextFileWrapper textfile = createMIFTextfile();
+				textfile.setBgcolour(t.getBgcolour());
+				textfile.setFgcolour(t.getFgcolour());
+				textfile.setHalign(t.getHalign());
+				textfile.setLength(t.getLength());
+				textfile.setOlcolour(t.getOlcolour());
+				textfile.setSize(t.getSize());
+				textfile.setText(t.getText());
+				textfile.setValign(t.getValign());
+				textfile.setWeight(t.getWeight());
 			}
 			
 			redrawGraph();
