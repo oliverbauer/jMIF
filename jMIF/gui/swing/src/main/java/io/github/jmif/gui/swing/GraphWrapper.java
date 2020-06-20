@@ -31,6 +31,7 @@ import com.mxgraph.swing.util.mxSwingConstants;
 import com.mxgraph.util.mxEvent;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxGraph;
+import com.mxgraph.view.mxGraphSelectionModel;
 
 import io.github.jmif.config.Configuration;
 import io.github.jmif.core.MIFException;
@@ -63,7 +64,7 @@ public class GraphWrapper {
 	private List<ProjectListener> listenerProjectChanged;
 	private List<SingleFrameCreatedListener> listenerSingleFrameCreated;
 
-	private static final int XOFFSET = 10;
+	private static final int XOFFSET = 40;
 	private static final int YOFFSET = 10;
 	private int currentLength = 0;
 
@@ -74,6 +75,13 @@ public class GraphWrapper {
 
 	private mxCell singleframeSlider;
 	private MIFProjectWrapper pr;
+	
+	private mxCell addFile;
+	private mxCell removeFile;
+	private mxCell addAudio;
+	private mxCell removeAudio;
+	private mxCell addText;
+	private mxCell removeText;
 	
 	public GraphWrapper() {
 		pr = new MIFProjectWrapper(new MIFProject());
@@ -457,7 +465,11 @@ public class GraphWrapper {
 			public boolean isCellSelectable(Object cell) {
 				var c = (mxCell) cell;
 				if (c != null && c.isVertex()) {
-					return get(c) != null || c == singleframeSlider || getAudio(c) != null || getText(c) != null;
+					boolean b1 = get(c) != null || c == singleframeSlider || getAudio(c) != null || getText(c) != null;
+					if (b1) {
+						return b1;
+					}
+					return (c == addAudio) || (c == removeAudio) || (c == addFile) || (c == removeFile) || (c == addText) || (c == removeText);
 				}
 				return false;
 			}
@@ -514,13 +526,28 @@ public class GraphWrapper {
 							
 							// 2. tracks
 							
-							var xOffsetTrack = 5;
 							var yOffsetTrack = 5;
 							var height = Configuration.timelineentryHeight;
+							
+							Color c1 = new Color(239, 252, 212);
+							Color c2 = new Color(198, 238, 245);
+							Color c3 = new Color(191, 242, 202);
+							
+							g.setColor(c1);
+							g.fillRect(5, yOffsetTrack,            25, YOFFSET + 2*height); // Track 0 Add/Remove Image/Video
+							g.setColor(c2);
+							g.fillRect(5, yOffsetTrack + 3*height, 25, YOFFSET + 2*height); // Track 1 Add/Remove Audio
+							g.setColor(c3);
+							g.fillRect(5, yOffsetTrack + 6*height, 25, YOFFSET + 2*height); // Track 2 Add/Remove Text
+							
+							var xOffsetTrack = 35;
+							g.setColor(c1);
+							g.fillRect(xOffsetTrack, yOffsetTrack,            w + xOffsetTrack, YOFFSET + 2*height); // Track 0 Image/Video
+							g.setColor(c2);
+							g.fillRect(xOffsetTrack, yOffsetTrack + 3*height, w + xOffsetTrack, YOFFSET + 2*height); // Track 1 Audio
+							g.setColor(c3);
+							g.fillRect(xOffsetTrack, yOffsetTrack + 6*height, w + xOffsetTrack, YOFFSET + 2*height); // Track 2 Text
 							g.setColor(new Color(237,	237, 	237  ));
-							g.fillRect(xOffsetTrack, yOffsetTrack,         w + xOffsetTrack, YOFFSET + 2*height); // Track 0
-							g.fillRect(xOffsetTrack, YOFFSET*2 + 2*height, w + xOffsetTrack, YOFFSET + 2*height); // Track 1
-							g.fillRect(xOffsetTrack, YOFFSET*4 + 4*height, w + xOffsetTrack, YOFFSET + 2*height); // Track 1
 							
 							
 							// 3. 
@@ -560,6 +587,26 @@ public class GraphWrapper {
 				};
 			}
 		};
+		
+		var height = Configuration.timelineentryHeight;
+		// Nodes are used for taking actions
+		addFile = (mxCell)graph.insertVertex(parent, null, "+", 10, YOFFSET + 0*height, 15, height);
+		removeFile = (mxCell)graph.insertVertex(parent, null, "-", 10, YOFFSET + 1*height, 15, height);
+
+		addAudio = (mxCell)graph.insertVertex(parent, null, "+", 10, YOFFSET + 3*height, 15, height);
+		removeAudio = (mxCell)graph.insertVertex(parent, null, "-", 10, YOFFSET + 4*height, 15, height);
+
+		addText = (mxCell)graph.insertVertex(parent, null, "+", 10, YOFFSET + 6*height, 15, height);
+		removeText = (mxCell)graph.insertVertex(parent, null, "-", 10, YOFFSET + 7*height, 15, height);
+		
+		graph.getSelectionModel().addListener(mxEvent.CHANGE, (sender, evt) -> {
+			var sm = (mxGraphSelectionModel) sender;
+			var cell = (mxCell) sm.getCell();
+			
+			if (cell == addFile) {
+				
+			}
+		});
 		
 		graph.addListener(mxEvent.CELLS_MOVED, (sender, evt) -> {
 			var c = (Object[])evt.getProperties().get("cells");
