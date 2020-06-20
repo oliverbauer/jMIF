@@ -342,6 +342,8 @@ public class LocalService {
 				}
 				image.setWidth(Integer.valueOf(output.substring(0, output.indexOf('x'))));
 				image.setHeight(Integer.valueOf(output.substring(output.indexOf('x') + 1)));
+				
+				logger.debug("Width/Height = {}/{}", image.getWidth(), image.getHeight());
 			} catch (IOException e) {
 				logger.error("Unable to get image dimension", e);
 			}

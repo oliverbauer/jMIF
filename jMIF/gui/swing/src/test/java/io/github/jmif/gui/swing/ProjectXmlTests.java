@@ -1,11 +1,13 @@
 package io.github.jmif.gui.swing;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -15,14 +17,19 @@ public class ProjectXmlTests {
 	
 	private final CoreGateway service = new CoreGateway();
 	
+	private String tempDir;
+	
+	@Before
+	public void before() throws IOException {
+		tempDir = Files.createTempDirectory("jMIF").toFile().getAbsolutePath()+"/";
+	}
+	
 	@Test
 	public void simpleImage() throws Exception {
-		var tempDir = Files.createTempDirectory("jMIF").toFile();
-
 		var project = new GraphWrapper();
 		project.getPr().setProfile("atsc_1080p_25");
 		service.updateProfile(project.getPr());
-		project.getPr().setWorkingDir(tempDir.getAbsolutePath());
+		project.getPr().setWorkingDir(tempDir);
 		service.createWorkingDirs(project.getPr());
 		project.getPr().setFileOfProject(project.getPr().getWorkingDir() + "defaultproject.xml");
 		project.getPr().setOutputVideo(project.getPr().getWorkingDir()+"output.avi");
@@ -35,12 +42,10 @@ public class ProjectXmlTests {
 	
 	@Test
 	public void simpleImageWithFilter() throws Exception {
-		var tempDir = Files.createTempDirectory("jMIF").toFile();
-
 		var project = new GraphWrapper();
 		project.getPr().setProfile("atsc_1080p_25");
 		service.updateProfile(project.getPr());
-		project.getPr().setWorkingDir(tempDir.getAbsolutePath());
+		project.getPr().setWorkingDir(tempDir);
 		service.createWorkingDirs(project.getPr());
 		project.getPr().setFileOfProject(project.getPr().getWorkingDir() + "defaultproject.xml");
 		project.getPr().setOutputVideo(project.getPr().getWorkingDir()+"output.avi");
@@ -68,14 +73,14 @@ public class ProjectXmlTests {
 	}
 	
 	@Test
-	@Ignore // TODO Problem with loading textfile from stored defaultproject.xml, see GraphWrapper.load
+//	@Ignore 
+	// TODO Problem with loading textfile from stored defaultproject.xml, see GraphWrapper.load
+	// TODO Problem with storing imageheight/imagewidth, but they have been set, see logfile
 	public void textLoaded() throws Exception {
-		var tempDir = Files.createTempDirectory("jMIF").toFile();
-
 		var project = new GraphWrapper();
 		project.getPr().setProfile("atsc_1080p_25");
 		service.updateProfile(project.getPr());
-		project.getPr().setWorkingDir(tempDir.getAbsolutePath());
+		project.getPr().setWorkingDir(tempDir);
 		service.createWorkingDirs(project.getPr());
 		project.getPr().setFileOfProject(project.getPr().getWorkingDir() + "defaultproject.xml");
 		project.getPr().setOutputVideo(project.getPr().getWorkingDir()+"output.avi");
@@ -97,7 +102,7 @@ public class ProjectXmlTests {
 		Assert.assertTrue(loadedProject.getPr().getTexttrack().getEntries().size() == 1);
 		Assert.assertTrue(loadedProject.getPr().getTexttrack().getEntries().get(0).getText().equals("Textcase"));
 		Assert.assertTrue(loadedProject.getPr().getMIFFiles().size() == 1);
-		Assert.assertTrue(loadedProject.getPr().getMIFFiles().get(0).getDisplayName().equals("1.JPG"));
-		
+		Assert.assertTrue(loadedProject.getPr().getMIFFiles().get(0).getWidth() == 5184);
+		Assert.assertTrue(loadedProject.getPr().getMIFFiles().get(0).getHeight() == 3888);
 	}
 }
