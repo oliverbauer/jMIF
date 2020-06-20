@@ -68,7 +68,7 @@ public class Splashscreen {
     }
     
     protected void initWorker() {
-        worker = new SwingWorker<Void, Integer>() {
+        worker = new SwingWorker<>() {
             @Override
             protected Void doInBackground() throws Exception {
                 checkLinux();
@@ -155,7 +155,7 @@ public class Splashscreen {
     }
     
     private void checkJava() {
-        String javaVersion = SystemUtils.JAVA_VERSION;
+        var javaVersion = SystemUtils.JAVA_VERSION;
         fldJava.setText(javaVersion);
         fldJava.setBackground(myGreen);
         
@@ -179,11 +179,11 @@ public class Splashscreen {
         	hasMissingRequirements = true;
         } else {
         	// Newest version 7.0.10-14 (checked 2020.05.24)
-        	boolean newestVersion = true;
+        	var newestVersion = true;
         	
-        	String prefix = imageMagickVersion.contains("-") ? imageMagickVersion.substring(0, imageMagickVersion.indexOf('-')) : imageMagickVersion;
-        	String[] version = prefix.split("\\.");
-        	String v = version[0]+version[1]+version[2];
+        	var prefix = imageMagickVersion.contains("-") ? imageMagickVersion.substring(0, imageMagickVersion.indexOf('-')) : imageMagickVersion;
+        	var version = prefix.split("\\.");
+        	var v = version[0]+version[1]+version[2];
         	if (Integer.parseInt(v) < 7010) {
         		newestVersion = false;
         	}
@@ -207,11 +207,11 @@ public class Splashscreen {
     	}                
         if (ffmpegVersion != null) {
         	// Newest version 4.2.3  (checked 2020.05.24)
-        	boolean newestVersion = true;
+        	var newestVersion = true;
         	
-        	String prefix = ffmpegVersion.contains("-") ? ffmpegVersion.substring(0, ffmpegVersion.indexOf('-')) : ffmpegVersion;
-        	String[] version = prefix.split("\\.");
-        	String v = version[0]+version[1]+version[2];
+        	var prefix = ffmpegVersion.contains("-") ? ffmpegVersion.substring(0, ffmpegVersion.indexOf('-')) : ffmpegVersion;
+        	var version = prefix.split("\\.");
+        	var v = version[0]+version[1]+version[2];
         	if (Integer.parseInt(v) < 423) {
         		newestVersion = false;
         	}
@@ -239,9 +239,9 @@ public class Splashscreen {
     	}
         if (mltVersion != null) {
         	// Newest version 6.20.0  (checked 2020.05.24)
-        	boolean newestVersion = true;
-        	String[] version = mltVersion.split("\\.");
-        	String v = version[0]+version[1]+version[2];
+        	var newestVersion = true;
+        	var version = mltVersion.split("\\.");
+        	var v = version[0]+version[1]+version[2];
         	if (Integer.parseInt(v) < 6200) {
         		newestVersion = false;
         	}
@@ -263,11 +263,11 @@ public class Splashscreen {
     private List<String> getProcessOutput(String command) throws IOException {
     	List<String> output = new ArrayList<>();
 		
-    	Process process = new ProcessBuilder("bash", "-c", command)
+    	var process = new ProcessBuilder("bash", "-c", command)
 			.redirectErrorStream(true)
 			.start();
     	
-		try (BufferedReader reader = new BufferedReader(
+		try (var reader = new BufferedReader(
 			    new InputStreamReader(process.getInputStream()))) {
 			String line;
 			while ((line = reader.readLine()) != null) {
@@ -293,7 +293,7 @@ public class Splashscreen {
         dialog.setModal(false);
         dialog.setUndecorated(true);
         
-        Dimension dim = new Dimension(700, 20);
+        var dim = new Dimension(700, 20);
         
         fldlLinux.setPreferredSize(dim);
         fldlLinux.setEditable(false);
@@ -315,12 +315,12 @@ public class Splashscreen {
         fldImageMagick.setEditable(false);
         fldImageMagick.setFont(font);
         
-        JPanel infoPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
+        var infoPanel = new JPanel(new GridBagLayout());
+        var gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
-        JLabel splashLabel = new JLabel("jMIF");
+        var splashLabel = new JLabel("jMIF");
         splashLabel.setFont(new Font("SansSerif", Font.BOLD, 40));
         infoPanel.add(splashLabel, gbc);
                

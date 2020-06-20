@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.swing.Box;
@@ -46,10 +45,10 @@ public class GraphView {
 	}
 	
 	public void init() {
-		JLabel zoom = new JLabel("Zoom: ");
-		JLabel plus = new JLabel("+");
-		JLabel minus = new JLabel("-");
-		Box horizontalZoomBox = Box.createHorizontalBox();
+		var zoom = new JLabel("Zoom: ");
+		var plus = new JLabel("+");
+		var minus = new JLabel("-");
+		var horizontalZoomBox = Box.createHorizontalBox();
 		horizontalZoomBox.add(Box.createHorizontalGlue());
 		horizontalZoomBox.add(Box.createRigidArea(new Dimension(10, 0)));
 		horizontalZoomBox.add(zoom);
@@ -60,8 +59,8 @@ public class GraphView {
 		graphPanel = Box.createVerticalBox();
 		graphPanel.setBackground(Configuration.bgColor);
 		graphPanel.add(horizontalZoomBox);
-		Box addRemoveForTracksBox = Box.createHorizontalBox();
-		Box verticalAddRemove = Box.createVerticalBox();
+		var addRemoveForTracksBox = Box.createHorizontalBox();
+		var verticalAddRemove = Box.createVerticalBox();
 		verticalAddRemove.add(Box.createVerticalStrut(20));
 		
 		verticalAddRemove.add(createAddFileLabel(frame));
@@ -88,13 +87,13 @@ public class GraphView {
 	}
 	
 	private Component createRemoveText() {
-		JLabel removeText = new JLabel("-");
+		var removeText = new JLabel("-");
 		removeText.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (selectionView.getCurrentAudioFile() != null) {
 					var currentMeltFile = selectionView.getCurrentTextFile();
-					mxCell cell = selectionView.getCell();
+					var cell = selectionView.getCell();
 					
 					remove(cell, currentMeltFile);
 				}
@@ -105,7 +104,7 @@ public class GraphView {
 	}
 
 	private Component createAddText() {
-		JLabel appenText = new JLabel("+");
+		var appenText = new JLabel("+");
 		appenText.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -126,14 +125,14 @@ public class GraphView {
 	}
 	
 	private JLabel createAddAudioLabel(JFrame frame) {
-		JLabel appendAudio = new JLabel("+");
+		var appendAudio = new JLabel("+");
 		appendAudio.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				try {
-					JFileChooser c = new JFileChooser();
+					var c = new JFileChooser();
 					
-					int returnVal = c.showOpenDialog(frame);
+					var returnVal = c.showOpenDialog(frame);
 					if (returnVal == JFileChooser.APPROVE_OPTION) {
 						graphWrapper.createMIFAudioFile(c.getSelectedFile());
 						graphWrapper.redrawGraph();
@@ -147,18 +146,18 @@ public class GraphView {
 	}
 	
 	private JLabel createAddFileLabel(JFrame frame) {
-		JLabel appendFile = new JLabel("+");
+		var appendFile = new JLabel("+");
 		appendFile.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				JFileChooser c = new JFileChooser();
+				var c = new JFileChooser();
 				c.setMultiSelectionEnabled(true);
 				c.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 				
-				int returnVal = c.showOpenDialog(frame);
+				var returnVal = c.showOpenDialog(frame);
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
 
-					File[] filesToAdd = c.getSelectedFiles();
+					var filesToAdd = c.getSelectedFiles();
 					
 					List<File> selectedFiles = new ArrayList<>();
 					for (File fileToAdd : filesToAdd) {
@@ -186,7 +185,7 @@ public class GraphView {
 					graphWrapper.redrawGraph();
 					
 					// Exec background threads...
-					ExecutorService executor = Executors.newWorkStealingPool();
+					var executor = Executors.newWorkStealingPool();
 					for (MIFFileWrapper<?> f : added) {
 						executor.submit(() -> {
 							try {
@@ -204,13 +203,13 @@ public class GraphView {
 	}
 	
 	private JLabel createRemoveFileLabel() {
-		JLabel removeFile = new JLabel("-");
+		var removeFile = new JLabel("-");
 		removeFile.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (selectionView.getCurrentMeltFile() != null) {
 					MIFFileWrapper<?> currentMeltFile = selectionView.getCurrentMeltFile();
-					mxCell cell = selectionView.getCell();
+					var cell = selectionView.getCell();
 					remove(cell, currentMeltFile);
 				}
 			}
@@ -220,13 +219,13 @@ public class GraphView {
 	}
 
 	private JLabel createRemoveAudioLabel() {
-		JLabel removeFile = new JLabel("-");
+		var removeFile = new JLabel("-");
 		removeFile.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (selectionView.getCurrentAudioFile() != null) {
 					var currentMeltFile = selectionView.getCurrentAudioFile();
-					mxCell cell = selectionView.getCell();
+					var cell = selectionView.getCell();
 					
 					remove(cell, currentMeltFile);
 				}

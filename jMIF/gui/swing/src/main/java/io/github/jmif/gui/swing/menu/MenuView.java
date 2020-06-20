@@ -2,11 +2,9 @@ package io.github.jmif.gui.swing.menu;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.io.File;
 import java.io.IOException;
 
 import javax.swing.Box;
-import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -31,19 +29,19 @@ public class MenuView {
 		panel.setLayout(new BorderLayout());
 		panel.setBackground(Configuration.bgColor);
 		
-		Box verticalBox = Box.createVerticalBox();
+		var verticalBox = Box.createVerticalBox();
 		verticalBox.add(Box.createVerticalStrut(10));
 		
-		Box horizontalBox = Box.createHorizontalBox();
+		var horizontalBox = Box.createHorizontalBox();
 		horizontalBox.add(Box.createHorizontalStrut(10));
 
-		Box buttonBox = Box.createVerticalBox();
-		JButton newButton = ButtonFactory.newButton("/images/svg/menuButtonQuadNew.svg", "/images/svg/menuButtonQuadNewHover.svg");
+		var buttonBox = Box.createVerticalBox();
+		var newButton = ButtonFactory.newButton("/images/svg/menuButtonQuadNew.svg", "/images/svg/menuButtonQuadNewHover.svg");
 		newButton.addActionListener(e -> {
-			JFileChooser c = new JFileChooser();
-			int returnVal = c.showOpenDialog(null);
+			var c = new JFileChooser();
+			var returnVal = c.showOpenDialog(null);
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
-				File project = c.getSelectedFile();
+				var project = c.getSelectedFile();
 				 if(!project.exists()) {
 					 graphWrapper.getPr().setFileOfProject(project.getAbsolutePath());
 					 graphWrapper.informListeners(type.NEW_PROJECT);
@@ -54,13 +52,13 @@ public class MenuView {
 		horizontalBox.add(buttonBox);
 		horizontalBox.add(Box.createHorizontalStrut(5));
 		
-		Box loadBox = Box.createVerticalBox();
-		JButton loadButton = ButtonFactory.newButton("/images/svg/menuButtonQuadOpen.svg", "/images/svg/menuButtonQuadOpenHover.svg");
+		var loadBox = Box.createVerticalBox();
+		var loadButton = ButtonFactory.newButton("/images/svg/menuButtonQuadOpen.svg", "/images/svg/menuButtonQuadOpenHover.svg");
 		loadButton.addActionListener(e -> {
-			JFileChooser c = new JFileChooser();
-			int returnVal = c.showOpenDialog(null);
+			var c = new JFileChooser();
+			var returnVal = c.showOpenDialog(null);
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
-				File project = c.getSelectedFile();
+				var project = c.getSelectedFile();
 				
 				logger.info("Loading {}", project.getAbsolutePath());
 				
@@ -76,8 +74,8 @@ public class MenuView {
 		horizontalBox.add(loadBox);
 		horizontalBox.add(Box.createHorizontalStrut(5));
 		
-		Box saveBox = Box.createVerticalBox();
-		JButton saveButton = ButtonFactory.newButton("/images/svg/menuButtonQuadSave.svg", "/images/svg/menuButtonQuadSaveHover.svg");
+		var saveBox = Box.createVerticalBox();
+		var saveButton = ButtonFactory.newButton("/images/svg/menuButtonQuadSave.svg", "/images/svg/menuButtonQuadSaveHover.svg");
 		saveButton.addActionListener(e -> { 
 			graphWrapper.save();
 		});
@@ -88,10 +86,10 @@ public class MenuView {
 		horizontalBox.add(new JLabel("jMIF - MLT, IMAGEMAGICK, FFMPEG"));
 		horizontalBox.add(Box.createGlue());
 		
-		Box previewBox = Box.createVerticalBox();
-		JButton previewButton = ButtonFactory.newButton("/images/svg/menuButtonQuadPreview.svg", "/images/svg/menuButtonQuadPreviewHover.svg");
+		var previewBox = Box.createVerticalBox();
+		var previewButton = ButtonFactory.newButton("/images/svg/menuButtonQuadPreview.svg", "/images/svg/menuButtonQuadPreviewHover.svg");
 		previewButton.addActionListener(e -> {
-			SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+			SwingWorker<Void, Void> worker = new SwingWorker<>() {
 				@Override
 			    public Void doInBackground() {
 		        	try {
@@ -109,10 +107,10 @@ public class MenuView {
 		horizontalBox.add(previewBox);
 		horizontalBox.add(Box.createHorizontalStrut(5));
 
-		Box renderBox = Box.createVerticalBox();
-		JButton renderButton = ButtonFactory.newButton("/images/svg/menuButtonQuadRender.svg", "/images/svg/menuButtonQuadRenderHover.svg");
+		var renderBox = Box.createVerticalBox();
+		var renderButton = ButtonFactory.newButton("/images/svg/menuButtonQuadRender.svg", "/images/svg/menuButtonQuadRenderHover.svg");
 		renderButton.addActionListener(e -> {
-			SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+			SwingWorker<Void, Void> worker = new SwingWorker<>() {
 				@Override
 			    public Void doInBackground() {
 		        	try {
@@ -130,8 +128,8 @@ public class MenuView {
 		horizontalBox.add(renderBox);
 		horizontalBox.add(Box.createHorizontalStrut(5));
 		
-		Box exitBox = Box.createVerticalBox();
-		JButton exitButton = ButtonFactory.newButton("/images/svg/menuButtonQuadExit.svg", "/images/svg/menuButtonQuadExitHover.svg"); 
+		var exitBox = Box.createVerticalBox();
+		var exitButton = ButtonFactory.newButton("/images/svg/menuButtonQuadExit.svg", "/images/svg/menuButtonQuadExitHover.svg"); 
 		exitButton.addActionListener(e -> System.exit(-1));
 		exitBox.add(exitButton);
 		horizontalBox.add(exitBox);

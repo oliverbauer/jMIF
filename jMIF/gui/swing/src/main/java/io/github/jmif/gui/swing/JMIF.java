@@ -1,12 +1,11 @@
 package io.github.jmif.gui.swing;
 
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.swing.Box;
@@ -15,7 +14,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
 import javax.swing.SwingWorker.StateValue;
 import javax.swing.WindowConstants;
 
@@ -66,8 +64,8 @@ public class JMIF {
 
 	public static void main(String[] args) throws Exception {
 		if (Configuration.showSplashscreen) {
-			Splashscreen splashscreen = new Splashscreen();
-			SwingWorker<Void, Integer> worker = splashscreen.getWorker();
+			var splashscreen = new Splashscreen();
+			var worker = splashscreen.getWorker();
 			while (worker.getState() != StateValue.DONE) {
 				Thread.sleep(10);
 			}
@@ -75,7 +73,7 @@ public class JMIF {
 
 		SwingUtilities.invokeLater(() -> {
 			try {
-				JMIF u = new JMIF();
+				var u = new JMIF();
 				u.showFrame();
 			} catch (MIFException | IOException | InterruptedException e) {
 				LOGGER.error("", e);
@@ -84,7 +82,7 @@ public class JMIF {
 	}
 
 	public void showFrame() throws MIFException,  IOException, InterruptedException {
-		long time = System.currentTimeMillis();
+		var time = System.currentTimeMillis();
 
 		var frame = new JFrame();
 		frame.setUndecorated(true); // remove title bar...
@@ -102,24 +100,24 @@ public class JMIF {
 		}
 
 		// Add Project stuff: name, output.file, render-profile
-		Box horizontalBox = Box.createHorizontalBox();
+		var horizontalBox = Box.createHorizontalBox();
 		horizontalBox.add(new JLabel("Project "+graphWrapper.getPr().getFileOfProject()));
 		horizontalBox.add(Box.createHorizontalStrut(20));
 		horizontalBox.add(new JLabel("Output "));
-		JTextField output = new JTextField();
+		var output = new JTextField();
 		output.setText(graphWrapper.getPr().getOutputVideo());
 		output.setMaximumSize(new Dimension(300, 30));
 		output.setPreferredSize(new Dimension(300, 30));
 		horizontalBox.add(output);
 		horizontalBox.add(Box.createHorizontalGlue());
 		
-		List<String> profiles = graphWrapper.getService().getProfiles();
+		var profiles = graphWrapper.getService().getProfiles();
 		
-		JComboBox<String> profilesCombobox = new JComboBox<>(profiles.toArray(new String[profiles.size()]));
+		var profilesCombobox = new JComboBox<>(profiles.toArray(new String[profiles.size()]));
 		profilesCombobox.setSelectedItem(graphWrapper.getPr().getProfile());
-		profilesCombobox.addItemListener((itemEvent) -> {
+		profilesCombobox.addItemListener(itemEvent -> {
 			try {
-				String item = (String)profilesCombobox.getSelectedItem();
+				var item = (String)profilesCombobox.getSelectedItem();
 				graphWrapper.getPr().setProfile(item);
 				graphWrapper.getService().updateProfile(graphWrapper.getPr());
 				graphWrapper.redrawGraph();
@@ -154,13 +152,13 @@ public class JMIF {
 		
 		// Select the first cell
 		if (!graphWrapper.getCells().isEmpty()) {
-			mxCell cell = graphWrapper.getCells().get(0);
+			var cell = graphWrapper.getCells().get(0);
 			mifSelectionView.updateImageOrVideo(cell, graphWrapper.get(cell));
 		}
 		
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
+		frame.setExtendedState(Frame.MAXIMIZED_BOTH); 
 		frame.getRootPane().setWindowDecorationStyle(5);
 
 		graphWrapper.save();
@@ -217,7 +215,7 @@ public class JMIF {
 	}
 
 	private ProjectListener createChangeListener() {
-		return (t) -> {
+		return t -> {
 			LOGGER.info("Change... redraw....{}", t);
 
 			if (t == type.LOAD_PROJECT) {
@@ -225,7 +223,7 @@ public class JMIF {
 					graphWrapper.initializeProject();
 
 					// Exec background threads...
-					ExecutorService executor = Executors.newWorkStealingPool();
+					var executor = Executors.newWorkStealingPool();
 					for (MIFFileWrapper<?> f : graphWrapper.getPr().getMIFFiles()) {
 						executor.submit(() -> {
 							try {

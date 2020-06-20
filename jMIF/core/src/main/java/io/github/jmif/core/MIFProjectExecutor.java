@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
@@ -47,7 +46,7 @@ class MIFProjectExecutor {
 	public void exportImage(String output, int frame) throws IOException {
 		adjustImagesIfNecessary();
 		
-		String consumer = consumerFrameExport
+		var consumer = consumerFrameExport
 			.replace("${1}", output)
 			.replace("${2}", String.valueOf(frame))
 			.replace("${3}", String.valueOf(frame))	;
@@ -57,14 +56,14 @@ class MIFProjectExecutor {
 	}
 	
 	public void convert(boolean preview) throws IOException {
-		long startTime = System.currentTimeMillis();
+		var startTime = System.currentTimeMillis();
 		
 		adjustImagesIfNecessary();
 		if (preview) {
 			createMeltFile(consumerPreview, "melt.sh");
 		} else {
 			// TODO Make sure that outputVideo never is null
-			String output = project.getOutputVideo();
+			var output = project.getOutputVideo();
 			if (output == null) {
 				output = "output.avi";
 			}
@@ -80,14 +79,14 @@ class MIFProjectExecutor {
 	
 	private void copyMP3() throws IOException {
 		if (project.getAudiotrack() != null) {
-			int count = 0;
+			var count = 0;
 			for (MIFAudioFile audio : project.getAudiotrack().getAudiofiles()) {
 				count++;
 				
 				execute("cp "+audio.getAudiofile()+" "+project.getWorkingDir()+"temp.mp3");
 				
-				String input = project.getWorkingDir()+"temp.mp3";
-				String output = project.getWorkingDir()+count+"_mp3.mp3";
+				var input = project.getWorkingDir()+"temp.mp3";
+				var output = project.getWorkingDir()+count+"_mp3.mp3";
 
 				if (audio.isNormalize()) {
 					/*
@@ -105,7 +104,7 @@ class MIFProjectExecutor {
 					 */
 					
 					// TODO Audio: Allow with milliseconds
-					StringBuilder sb = new StringBuilder("ffmpeg -y -i ");
+					var sb = new StringBuilder("ffmpeg -y -i ");
 					sb.append(input);
 					sb.append(" -ss ");
 					sb.append(DurationFormatUtils.formatDuration(audio.getEncodeStart(), "HH:mm:ss"));
@@ -115,7 +114,7 @@ class MIFProjectExecutor {
 					if (audio.isNormalize()) {
 						sb.append(" -filter:a loudnorm ");
 					}
-					String tempOutput = output;
+					var tempOutput = output;
 					if (audio.getFadeIn() > 0 || audio.getFadeOut() > 0) {
 						tempOutput = project.getWorkingDir()+count+"_xx_mp3.mp3";
 					}
@@ -125,7 +124,7 @@ class MIFProjectExecutor {
 					
 					if (audio.getFadeIn() > 0 || audio.getFadeOut() > 0) {
 						// TODO Audio: Allow with milliseconds
-						StringBuilder sb2 = new StringBuilder("ffmpeg -y -i ");
+						var sb2 = new StringBuilder("ffmpeg -y -i ");
 						sb2.append(tempOutput);
 						sb2.append(" -ss ");
 						sb2.append(DurationFormatUtils.formatDuration(audio.getEncodeStart(), "HH:mm:ss"));
@@ -151,7 +150,7 @@ class MIFProjectExecutor {
 					}
 				} else {
 					// TODO Audio: Allow with milliseconds
-					StringBuilder sb = new StringBuilder("ffmpeg -y -i ");
+					var sb = new StringBuilder("ffmpeg -y -i ");
 					sb.append(input);
 					sb.append(" -ss ");
 					sb.append(DurationFormatUtils.formatDuration(audio.getEncodeStart(), "HH:mm:ss"));
@@ -184,21 +183,21 @@ class MIFProjectExecutor {
 	
 	private void createMeltFile(String consumer, String scriptName) {
 		try {
-			StringBuilder sb = new StringBuilder();
+			var sb = new StringBuilder();
 			sb.append("#/!/usr/bin/env bash\n\n");
 			sb.append("melt \\\n");
 			
 			sb.append("color:black out=1 \\\n"); // FIXME what is the overall framelength?
 			
-			int count = 0;
+			var count = 0;
 			sb.append("-track \\\n");
 			for (MIFFile meltfile : this.project.getMIFFiles()) {
-				File file = meltfile.getFile();
-				String input = project.getWorkingDir()+"scaled/"+file.getName();
-				String extension = FilenameUtils.getExtension(file.getName());
+				var file = meltfile.getFile();
+				var input = project.getWorkingDir()+"scaled/"+file.getName();
+				var extension = FilenameUtils.getExtension(file.getName());
 				
-				boolean useMixer = count != 0;
-				int frames = (int)((meltfile.getDuration() / 1000d) * project.getProfileFramerate());
+				var useMixer = count != 0;
+				var frames = (int)((meltfile.getDuration() / 1000d) * project.getProfileFramerate());
 				
 				if (Configuration.allowedImageTypes.contains(extension) || Configuration.allowedVideoTypes.contains(extension)) {
 					sb.append("   ").append(input).append(" in=0 out=").append(frames - 1);
@@ -207,7 +206,7 @@ class MIFProjectExecutor {
 						sb.append(" -attach ");
 						sb.append(currentlyAddedFilters.getFiltername());
 						sb.append(" ");
-						Map<String, String> filterUsage = currentlyAddedFilters.getFilterUsage();
+						var filterUsage = currentlyAddedFilters.getFilterUsage();
 						for (String v : filterUsage.keySet()) {
 							sb.append(v).append("=").append(filterUsage.get(v)).append(" ");
 						}				
@@ -218,7 +217,7 @@ class MIFProjectExecutor {
 					LOGGER.error("Unsupported file extension {}", extension);
 				}
 				if (useMixer && meltfile.getOverlayToPrevious() > 0) {
-					int overlay = (int)((meltfile.getOverlayToPrevious() / 1000d) * project.getProfileFramerate());
+					var overlay = (int)((meltfile.getOverlayToPrevious() / 1000d) * project.getProfileFramerate());
 					sb.append(" -mix ").append(overlay).append(" -mixer luma");
 				}
 				sb.append(" \\\n");
@@ -246,10 +245,10 @@ class MIFProjectExecutor {
 			
 			if (!project.getAudiotrack().getAudiofiles().isEmpty()) {
 				sb.append(" -audio-track ");
-				for (int i=0; i<=project.getAudiotrack().getAudiofiles().size()-1; i++) {
-					MIFAudioFile mifAudioFile = project.getAudiotrack().getAudiofiles().get(i);
-					int millis = mifAudioFile.getEncodeEnde() - mifAudioFile.getEncodeStart();
-					int frames = ((millis/1000) * project.getProfileFramerate() - 1);
+				for (var i=0; i<=project.getAudiotrack().getAudiofiles().size()-1; i++) {
+					var mifAudioFile = project.getAudiotrack().getAudiofiles().get(i);
+					var millis = mifAudioFile.getEncodeEnde() - mifAudioFile.getEncodeStart();
+					var frames = ((millis/1000) * project.getProfileFramerate() - 1);
 					
 					sb.append(" "+(i+1)+"_mp3.mp3 in=0 out="+frames+" "); // TODO Audio: Overlay
 				}
@@ -279,11 +278,11 @@ class MIFProjectExecutor {
 	}
 	
 	private void adjustImagesIfNecessary() throws IOException {
-		String workingDir = project.getWorkingDir();
+		var workingDir = project.getWorkingDir();
 		for (MIFFile f : project.getMIFFiles()) {
-			String filename = f.getFile().getName();
-			String input = workingDir+"orig/"+filename;
-			String output = workingDir + "scaled/" + filename;
+			var filename = f.getFile().getName();
+			var input = workingDir+"orig/"+filename;
+			var output = workingDir + "scaled/" + filename;
 
 			if (f instanceof MIFImage) {
 				if (!new File(output).exists()) {
@@ -298,12 +297,12 @@ class MIFProjectExecutor {
 	}
 	
 	public void createFinalImageConversion(MIFImage image, String output) throws IOException {
-		String workingDir = project.getWorkingDir();
-		String filename = image.getFile().getName();
-		String input = workingDir+"orig/"+filename;
+		var workingDir = project.getWorkingDir();
+		var filename = image.getFile().getName();
+		var input = workingDir+"orig/"+filename;
 		
-		int w = project.getProfileWidth();  // e.g. 1920
-		int h = project.getProfileHeight(); // e.g. 1080
+		var w = project.getProfileWidth();  // e.g. 1920
+		var h = project.getProfileHeight(); // e.g. 1080
 
 		switch (image.getStyle()) {
 		case FILL:
@@ -331,7 +330,7 @@ class MIFProjectExecutor {
 	}
 	
 	private void executeMELT(String command) throws IOException {
-		Process process = createProcess(command);
+		var process = createProcess(command);
 		
 		Runnable r = () -> {
 			try {
@@ -375,7 +374,7 @@ class MIFProjectExecutor {
 	private void execute(String command, boolean logOutput) throws IOException {
 		LOGGER.info("Execute: {}", command);
 		
-		Process process = createProcess(command);
+		var process = createProcess(command);
 		
 		if (logOutput) {
 			new Thread(() -> logProcess(process)).start();
@@ -396,7 +395,7 @@ class MIFProjectExecutor {
 	}
 	
 	private void logProcess(Process process) {
-		try (BufferedReader reader = new BufferedReader(
+		try (var reader = new BufferedReader(
 			    new InputStreamReader(process.getInputStream()))) {
 			String line;
 			while ((line = reader.readLine()) != null) {

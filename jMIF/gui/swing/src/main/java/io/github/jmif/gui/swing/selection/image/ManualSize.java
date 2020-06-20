@@ -2,10 +2,8 @@ package io.github.jmif.gui.swing.selection.image;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.util.Map;
 
 import javax.swing.Box;
 import javax.swing.ImageIcon;
@@ -17,8 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mxgraph.model.mxCell;
-import com.mxgraph.model.mxGeometry;
-import com.mxgraph.shape.mxIShape;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.view.mxInteractiveCanvas;
 import com.mxgraph.util.mxConstants;
@@ -38,39 +34,39 @@ public class ManualSize {
 	private String command = null;
 	
 	public void showFrame(final GraphWrapper graphWrapper, MIFImageWrapper mifImage, ImageView imageView) {
-		JFrame frame = new JFrame();
-		JPanel panel = new JPanel(new BorderLayout());
+		var frame = new JFrame();
+		var panel = new JPanel(new BorderLayout());
 
-		ImageIcon ic = new ImageIcon(mifImage.getFile().getAbsolutePath());
+		var ic = new ImageIcon(mifImage.getFile().getAbsolutePath());
 
-		int w = ic.getIconWidth() / 5;
-		int h = ic.getIconHeight() / 5;
-		BufferedImage resizedImg = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-		Graphics2D g2 = resizedImg.createGraphics();
+		var w = ic.getIconWidth() / 5;
+		var h = ic.getIconHeight() / 5;
+		var resizedImg = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+		var g2 = resizedImg.createGraphics();
 		g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 		g2.drawImage(ic.getImage(), 0, 0, w, h, null);
 		g2.dispose();
 
-		double ratio = 1920d / 1080d;
-		double displayratio = (double) w / (double) h;
+		var ratio = 1920d / 1080d;
+		var displayratio = (double) w / (double) h;
 
-		String input = ic.getIconWidth() + "x" + ic.getIconHeight();
-		double inputRadio = (double) ic.getIconWidth() / (double) ic.getIconHeight();
-		String output = w + "x" + h;
+		var input = ic.getIconWidth() + "x" + ic.getIconHeight();
+		var inputRadio = (double) ic.getIconWidth() / (double) ic.getIconHeight();
+		var output = w + "x" + h;
 
 		logger.info("Ratio " + ratio + " 1920x1080 scaled from " + input + " (ASP " + inputRadio + ") to " + output
 				+ " (ASP " + displayratio + ")");
 		mxGraph graph = new mxGraph() {
 			@Override
 			public Object resizeCell(Object cell, mxRectangle bounds) {
-				double r = bounds.getWidth() / bounds.getHeight();
+				var r = bounds.getWidth() / bounds.getHeight();
 				logger.debug("Try to scale to " + bounds.getWidth() + "," + bounds.getHeight() + " = " + r);
 
 				if (r < 1) {
-					double targetWidth = bounds.getHeight() * ratio;
+					var targetWidth = bounds.getHeight() * ratio;
 					bounds.setWidth(targetWidth);
 				} else {
-					double targetHeight = bounds.getWidth() / ratio;
+					var targetHeight = bounds.getWidth() / ratio;
 					bounds.setHeight(targetHeight);
 				}
 				r = bounds.getWidth() / bounds.getHeight();
@@ -87,14 +83,14 @@ public class ManualSize {
 						"  Originalimage " + bounds.getY() * 5 + " to " + (bounds.getY() + bounds.getHeight()) * 5
 								+ " remains " + 5 * (h - bounds.getY() - bounds.getHeight()));
 
-				double ws = bounds.getWidth();
-				double hs = bounds.getHeight();
+				var ws = bounds.getWidth();
+				var hs = bounds.getHeight();
 
-				double wr = bounds.getWidth() * 5;
-				double hr = bounds.getHeight() * 5;
+				var wr = bounds.getWidth() * 5;
+				var hr = bounds.getHeight() * 5;
 
-				double arS = ws / hs;
-				double arR = wr / hr;
+				var arS = ws / hs;
+				var arR = wr / hr;
 				logger.debug("  AR displayed " + arS + " (" + ws + "x" + hs + "), AR real " + arR + " (" + wr + "x"
 						+ hr + ")");
 
@@ -105,9 +101,9 @@ public class ManualSize {
 
 		};
 
-		int x = 1920 / 4;
-		int y = 1080 / 4;
-		mxCell cell = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, "Process", 0, 0, x, y, "process");
+		var x = 1920 / 4;
+		var y = 1080 / 4;
+		var cell = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, "Process", 0, 0, x, y, "process");
 		cell.setStyle("fillOpacity=90;opacity=90;");
 
 		mxGraphComponent graphComponent = new mxGraphComponent(graph) {
@@ -119,13 +115,13 @@ public class ManualSize {
 
 					@Override
 					public Object drawCell(mxCellState state) {
-						Map<String, Object> style = state.getStyle();
-						mxIShape shape = getShape(style);
+						var style = state.getStyle();
+						var shape = getShape(style);
 
 						if (g != null && shape != null) {
 							// Creates a temporary graphics instance for drawing this shape
-							float opacity = mxUtils.getFloat(style, mxConstants.STYLE_OPACITY, 50);
-							Graphics2D previousGraphics = g;
+							var opacity = mxUtils.getFloat(style, mxConstants.STYLE_OPACITY, 50);
+							var previousGraphics = g;
 							g = createTemporaryGraphics(style, opacity, state);
 
 							// Paints the shape and restores the graphics object
@@ -142,10 +138,10 @@ public class ManualSize {
 		graphComponent.setConnectable(false); // Inhibit edge creation in the graph.
 		graph.addListener(mxEvent.CELLS_MOVED, (sender, evt) -> {
 
-			mxGeometry bounds = graph.getModel().getGeometry(cell);
+			var bounds = graph.getModel().getGeometry(cell);
 
-			double wr = bounds.getWidth() * 5;
-			double hr = bounds.getHeight() * 5;
+			var wr = bounds.getWidth() * 5;
+			var hr = bounds.getHeight() * 5;
 
 			command = "-quality 100 -crop " + wr + "x" + hr + "+" + 5 * bounds.getX() + "+" + 5 * bounds.getY() + " -geometry 1920";
 		});
@@ -154,8 +150,8 @@ public class ManualSize {
 		graph.setCellsMovable(true); // Moving cells in the graph. Note that an edge is also a cell.
 		graph.setCellsResizable(true); // Inhibit cell re-sizing.
 
-		JButton ok = new JButton("OK");
-		JButton cancel = new JButton("Cancel");
+		var ok = new JButton("OK");
+		var cancel = new JButton("Cancel");
 		ok.addActionListener(event -> {
 			try {
 				mifImage.setManualStyleCommand(command);
@@ -171,13 +167,13 @@ public class ManualSize {
 		
 		panel.add(graphComponent, BorderLayout.CENTER);
 		
-		Box buttonBox = Box.createHorizontalBox();
+		var buttonBox = Box.createHorizontalBox();
 		buttonBox.add(Box.createHorizontalGlue());
 		buttonBox.add(ok);
 		buttonBox.add(cancel);
 		panel.add(buttonBox, BorderLayout.SOUTH);
 		
-		Dimension dim = new Dimension(w, h);
+		var dim = new Dimension(w, h);
 		graphComponent.setMinimumSize(dim);
 		graphComponent.setMaximumSize(dim);
 		graphComponent.setPreferredSize(dim);

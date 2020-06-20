@@ -3,11 +3,9 @@ package io.github.jmif.gui.swing.selection.imageLibrary;
 import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Future;
 
 import javax.imageio.ImageIO;
 import javax.swing.Box;
@@ -40,20 +38,20 @@ public class ImageLibraryView {
 		this.graphWrapper = graphWrapper;
 		box = Box.createVerticalBox();
 
-		JButton chooseDirectory = new JButton("Select directory");
+		var chooseDirectory = new JButton("Select directory");
 		chooseDirectory.addActionListener(a -> {
-			JFileChooser c = new JFileChooser();
+			var c = new JFileChooser();
 			c.setMultiSelectionEnabled(false);
 			c.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
-			int returnVal = c.showOpenDialog(new JFrame());
+			var returnVal = c.showOpenDialog(new JFrame());
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
-				File directory = c.getSelectedFile();
+				var directory = c.getSelectedFile();
 
 				List<File> images = new ArrayList<>();
 				for (File file : directory.listFiles()) {
 					if (!file.isDirectory()) {
-						String type = file.getName().substring(file.getName().lastIndexOf('.') + 1);
+						var type = file.getName().substring(file.getName().lastIndexOf('.') + 1);
 						if (Configuration.allowedImageTypes.contains(type)) {
 							images.add(file);
 						}
@@ -63,15 +61,15 @@ public class ImageLibraryView {
 				createImageList(images);
 			}
 		});
-		JButton chooseDirectoryRec = new JButton("Select directory (recursivly)");
+		var chooseDirectoryRec = new JButton("Select directory (recursivly)");
 		chooseDirectoryRec.addActionListener(a -> {
-			JFileChooser c = new JFileChooser();
+			var c = new JFileChooser();
 			c.setMultiSelectionEnabled(false);
 			c.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
-			int returnVal = c.showOpenDialog(new JFrame());
+			var returnVal = c.showOpenDialog(new JFrame());
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
-				File directory = c.getSelectedFile();
+				var directory = c.getSelectedFile();
 				createImageList(collectImagesRecursivly(directory));
 			}
 		});
@@ -79,8 +77,8 @@ public class ImageLibraryView {
 		newBox = Box.createVerticalBox();
 		scrollPane = new JScrollPane(newBox);
 
-		int w = 5500;
-		int h = 450;
+		var w = 5500;
+		var h = 450;
 		scrollPane.setMinimumSize(new Dimension(w, h));
 		scrollPane.setPreferredSize(new Dimension(w, h));
 		scrollPane.setMaximumSize(new Dimension(w, h));
@@ -98,7 +96,7 @@ public class ImageLibraryView {
 		}
 		for (File file : dir.listFiles()) {
 			if (file.isFile()) {
-				String type = file.getName().substring(file.getName().lastIndexOf('.') + 1);
+				var type = file.getName().substring(file.getName().lastIndexOf('.') + 1);
 				if (Configuration.allowedImageTypes.contains(type)) {
 					fileTree.add(file);
 				}
@@ -114,18 +112,18 @@ public class ImageLibraryView {
 
 		newBox.removeAll();
 
-		int count = 0;
-		Box subBox = Box.createHorizontalBox();
+		var count = 0;
+		var subBox = Box.createHorizontalBox();
 		for (final File f : images) {
 			count++;
 
-			JLabel imageLabel = new JLabel();
+			var imageLabel = new JLabel();
 
 			SwingWorker<Void,Integer> worker = new SwingWorker<>() {
 				@Override
 				protected Void doInBackground() throws Exception {
-					BufferedImage img = ImageIO.read(f);
-					Future<BufferedImage> scaledImg = AsyncScalr.resize(img, Mode.AUTOMATIC, 300, 300);
+					var img = ImageIO.read(f);
+					var scaledImg = AsyncScalr.resize(img, Mode.AUTOMATIC, 300, 300);
 					imageLabel.setIcon(new ImageIcon(scaledImg.get()));
 					return null;
 				}

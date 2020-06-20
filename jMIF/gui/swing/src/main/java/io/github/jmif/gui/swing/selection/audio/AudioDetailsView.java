@@ -43,7 +43,7 @@ public class AudioDetailsView {
 	private JLabel labelFadeOut = new JLabel("FadeOut");
 
 	public AudioDetailsView(GraphWrapper mifProject) {
-		Box box = Box.createVerticalBox();
+		var box = Box.createVerticalBox();
 		
 	    wrap(box, labelFile, file);
 	    wrap(box, labelLength, length);
@@ -58,9 +58,9 @@ public class AudioDetailsView {
 	    normalize.addActionListener(e -> audioFile.setNormalize(normalize.isSelected()));
 	    
 	    encodeStart.addActionListener(e -> {
-	    	String input = encodeEnd.getText();
+	    	var input = encodeEnd.getText();
 	    	try {
-	    		int i = Integer.parseInt(input);
+	    		var i = Integer.parseInt(input);
 	    		if (i<0) {
 	    			throw new IllegalArgumentException("Darf nicht kleiner 0 sein");
 	    		}
@@ -73,9 +73,9 @@ public class AudioDetailsView {
 	    });
 	    
 	    encodeEnd.addActionListener(e -> {
-	    	String input = encodeEnd.getText();
+	    	var input = encodeEnd.getText();
 	    	try {
-	    		int i = Integer.parseInt(input);
+	    		var i = Integer.parseInt(input);
 	    		
 	    		if (i<1) {
 	    			throw new IllegalArgumentException("Muss mind. 1 sekunde sein");
@@ -91,9 +91,9 @@ public class AudioDetailsView {
 	    	}
 	    });
 	    fadeIn.addActionListener(e -> {
-	    	String input = fadeIn.getText();
+	    	var input = fadeIn.getText();
 	    	try {
-	    		int i = Integer.parseInt(input);
+	    		var i = Integer.parseInt(input);
 	    		if (i<0) {
 	    			throw new IllegalArgumentException("Not allowed to be negative");
 	    		}
@@ -106,9 +106,9 @@ public class AudioDetailsView {
 	    	}
 	    });
 	    fadeOut.addActionListener(e -> {
-	    	String input = fadeOut.getText();
+	    	var input = fadeOut.getText();
 	    	try {
-	    		int i = Integer.parseInt(input);
+	    		var i = Integer.parseInt(input);
 	    		if (i<0) {
 	    			throw new IllegalArgumentException("Not allowed to be negative");
 	    		}
@@ -131,7 +131,7 @@ public class AudioDetailsView {
 	}
 	
 	private void wrap(Box box, JComponent c1, JComponent c2) {
-	    Box boxFilename = Box.createHorizontalBox();
+	    var boxFilename = Box.createHorizontalBox();
 	    boxFilename.add(Box.createRigidArea(new Dimension(10, 0)));
 	    c1.setMinimumSize(new Dimension(140, 20));
 	    c1.setPreferredSize(new Dimension(140, 20));

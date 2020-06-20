@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mxgraph.model.mxCell;
-import com.mxgraph.model.mxGeometry;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.util.mxSwingConstants;
 import com.mxgraph.util.mxEvent;
@@ -96,7 +95,7 @@ public class GraphWrapper {
 	
 	public void save() {
 		try {
-			long time = System.currentTimeMillis();
+			var time = System.currentTimeMillis();
 			
 			var file = new File(pr.getFileOfProject());
 			var context = JAXBContext.newInstance(MIFProject.class);
@@ -112,13 +111,13 @@ public class GraphWrapper {
 
 	public void load() throws MIFException, InterruptedException, IOException {
 		try {
-			long time = System.currentTimeMillis();
+			var time = System.currentTimeMillis();
 			
 			var file = new File(pr.getFileOfProject());
 			var context = JAXBContext.newInstance(MIFProject.class);
 			var unmarshaller = context.createUnmarshaller();
 
-			MIFProjectWrapper project = new MIFProjectWrapper((MIFProject) unmarshaller.unmarshal(file));
+			var project = new MIFProjectWrapper((MIFProject) unmarshaller.unmarshal(file));
 			// FIXME jaxb: textfiles not loaded, but they exists in projectfile.xml!
 			getCells().clear();
 			getTextCells().clear();
@@ -134,7 +133,7 @@ public class GraphWrapper {
 			
 			// TODO jaxb: textfiles not loaded, but they exists in projectfile.xml!
 			for (MIFTextFile t : project.getTexttrack().getEntries()) {
-				MIFTextFileWrapper textfile = createMIFTextfile();
+				var textfile = createMIFTextfile();
 				textfile.setBgcolour(t.getBgcolour());
 				textfile.setFgcolour(t.getFgcolour());
 				textfile.setHalign(t.getHalign());
@@ -311,7 +310,7 @@ public class GraphWrapper {
 	}
 	
 	public void initializeProject() {
-		int current = 0;
+		var current = 0;
 		for (MIFFileWrapper<?> file : pr.getMIFFiles()) {
 			logger.info("Adding file {}", file.getFile());
 
@@ -323,20 +322,20 @@ public class GraphWrapper {
 			var x = currentLength + XOFFSET;
 			var y = current % 2 == 0 ? 0 + YOFFSET : Configuration.timelineentryHeight + YOFFSET;
 			var w = getPixelwidth(file);
-			var h = Configuration.timelineentryHeight;;
+			var h = Configuration.timelineentryHeight;
 
 			put(file, createVertex(n, x, y, w, h));
 			
 			currentLength += w;
 			current++;
 		}
-		int audioLength = 0;
+		var audioLength = 0;
 		current = 0;
 		for (Entry<mxCell, MIFAudioFileWrapper> audioEntry : nodeToMIFAudio.entrySet()) {
 			current++;
 			
-			mxCell mxCell = audioEntry.getKey();
-			MIFAudioFileWrapper audioFile = audioEntry.getValue();
+			var mxCell = audioEntry.getKey();
+			var audioFile = audioEntry.getValue();
 			
 			var x = XOFFSET + audioLength;
 			var y = YOFFSET*2 +YOFFSET/2 + 2*Configuration.timelineentryHeight;
@@ -350,13 +349,13 @@ public class GraphWrapper {
 			resize(mxCell, new mxRectangle(x, y, w, h));
 		}
 		
-		int textLength = 0;
+		var textLength = 0;
 		current = 0;
 		for (Entry<mxCell, MIFTextFileWrapper> textEntry : nodeToMIFText.entrySet()) {
 			current++;
 			
-			mxCell mxCell = textEntry.getKey();
-			MIFTextFileWrapper textFile = textEntry.getValue();
+			var mxCell = textEntry.getKey();
+			var textFile = textEntry.getValue();
 			
 			var x = XOFFSET + textLength;
 			var y = YOFFSET*4 +YOFFSET/2 + 4*Configuration.timelineentryHeight;
@@ -399,13 +398,13 @@ public class GraphWrapper {
 			currentLength += w;
 			current++;
 		}
-		int audioLength = 0;
+		var audioLength = 0;
 		current = 0;
 		for (Entry<mxCell, MIFAudioFileWrapper> audioEntry : nodeToMIFAudio.entrySet()) {
 			current++;
 			
-			mxCell mxCell = audioEntry.getKey();
-			MIFAudioFileWrapper audioFile = audioEntry.getValue();
+			var mxCell = audioEntry.getKey();
+			var audioFile = audioEntry.getValue();
 			
 			if (current > 1) {
 				audioLength -= getOverlaywidth(audioFile);
@@ -423,12 +422,12 @@ public class GraphWrapper {
 			resize(mxCell, new mxRectangle(x, y, w, h));
 		}
 		
-		int textLength = 0;
+		var textLength = 0;
 		current = 0;
 		for (Entry<mxCell, MIFTextFileWrapper> textEntry : nodeToMIFText.entrySet()) {
 			current++;
 			
-			mxCell mxCell = textEntry.getKey();
+			var mxCell = textEntry.getKey();
 			var textFile = textEntry.getValue();
 			
 			if (current > 1) {
@@ -456,7 +455,7 @@ public class GraphWrapper {
 		graph = new mxGraph() {
 			@Override
 			public boolean isCellSelectable(Object cell) {
-				mxCell c = (mxCell) cell;
+				var c = (mxCell) cell;
 				if (c != null && c.isVertex()) {
 					return get(c) != null || c == singleframeSlider || getAudio(c) != null || getText(c) != null;
 				}
@@ -477,8 +476,8 @@ public class GraphWrapper {
 					public void paintComponent(Graphics g) {
 						if (!pr.getMIFFiles().isEmpty() || !pr.isAudioFilesEmpty()) {
 							// 1. Timeline
-							int length = 0;
-							int current = 0;
+							var length = 0;
+							var current = 0;
 							for (MIFFileWrapper<?> file : pr.getMIFFiles()) {
 								if (current > 0) {
 									length -= getOverlaywidth(file);
@@ -486,7 +485,7 @@ public class GraphWrapper {
 								length += getPixelwidth(file);
 								current++;
 							}
-							int audioLength = 0;
+							var audioLength = 0;
 							current = 0;
 							for (Entry<mxCell, MIFAudioFileWrapper> audioEntry : nodeToMIFAudio.entrySet()) {
 								if (current > 0) {
@@ -495,7 +494,7 @@ public class GraphWrapper {
 								audioLength += getPixelwidth(audioEntry.getValue());
 								current++;
 							}
-							int textLength = 0;
+							var textLength = 0;
 							current = 0;
 							for (Entry<mxCell, MIFTextFileWrapper> textEntry : nodeToMIFText.entrySet()) {
 								if (current > 0) {
@@ -505,12 +504,12 @@ public class GraphWrapper {
 								current++;
 							}
 
-							int max1 = Math.max(length, audioLength) ;
-							int w = Math.max(max1, textLength) + XOFFSET/2;
+							var max1 = Math.max(length, audioLength) ;
+							var w = Math.max(max1, textLength) + XOFFSET/2;
 							
 							g.setColor(Color.BLUE);
 							
-							int y = 145; // =  6 * height + 2 offset (1 for image->text, 1 for text-> audio) + ? 
+							var y = 145; // =  6 * height + 2 offset (1 for image->text, 1 for text-> audio) + ? 
 							g.drawLine(0, y, w, y);
 							
 							// 2. tracks
@@ -526,26 +525,26 @@ public class GraphWrapper {
 							
 							// 3. 
 							g.setColor(Color.DARK_GRAY);
-							for (int i = 1; i <= w; i++) {
+							for (var i = 1; i <= w; i++) {
 								// e.g. all 25 or 50 pixels
 								if (i % Configuration.pixelwidth_per_second == 0) {
 									g.drawLine(i+XOFFSET, 50+YOFFSET, i+XOFFSET, 45+YOFFSET);
 								}
 								if (i % 125 == 0) {
 							        //creates a copy of the Graphics instance
-							        Graphics2D g2d = (Graphics2D) g.create();
+							        var g2d = (Graphics2D) g.create();
 
 							        float dash2[] = {5f, 1f, 1f};
-							        BasicStroke bs2 = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 1.0f, dash2, 2f);
+							        var bs2 = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 1.0f, dash2, 2f);
 							        
 							        g2d.setStroke(bs2);
-							        int x1 = i+XOFFSET;
-							        int y1 = 200+YOFFSET;
-							        int x2 = i+XOFFSET;
-							        int y2 = 5;
+							        var x1 = i+XOFFSET;
+							        var y1 = 200+YOFFSET;
+							        var x2 = i+XOFFSET;
+							        var y2 = 5;
 									g2d.drawLine(x1, y1, x2, y2);
 									
-									String t = String.valueOf(i / Configuration.pixelwidth_per_second)+"s";
+									var t = String.valueOf(i / Configuration.pixelwidth_per_second)+"s";
 									if ((i/Configuration.pixelwidth_per_second) >= 60) {
 										t = i/60+"m "+i%60+"s";
 									}
@@ -563,16 +562,16 @@ public class GraphWrapper {
 		};
 		
 		graph.addListener(mxEvent.CELLS_MOVED, (sender, evt) -> {
-			Object[] c = (Object[])evt.getProperties().get("cells");
+			var c = (Object[])evt.getProperties().get("cells");
 			
 			if (c[0] == singleframeSlider) {
-				mxGeometry bounds = graph.getModel().getGeometry(c[0]);
+				var bounds = graph.getModel().getGeometry(c[0]);
 				bounds.setY(0);
 				graph.getModel().setGeometry(c[0], bounds); // don't allow move on y-axis
 				
-				 final int x = (int)bounds.getCenterX() - 10;
+				 final var x = (int)bounds.getCenterX() - 10;
 
-				 SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+				 SwingWorker<Void, Void> worker = new SwingWorker<>() {
 					@Override
 				    public Void doInBackground() {
 						exportFrame(x);

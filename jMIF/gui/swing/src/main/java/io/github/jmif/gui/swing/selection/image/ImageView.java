@@ -50,7 +50,7 @@ public class ImageView {
 		this.graphWrapper = graphWrapper;
 
 		// Left part is the original image
-		Box leftBox = Box.createVerticalBox();
+		var leftBox = Box.createVerticalBox();
 		imgPicture = new JLabel[2];
 		imgPicture[0] = new JLabel();
 		imgPicture[0].setBorder(BorderFactory.createLineBorder(Color.black));
@@ -59,18 +59,18 @@ public class ImageView {
 		leftBox.add(imgPicture[0]);
 
 		// Right side (center)
-		Box rightBox = Box.createVerticalBox();
+		var rightBox = Box.createVerticalBox();
 		rightBox.add(getResizeStyleBox());
 		rightBox.add(Box.createVerticalStrut(5));
 		rightBox.add(getPreviewImage());
 		rightBox.add(Box.createVerticalGlue());
 
-		Box box = Box.createVerticalBox();
+		var box = Box.createVerticalBox();
 		box.add(Box.createVerticalStrut(10));
 
-		JPanel panel2 = new JPanel(new BorderLayout());
+		var panel2 = new JPanel(new BorderLayout());
 		panel2.add(leftBox, BorderLayout.WEST);
-		Box h = Box.createHorizontalBox();
+		var h = Box.createHorizontalBox();
 		h.add(Box.createHorizontalStrut(10));
 		h.add(rightBox);
 		panel2.add(h, BorderLayout.CENTER);
@@ -85,7 +85,7 @@ public class ImageView {
 	}
 
 	private Box getPreviewImage() {
-		Box b = Box.createHorizontalBox();
+		var b = Box.createHorizontalBox();
 		imgPicture[1] = new JLabel();
 		imgPicture[1].setBorder(BorderFactory.createLineBorder(Color.black));
 		imgPicture[1].setBackground(Color.BLACK);
@@ -97,7 +97,7 @@ public class ImageView {
 	}
 
 	private Box getResizeStyleBox() {
-		Box dropDownBoxesBox = Box.createHorizontalBox();
+		var dropDownBoxesBox = Box.createHorizontalBox();
 		resizeStyleLabel = new JLabel("Resizestyle: ");
 		dropDownBoxesBox.add(resizeStyleLabel);
 		resizeStyle = new JComboBox<>(ImageResizeStyle.values());
@@ -109,15 +109,15 @@ public class ImageView {
 		dropDownBoxesBox.add(Box.createHorizontalStrut(10));
 		resizeStyleDetailsLabel = new JLabel("Crop from where: ");
 		dropDownBoxesBox.add(resizeStyleDetailsLabel);
-		String[] detailConfig = Arrays.asList("Half/Half", "Top", "Bottom").toArray(new String[3]);
+		var detailConfig = Arrays.asList("Half/Half", "Top", "Bottom").toArray(new String[3]);
 		resizeStyleDetails = new JComboBox<>(detailConfig);
 		resizeStyleDetails.setPreferredSize(new Dimension(100, 25));
 		resizeStyleDetails.setMaximumSize(new Dimension(100, 25));
 		dropDownBoxesBox.add(resizeStyleDetails);
 		dropDownBoxesBox.add(Box.createHorizontalStrut(10));
 		manualExtraction.addActionListener(e -> {
-			ManualSize manualSize = new ManualSize();
-			manualSize.showFrame(graphWrapper, (MIFImageWrapper)selectedMeltFile, this);
+			var manualSize = new ManualSize();
+			manualSize.showFrame(graphWrapper, selectedMeltFile, this);
 		});
 		dropDownBoxesBox.add(manualExtraction);
 
@@ -134,7 +134,7 @@ public class ImageView {
 		this.selectedMeltFile = meltFile;
 		this.selectedCell = cell;
 
-		ImageResizeStyle selectedItem = meltFile.getStyle();
+		var selectedItem = meltFile.getStyle();
 		resizeStyle.setSelectedItem(selectedItem);
 		switch (selectedItem) {
 		case CROP:
@@ -167,8 +167,8 @@ public class ImageView {
 	private ItemListener getItemListener() {
 		return e -> {
 			if (e.getStateChange() == ItemEvent.SELECTED && selectedMeltFile != null) {
-				ImageResizeStyle item = (ImageResizeStyle) e.getItem();
-				((MIFImageWrapper) selectedMeltFile).setStyle(item);
+				var item = (ImageResizeStyle) e.getItem();
+				selectedMeltFile.setStyle(item);
 
 				logger.info("Switching over '{}'", item);
 				var mifImage = MIFImageWrapper.class.cast(selectedMeltFile);

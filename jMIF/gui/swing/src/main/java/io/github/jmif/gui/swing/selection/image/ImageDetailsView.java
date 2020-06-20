@@ -41,9 +41,9 @@ public class ImageDetailsView {
 	    wrap(box, labelOVerlay, overlay);
 	    
 	    duration.addActionListener(e -> {
-	    	String input = duration.getText();
+	    	var input = duration.getText();
 	    	try {
-	    		int i = Integer.parseInt(input);
+	    		var i = Integer.parseInt(input);
 	    		
 	    		if (i<25) {
 	    			throw new IllegalArgumentException("Muss >= 25 Frames sein");
@@ -61,9 +61,9 @@ public class ImageDetailsView {
 	    
 
 	    overlay.addActionListener(e -> {
-	    	String input = overlay.getText();
+	    	var input = overlay.getText();
 	    	try {
-	    		int i = Integer.parseInt(input);
+	    		var i = Integer.parseInt(input);
 	    		
 	    		// TODO Image: Overlay: Check if prev. meltfile is longer:-)
 
@@ -80,7 +80,7 @@ public class ImageDetailsView {
 	}
 
 	private void wrap(Box box, JComponent c1, JComponent c2) {
-	    Box boxFilename = Box.createHorizontalBox();
+	    var boxFilename = Box.createHorizontalBox();
 	    c1.setMinimumSize(new Dimension(140, 20));
 	    c1.setPreferredSize(new Dimension(140, 20));
 	    boxFilename.add(c1);

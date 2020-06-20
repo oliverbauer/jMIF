@@ -8,7 +8,7 @@ public class TimeUtil {
 	}
 	
 	public static String getMessage(long startTime) {
-		long millis = System.currentTimeMillis()-startTime;
+		var millis = System.currentTimeMillis()-startTime;
 		return DurationFormatUtils.formatDuration(millis, "HH:mm:ss,SSS")+"[HH:mm:ss,SSS]";
 	}
 }

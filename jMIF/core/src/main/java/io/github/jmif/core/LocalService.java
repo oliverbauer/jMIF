@@ -9,7 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
@@ -24,12 +23,12 @@ import io.github.jmif.entities.MIFAudioFile;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFImage.ImageResizeStyle;
-import io.github.jmif.entities.melt.Melt;
-import io.github.jmif.entities.melt.MeltFilter;
-import io.github.jmif.entities.melt.MeltFilterDetails;
 import io.github.jmif.entities.MIFProject;
 import io.github.jmif.entities.MIFTextFile;
 import io.github.jmif.entities.MIFVideo;
+import io.github.jmif.entities.melt.Melt;
+import io.github.jmif.entities.melt.MeltFilter;
+import io.github.jmif.entities.melt.MeltFilterDetails;
 
 /**
  * @author thebrunner
@@ -61,9 +60,9 @@ public class LocalService {
 		var height = -1;
 		var width = -1;
 		try {
-			Process process = new ProcessBuilder("bash", "-c", "melt -query \"profile\"="+project.getProfile()).start();
+			var process = new ProcessBuilder("bash", "-c", "melt -query \"profile\"="+project.getProfile()).start();
 
-			try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+			try (var reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
 				String line;
 				while ((line = reader.readLine()) != null) {
 					if (line.contains("frame_rate_num:")) {
@@ -132,13 +131,13 @@ public class LocalService {
 					.directory(file.getParentFile())
 					.redirectErrorStream(true)
 					.start();
-			try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+			try (var reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
 				String line;
 				while ((line = reader.readLine()) != null) {
 					if (line.startsWith("codec_long_name")) {
 						video.setAudioCodec(line.substring(line.indexOf('=')+1));
 					} else if (line.startsWith("bit_rate")) {
-						String value = line.substring(line.indexOf('=')+1);
+						var value = line.substring(line.indexOf('=')+1);
 						video.setAudioBitrate(Integer.valueOf(value) / 1000);
 					}
 				}
@@ -155,7 +154,7 @@ public class LocalService {
 					.directory(file.getParentFile())
 					.redirectErrorStream(true)
 					.start();
-			try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+			try (var reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
 				String line;
 				while ((line = reader.readLine()) != null) {
 					
@@ -166,8 +165,8 @@ public class LocalService {
 					} else if (line.startsWith("duration")) {
 						// E.g. "7.0"
 						line = line.substring(line.indexOf('=')+1);
-						String s = line.substring(0, line.indexOf('.') + 2);
-						int v = (int)(Float.parseFloat(s) * 1000);
+						var s = line.substring(0, line.indexOf('.') + 2);
+						var v = (int)(Float.parseFloat(s) * 1000);
 						video.setDuration(v);
 					} else if (line.startsWith("bit_rate")) {
 						video.setVideoBitrate(Integer.parseInt(line.substring(line.indexOf('=')+1)) / 1000);
@@ -176,7 +175,7 @@ public class LocalService {
 					} else if (line.startsWith("display_aspect_ratio")) {
 						video.setAr(line.substring(line.indexOf('=')+1));
 					} else if (line.startsWith("r_frame_rate")) {
-						String s = line.substring(line.indexOf('=')+1, line.indexOf('/'));
+						var s = line.substring(line.indexOf('=')+1, line.indexOf('/'));
 						video.setFps(Integer.parseInt(s));
 					}
 				}
@@ -186,7 +185,7 @@ public class LocalService {
 		}
 
 		// set images...
-		for (int i = 1; i <= 10; i++) {
+		for (var i = 1; i <= 10; i++) {
 			video.addPreviewImagePath(Paths.get(workingDir).resolve("preview").resolve("_low_"+filename+"_"+i+".png"));
 		}
 
@@ -222,7 +221,7 @@ public class LocalService {
 
 			String output = null;
 
-			try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+			try (var reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
 				String line;
 				while ((line = reader.readLine()) != null) {
 					output = line;
@@ -262,7 +261,7 @@ public class LocalService {
 		 */
 		video.getPreviewImagesPath().clear();
 		var cnt = (int) (video.getDuration() / 1000d);
-		for (int i = 1; i <= 10; i++) {
+		for (var i = 1; i <= 10; i++) {
 			var image = Paths.get(workingDir).resolve("preview").resolve("_low_"+filename+"_"+i+".png");
 			if (!Files.exists(image)) {
 				logger.info("Init: Create Preview-Video-Image {}", image);
@@ -291,7 +290,7 @@ public class LocalService {
 		image.setStyle(ImageResizeStyle.MANUAL);
 		Process process;
 		try {
-			String temp = image.getManualStyleCommand();
+			var temp = image.getManualStyleCommand();
 			temp = temp.replace("geometry 1920", "geometry "+image.getPreviewWidth()+"x");
 
 			logger.info("Execute {}", temp);
@@ -300,7 +299,7 @@ public class LocalService {
 				.redirectErrorStream(true)
 				.start();
 			
-			try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+			try (var reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
 				String line;
 				while ((line = reader.readLine()) != null) {
 					logger.info(line);
@@ -335,7 +334,7 @@ public class LocalService {
 					.start();
 				String output = null;
 
-				try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+				try (var reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
 					String line;
 					while ((line = reader.readLine()) != null) {
 						output = line;
@@ -404,7 +403,7 @@ public class LocalService {
 				process.waitFor();
 				image.setImagePreview(ImageIO.read(image.getImagePreviewPath().toFile()));
 
-				try (BufferedReader reader = new BufferedReader(
+				try (var reader = new BufferedReader(
 						new InputStreamReader(process.getInputStream()))) {
 					String line;
 					while ((line = reader.readLine()) != null) {
@@ -522,18 +521,18 @@ public class LocalService {
 	private void checkLengthInSeconds(MIFAudioFile audio) {
 		Process process;
 		try {
-			String command = "ffprobe -v error -select_streams a:0 -show_entries stream=duration,bit_rate -of default=noprint_wrappers=1:nokey=1 "+audio.getAudiofile();
+			var command = "ffprobe -v error -select_streams a:0 -show_entries stream=duration,bit_rate -of default=noprint_wrappers=1:nokey=1 "+audio.getAudiofile();
 
 			process = new ProcessBuilder("bash", "-c", command)
 					.redirectErrorStream(true)
 					.start();
 			process.waitFor();
 
-			try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-				String durationOutput = reader.readLine();
-				String bitrateOutput = reader.readLine();
+			try (var reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+				var durationOutput = reader.readLine();
+				var bitrateOutput = reader.readLine();
 
-				float f = Float.parseFloat(durationOutput);
+				var f = Float.parseFloat(durationOutput);
 				f = f * 1000;
 				
 				audio.setLengthOfInput((int)f);
@@ -569,9 +568,9 @@ public class LocalService {
 	public List<String> getProfiles() throws MIFException {
 		try {
 			List<String> profiles = new ArrayList<>();
-			Process process = new ProcessBuilder("bash", "-c", "melt -query \"profiles\"")
+			var process = new ProcessBuilder("bash", "-c", "melt -query \"profiles\"")
 				.start();
-			try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+			try (var reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
 				String line;
 				while ((line = reader.readLine()) != null) {
 					if (line.contains("_")) {
@@ -591,10 +590,10 @@ public class LocalService {
 	private List<String> getFilters() throws MIFException {
 		try {
 			List<String> filters = new ArrayList<>();
-			Process process = new ProcessBuilder("bash", "-c", "melt -query \"filters\"")
+			var process = new ProcessBuilder("bash", "-c", "melt -query \"filters\"")
 				.start();
 			process.waitFor();
-			try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+			try (var reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
 				String line;
 				while ((line = reader.readLine()) != null) {
 					if (line.startsWith(" ")) {
@@ -614,10 +613,10 @@ public class LocalService {
 	private List<String> getFilterDetails(String filter) throws MIFException {
 		try {
 			List<String> filterDetails = new ArrayList<>();
-			Process process = new ProcessBuilder("bash", "-c", "melt -query \"filter\"="+filter)
+			var process = new ProcessBuilder("bash", "-c", "melt -query \"filter\"="+filter)
 				.start();
 			process.waitFor();
-			try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+			try (var reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
 				String line;
 				while ((line = reader.readLine()) != null) {
 					filterDetails.add(line);
@@ -634,17 +633,17 @@ public class LocalService {
 		
 		// TODO read/write an input xml containing the result of the following expensive output
 		try {
-			List<String> filterNames = getFilters();
+			var filterNames = getFilters();
 			logger.info("Filter {} loaded", filterNames.size());
 			
 			for (String filter: filterNames) {
-				List<String> details = getFilterDetails(filter);
+				var details = getFilterDetails(filter);
 				
 				// E.g. oldfilm has 8 parameter...
-				MeltFilterDetails meltFilter = new MeltFilterDetails(filter);
+				var meltFilter = new MeltFilterDetails(filter);
 				
-				boolean parametersStarted = false;
-				boolean valuesStarted = false;
+				var parametersStarted = false;
+				var valuesStarted = false;
 				String currentParameter = null;
 				for (String d : details) {
 					if (!parametersStarted) {
@@ -680,8 +679,8 @@ public class LocalService {
 						if (d.contains(":")) {
 							valuesStarted = false;
 							
-							String key = d.substring(0, d.indexOf(':')).trim();
-							String description = d.substring(d.indexOf(':')+1).trim();
+							var key = d.substring(0, d.indexOf(':')).trim();
+							var description = d.substring(d.indexOf(':')+1).trim();
 	
 							meltFilter.appendConfigurationDetail(currentParameter, key, description);
 						} else {
@@ -725,7 +724,7 @@ public class LocalService {
 			try {
 				var context = JAXBContext.newInstance(Melt.class);
 				var unmarshaller = context.createUnmarshaller();
-				Melt m = (Melt) unmarshaller.unmarshal(new File("meltfilterdetails.xml"));
+				var m = (Melt) unmarshaller.unmarshal(new File("meltfilterdetails.xml"));
 			
 				meltFilters.addAll(m.getMeltFilterDetails());
 				
@@ -767,11 +766,11 @@ public class LocalService {
 	
 	public void applyFilter(MIFProject pr, MIFFile mifFile, MeltFilter meltFilter) throws MIFException {
 		if (mifFile instanceof MIFImage) {
-			MIFImage mifImage = MIFImage.class.cast(mifFile);
+			var mifImage = MIFImage.class.cast(mifFile);
 			
-			MIFProjectExecutor mifProjectExecutor = new MIFProjectExecutor(pr);
+			var mifProjectExecutor = new MIFProjectExecutor(pr);
 	
-			String output = "/tmp/temp.jpg";
+			var output = "/tmp/temp.jpg";
 			
 			try {
 				mifProjectExecutor.createFinalImageConversion(mifImage, output);
@@ -779,12 +778,12 @@ public class LocalService {
 				e.printStackTrace();
 			}
 			
-			StringBuilder sb  = new StringBuilder();
+			var sb  = new StringBuilder();
 			sb.append("melt ").append(output).append(" out=50 ");
 			for (MeltFilter currentlyAddedFilters : mifImage.getFilters()) {
 				sb.append(" -attach-cut ");
 				sb.append(currentlyAddedFilters.getFiltername());
-				Map<String, String> filterUsage = currentlyAddedFilters.getFilterUsage();
+				var filterUsage = currentlyAddedFilters.getFilterUsage();
 				for (String v : filterUsage.keySet()) {
 					sb.append(v).append("=").append(filterUsage.get(v)).append(" ");
 				}				
@@ -792,7 +791,7 @@ public class LocalService {
 			sb.append(" -attach-cut ");
 			sb.append(meltFilter.getFiltername())
 			.append(" ");
-			Map<String, String> filterUsage = meltFilter.getFilterUsage();
+			var filterUsage = meltFilter.getFilterUsage();
 			for (String v : filterUsage.keySet()) {
 				sb.append(v).append("=").append(filterUsage.get(v)).append(" ");
 			}
@@ -807,7 +806,7 @@ public class LocalService {
 
 	
 	public MIFTextFile createText() {
-		MIFTextFile textFile = new MIFTextFile();
+		var textFile = new MIFTextFile();
 		return textFile;
 	}
 }

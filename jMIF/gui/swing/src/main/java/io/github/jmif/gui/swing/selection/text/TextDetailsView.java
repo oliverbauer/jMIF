@@ -50,7 +50,7 @@ public class TextDetailsView {
 	private MIFTextFileWrapper mifText;
 	
 	public TextDetailsView(GraphWrapper graphwrapper) {
-		Box box = Box.createVerticalBox();
+		var box = Box.createVerticalBox();
 		
 	    wrap(box, labelText, text);
 	    wrap(box, labelLength, length);
@@ -77,20 +77,20 @@ public class TextDetailsView {
 	    });
 	    
 	    // -attach affine transition.valign=top transition.halign=center
-		String[] valignValues = Arrays.asList("top", "middle", "bottom").toArray(new String[3]);
+		var valignValues = Arrays.asList("top", "middle", "bottom").toArray(new String[3]);
 		valign = new JComboBox<>(valignValues);
 		valign.addItemListener(e -> {
-			String value = (String)valign.getSelectedItem();
+			var value = (String)valign.getSelectedItem();
 			mifText.setValign(value);
 			chooser.updateImagePreview();
 		});
 		wrap(box, labelVAlign, valign);
 		
 		// -attach affine transition.valign=top transition.halign=center
-		String[] halignValues = Arrays.asList("left", "center", "right").toArray(new String[3]);
+		var halignValues = Arrays.asList("left", "center", "right").toArray(new String[3]);
 		halign = new JComboBox<>(halignValues);
 		halign.addItemListener(e -> {
-			String value = (String)halign.getSelectedItem();
+			var value = (String)halign.getSelectedItem();
 			mifText.setHalign(value);
 			chooser.updateImagePreview();
 		});
@@ -107,9 +107,9 @@ public class TextDetailsView {
 		}
 		
 		chooser = new PangoColorChooser(file, mifText);
-	    Box boxFilename = Box.createHorizontalBox();
+	    var boxFilename = Box.createHorizontalBox();
 	    boxFilename.add(Box.createRigidArea(new Dimension(10, 0)));
-	    JLabel label = new JLabel();
+	    var label = new JLabel();
 	    label.setMinimumSize(new Dimension(140, 20));
 	    label.setPreferredSize(new Dimension(140, 20));
 	    boxFilename.add(label);
@@ -146,7 +146,7 @@ public class TextDetailsView {
 	}
 
 	private void wrap(Box box, JComponent c1, JComponent c2) {
-	    Box boxFilename = Box.createHorizontalBox();
+	    var boxFilename = Box.createHorizontalBox();
 	    boxFilename.add(Box.createRigidArea(new Dimension(10, 0)));
 	    c1.setMinimumSize(new Dimension(140, 20));
 	    c1.setPreferredSize(new Dimension(140, 20));

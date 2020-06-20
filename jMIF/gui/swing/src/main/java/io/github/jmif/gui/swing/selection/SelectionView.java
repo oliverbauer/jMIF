@@ -1,7 +1,6 @@
 package io.github.jmif.gui.swing.selection;
 
 import java.awt.BorderLayout;
-import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.JComponent;
@@ -16,7 +15,6 @@ import com.mxgraph.model.mxCell;
 
 import io.github.jmif.core.MIFException;
 import io.github.jmif.entities.melt.Melt;
-import io.github.jmif.entities.melt.MeltFilterDetails;
 import io.github.jmif.gui.swing.GraphWrapper;
 import io.github.jmif.gui.swing.entities.MIFAudioFileWrapper;
 import io.github.jmif.gui.swing.entities.MIFFileWrapper;
@@ -69,9 +67,9 @@ public class SelectionView {
 		audioDetailsView = new AudioDetailsView(graphWrapper);
 		textDetailsView = new TextDetailsView(graphWrapper);
 		
-		Melt melt = new Melt();
-		List<MeltFilterDetails> audioFilters = graphWrapper.getService().getMeltAudioFilterDetails(melt);
-		List<MeltFilterDetails> imageAndVideoFilters = graphWrapper.getService().getMeltVideoFilterDetails(melt);
+		var melt = new Melt();
+		var audioFilters = graphWrapper.getService().getMeltAudioFilterDetails(melt);
+		var imageAndVideoFilters = graphWrapper.getService().getMeltVideoFilterDetails(melt);
 		filterViewVideo = new FilterView(graphWrapper, imageAndVideoFilters);
 		filterViewImage = new FilterView(graphWrapper, imageAndVideoFilters);
 		filterViewAudio = new FilterView(graphWrapper, audioFilters);
@@ -79,14 +77,14 @@ public class SelectionView {
 		imageView = new ImageView(graphWrapper);
 		
 		videoView = new VideoView();
-		JPanel videoPanel = videoView.getPanel();
+		var videoPanel = videoView.getPanel();
 		
 		singleFrameView = new FrameView();
 		graphWrapper.addSingleFrameCreatedListener(singleFrameView);
-		Box singleFrameBox = singleFrameView.getBox();
+		var singleFrameBox = singleFrameView.getBox();
 		
 		textView = new TextView();
-		JPanel textPanel = textView.getPanel();
+		var textPanel = textView.getPanel();
 		
 		tabPane.addTab("ImageView", wrap(imageDetailsView.getBox(), imageView.getJPanel(),       filterViewImage.getJPanel()));
 		tabPane.addTab("VideoView", wrap(videoDetailsView.getBox(), videoPanel,                  filterViewVideo.getJPanel()));
@@ -106,7 +104,7 @@ public class SelectionView {
 	}
     
     private JPanel wrap(JComponent c1, JComponent c2, JComponent c3) {
-		JPanel panel = new JPanel(new BorderLayout());
+		var panel = new JPanel(new BorderLayout());
 		if (c1 != null) {
 			panel.add(c1, BorderLayout.NORTH);
 		}
@@ -114,11 +112,11 @@ public class SelectionView {
 			panel.add(c2, BorderLayout.CENTER);
 		} else if (c2 != null && c3 != null) {
 			
-			JPanel p = new JPanel(new BorderLayout());
+			var p = new JPanel(new BorderLayout());
 			p.add(c2, BorderLayout.NORTH);
 			p.add(c3, BorderLayout.CENTER);
 			
-			JScrollPane scrollBar = new JScrollPane(p);
+			var scrollBar = new JScrollPane(p);
 			panel.add(scrollBar, BorderLayout.CENTER);
 			
 		}

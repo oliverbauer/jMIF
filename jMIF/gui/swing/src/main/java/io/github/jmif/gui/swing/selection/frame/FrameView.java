@@ -18,7 +18,7 @@ public class FrameView implements SingleFrameCreatedListener {
 	public FrameView() {
 		box = Box.createVerticalBox();
 		picture = new JLabel("Please drag and drop the slider");
-		JScrollPane scrollPane = new JScrollPane(picture);
+		var scrollPane = new JScrollPane(picture);
 		box.add(scrollPane);
 	}
 	

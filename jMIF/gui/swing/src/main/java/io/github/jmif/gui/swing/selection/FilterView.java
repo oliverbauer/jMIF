@@ -7,7 +7,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.swing.Box;
@@ -56,17 +55,17 @@ public class FilterView {
 		this.graphWrapper = graphWrapper;
 		this.filters = filters;
 		
-		Box box = Box.createVerticalBox();
+		var box = Box.createVerticalBox();
 
 		currentlyAppliedFilters = getCurrentlyAppliedFilters();
 		
-		Box hBox = Box.createHorizontalBox();
+		var hBox = Box.createHorizontalBox();
 		hBox.add(currentlyAppliedFilters);
 		hBox.add(Box.createHorizontalGlue());
 		box.add(hBox);
 		box.add(Box.createVerticalStrut(5));
 		
-		Box hBox2 = Box.createHorizontalBox();
+		var hBox2 = Box.createHorizontalBox();
 		hBox2.add(getAvailableFiltersBox());
 		hBox2.add(Box.createHorizontalGlue());
 		box.add(hBox2);
@@ -96,7 +95,7 @@ public class FilterView {
 	}
 
 	private Box getCurrentlyAppliedFilters() {
-		Box box = Box.createHorizontalBox();
+		var box = Box.createHorizontalBox();
 
 		lblCurrentlyAppliedFilters = new JLabel("Currently applied filters: -");
 		box.add(lblCurrentlyAppliedFilters);
@@ -112,14 +111,14 @@ public class FilterView {
 			lblCurrentlyAppliedFilters.setText("Currently applied filters: ");
 			currentlyAppliedFilters.add(lblCurrentlyAppliedFilters);
 
-			List<MeltFilter> filters = selectedMeltFile.getFilters();
-			for (int i=0; i<=filters.size()-1; i++) {
-				String filterName = filters.get(i).getFiltername();
-				JLabel filterNameLabel = new JLabel(filterName);
+			var filters = selectedMeltFile.getFilters();
+			for (var i=0; i<=filters.size()-1; i++) {
+				var filterName = filters.get(i).getFiltername();
+				var filterNameLabel = new JLabel(filterName);
 
 				currentlyAppliedFilters.add(filterNameLabel);
 
-				JLabel removeFilter = new JLabel(new ImageIcon(ImageView.class.getClassLoader().getResource("images/png/removeFilter.png")));
+				var removeFilter = new JLabel(new ImageIcon(ImageView.class.getClassLoader().getResource("images/png/removeFilter.png")));
 				removeFilter.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseClicked(MouseEvent e) {
@@ -139,10 +138,10 @@ public class FilterView {
 	}
 
 	private void removeFilter(String filterName) {
-		MeltFilter filter = selectedMeltFile.getFilters().stream().filter(f -> f.getFiltername().equals(filterName)).findAny().get();
+		var filter = selectedMeltFile.getFilters().stream().filter(f -> f.getFiltername().equals(filterName)).findAny().get();
 		selectedMeltFile.getFilters().remove(filter);
 
-		if (filterName.equals((String)selectedFilter.getSelectedItem())) {
+		if (filterName.equals(selectedFilter.getSelectedItem())) {
 			addFilter.setEnabled(true);
 		}
 
@@ -163,7 +162,7 @@ public class FilterView {
 					return;
 				}
 
-				String filter = (String)selectedFilter.getSelectedItem();
+				var filter = (String)selectedFilter.getSelectedItem();
 
 				if (selectedMeltFile != null) {
 					// do not add a filter twice
@@ -174,7 +173,7 @@ public class FilterView {
 					}
 				}
 
-				MeltFilter meltFilter = new MeltFilter(filter);
+				var meltFilter = new MeltFilter(filter);
 				showFilterConfiguration(meltFilter);
 				currentlySelectedFilter = meltFilter;
 			} catch (MIFException e1) {
@@ -184,7 +183,7 @@ public class FilterView {
 		selectedFilter.setPreferredSize(new Dimension(240, 25));
 		selectedFilter.setMaximumSize(new Dimension(240, 25));
 
-		Box dropDownBoxesBox = Box.createHorizontalBox();
+		var dropDownBoxesBox = Box.createHorizontalBox();
 		dropDownBoxesBox.add(selectedFilter);
 		dropDownBoxesBox.add(Box.createHorizontalStrut(10));
 
@@ -215,27 +214,27 @@ public class FilterView {
 	private void showFilterConfiguration(MeltFilter meltFilter) throws MIFException {
 		filterConfigurationContent.removeAll();
 
-		MeltFilterDetails meltFilterDetails = 
+		var meltFilterDetails = 
 				graphWrapper.getService().getMeltFilterDetailsFor(melt, meltFilter);
 
-		Map<String, Integer> configIndex = meltFilterDetails.getConfigIndex(); // parameter to integer
-		List<Map<String, String>> configuration = meltFilterDetails.getConfiguration();
+		var configIndex = meltFilterDetails.getConfigIndex(); // parameter to integer
+		var configuration = meltFilterDetails.getConfiguration();
 
 		for (String param : configIndex.keySet()) {
 
-			Map<String, String> keyValue = configuration.get(configIndex.get(param));
+			var keyValue = configuration.get(configIndex.get(param));
 
-			Box horizontal = Box.createHorizontalBox();
-			JLabel firstLabel = new JLabel(param);
+			var horizontal = Box.createHorizontalBox();
+			var firstLabel = new JLabel(param);
 			firstLabel.setMinimumSize(new Dimension(250, 20));
 			firstLabel.setPreferredSize(new Dimension(250, 20));
 			firstLabel.setMaximumSize(new Dimension(250, 20));
 			horizontal.add(firstLabel);
 
 			horizontal.add(Box.createHorizontalStrut(10));
-			JTextField textField = new JTextField(keyValue.get("default"));
+			var textField = new JTextField(keyValue.get("default"));
 			textField.addActionListener(e -> {
-				String enteredText = textField.getText();
+				var enteredText = textField.getText();
 				// TODO Filter: validate input?
 				meltFilter.getFilterUsage().put(param, enteredText);
 
@@ -246,7 +245,7 @@ public class FilterView {
 			horizontal.add(textField);
 
 			// description + minimum +maximum daneben...
-			JLabel description = new JLabel(keyValue.get("description"));
+			var description = new JLabel(keyValue.get("description"));
 			description.setMinimumSize(new Dimension(400, 20));
 			description.setPreferredSize(new Dimension(400, 20));
 			description.setMaximumSize(new Dimension(400, 20));
@@ -261,7 +260,7 @@ public class FilterView {
 			} else {
 				details = "type="+keyValue.get("type");
 			}
-			JLabel minMax = new JLabel(details);
+			var minMax = new JLabel(details);
 			horizontal.add(Box.createHorizontalStrut(10));
 			horizontal.add(minMax);
 
