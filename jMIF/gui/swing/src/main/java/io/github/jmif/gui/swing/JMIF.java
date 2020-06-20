@@ -274,8 +274,6 @@ public class JMIF {
 			mifSelectionView.setSingleFrameView();
 		} else if (graphWrapper.getText(cell) != null) {
 			mifSelectionView.updateText(cell, graphWrapper.getText(cell));
-		} else {
-			LOGGER.error("Unknown element clicked");
 		}
 	}
 }

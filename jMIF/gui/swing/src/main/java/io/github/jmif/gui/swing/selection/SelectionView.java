@@ -223,11 +223,11 @@ public class SelectionView {
 		return panel;
 	}
 	
-	public MIFFileWrapper<?> getCurrentMeltFile() {
+	public MIFFileWrapper<?> getCurrentFile() {
 		return selectedMeltFile;
 	}
 
-	public MIFAudioFileWrapper getCurrentAudioFile() {
+	public MIFAudioFileWrapper getCurrentAudio() {
 		return selectedAudioFile;
 	}
 	
@@ -235,7 +235,7 @@ public class SelectionView {
 		return selectedCell;
 	}
 
-	public MIFTextFileWrapper getCurrentTextFile() {
+	public MIFTextFileWrapper getCurrentText() {
 		return selectedTextFile;
 	}
 }
