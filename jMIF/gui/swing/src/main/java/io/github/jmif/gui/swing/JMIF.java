@@ -51,7 +51,6 @@ import io.github.jmif.util.TimeUtil;
  *	$ sudo apt-get update
  *	$ sudo apt-get install audiowaveform
  *
- * TODO MLT: Checkout  https://gl-transitions.com/
  * TODO Allow multiple files with same name
  */
 public class JMIF {
