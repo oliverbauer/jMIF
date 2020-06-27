@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.concurrent.Executors;
 
+import javax.inject.Inject;
 import javax.swing.Box;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -18,6 +19,8 @@ import javax.swing.SwingWorker.StateValue;
 import javax.swing.WindowConstants;
 
 import org.apache.commons.io.FileUtils;
+import org.jboss.weld.environment.se.Weld;
+import org.jboss.weld.environment.se.WeldContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,9 +62,23 @@ public class JMIF {
 	private GraphWrapper graphWrapper;
 	private MenuView mifMenuView;
 	private GraphView mifGraphView;
+	
+	@Inject
 	private SelectionView mifSelectionView;
 
 	public static void main(String[] args) throws Exception {
+		Weld weld = new Weld()
+			.property("org.jboss.weld.construction.relaxed", true)
+			.property("org.jboss.weld.bootstrap.concurrentDeployment", false);
+		
+		
+		try (WeldContainer container = weld.initialize()) {
+			JMIF bean = container.select(JMIF.class).get();
+			bean.show();
+		}
+	}
+	
+	public void show() throws Exception {
 		if (Configuration.showSplashscreen) {
 			var splashscreen = new Splashscreen();
 			var worker = splashscreen.getWorker();
@@ -72,8 +89,7 @@ public class JMIF {
 
 		SwingUtilities.invokeLater(() -> {
 			try {
-				var u = new JMIF();
-				u.showFrame();
+				showFrame();
 			} catch (MIFException | IOException | InterruptedException e) {
 				LOGGER.error("", e);
 			}
@@ -129,7 +145,7 @@ public class JMIF {
 		horizontalBox.add(profilesCombobox);
 		panelBox.add(horizontalBox);
 		
-		mifSelectionView = new SelectionView(graphWrapper);
+		mifSelectionView.init(graphWrapper);
 		mifGraphView = new GraphView(frame, graphWrapper, mifSelectionView);
 		mifGraphView.init();
 		panelBox.add(mifGraphView.getGraphPanel());

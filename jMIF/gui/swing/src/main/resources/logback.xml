@@ -12,5 +12,6 @@
     <root level="debug">
  		<appender-ref ref="CONSOLE"/>
     </root>
-
+    
+    <logger name="org.jboss" level="info" />
 </configuration>

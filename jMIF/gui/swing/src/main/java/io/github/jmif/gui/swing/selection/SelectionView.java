@@ -2,6 +2,7 @@ package io.github.jmif.gui.swing.selection;
 
 import java.awt.BorderLayout;
 
+import javax.inject.Inject;
 import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -43,6 +44,7 @@ public class SelectionView {
 
 	private JTabbedPane tabPane;
 	
+	@Inject
 	private ImageView imageView;
 	private ImageDetailsView imageDetailsView;
 	private FilterView filterViewImage;
@@ -59,7 +61,7 @@ public class SelectionView {
 	
 	private FrameView singleFrameView;
 
-    public SelectionView(GraphWrapper graphWrapper) throws MIFException {
+    public void init(GraphWrapper graphWrapper) throws MIFException {
 		panel = Box.createVerticalBox();
 		tabPane = new JTabbedPane();
 		imageDetailsView = new ImageDetailsView(graphWrapper);
@@ -74,7 +76,7 @@ public class SelectionView {
 		filterViewImage = new FilterView(graphWrapper, imageAndVideoFilters);
 		filterViewAudio = new FilterView(graphWrapper, audioFilters);
 		
-		imageView = new ImageView(graphWrapper);
+		imageView.init(graphWrapper);
 		
 		videoView = new VideoView();
 		var videoPanel = videoView.getPanel();

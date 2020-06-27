@@ -9,6 +9,7 @@ import java.awt.event.ItemListener;
 import java.util.Arrays;
 import java.util.Objects;
 
+import javax.inject.Inject;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
@@ -25,12 +26,16 @@ import com.mxgraph.model.mxCell;
 import io.github.jmif.core.MIFException;
 import io.github.jmif.entities.MIFImage.ImageResizeStyle;
 import io.github.jmif.gui.swing.GraphWrapper;
+import io.github.jmif.gui.swing.config.UserConfig;
 import io.github.jmif.gui.swing.entities.MIFImageWrapper;
 
 public class ImageView {
+	@Inject
+	private UserConfig userConfig;
+	
 	private static final Logger logger = LoggerFactory.getLogger(ImageView.class);
 
-	private final GraphWrapper graphWrapper;
+	private GraphWrapper graphWrapper;
 
 	private JLabel[] imgPicture;
 
@@ -45,8 +50,10 @@ public class ImageView {
 	private mxCell selectedCell;
 	private MIFImageWrapper selectedMeltFile;
 
-	public ImageView(final GraphWrapper graphWrapper) throws MIFException {
+	public void init(final GraphWrapper graphWrapper) throws MIFException {
 
+		System.err.println(getClass()+":"+userConfig);
+		
 		this.graphWrapper = graphWrapper;
 
 		// Left part is the original image
