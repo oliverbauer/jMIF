@@ -51,6 +51,7 @@ import io.github.jmif.util.TimeUtil;
 public class JMIF {
 	private static final Logger LOGGER = LoggerFactory.getLogger(JMIF.class);
 
+	@Inject
 	private GraphWrapper graphWrapper;
 	
 	@Inject
@@ -103,7 +104,7 @@ public class JMIF {
 		frame.setTitle("MIF-enizer (MLT/ImageMagickFFMPEG/)");
 
 		// TODO Menu: disbale save-button, preview and gen-button on start...
-		graphWrapper = createMIFProject(userConfig.getGENERAL_PROFILE());
+		createMIFProject(userConfig.getGENERAL_PROFILE());
 		graphWrapper.getGraph().getSelectionModel().addListener(mxEvent.CHANGE, (sender, evt) -> cellClicked(sender));
 
 		var panelBox = Box.createVerticalBox();
@@ -169,57 +170,68 @@ public class JMIF {
 		LOGGER.info("Initialized jMIF in {}", TimeUtil.getMessage(time));
 	}
 
-	private GraphWrapper createMIFProject(String profile) throws MIFException, IOException, InterruptedException {
+	private void createMIFProject(String profile) throws MIFException, IOException, InterruptedException {
 		var tempDir = Files.createTempDirectory("jMIF").toFile();
 
-		var project = new GraphWrapper();
-		project.getPr().setProfile(profile);
-		project.getService().updateProfile(project.getPr());
-		project.getPr().setWorkingDir(tempDir.getAbsolutePath());
-		project.getService().createWorkingDirs(project.getPr());
-		project.getPr().setFileOfProject(project.getPr().getWorkingDir() + "defaultproject.xml");
-		project.getPr().setOutputVideo(project.getPr().getWorkingDir()+"output.avi");
+		graphWrapper.init();
+		graphWrapper.getPr().setProfile(profile);
+		graphWrapper.getService().updateProfile(graphWrapper.getPr());
+		graphWrapper.getPr().setWorkingDir(tempDir.getAbsolutePath());
+		graphWrapper.getService().createWorkingDirs(graphWrapper.getPr());
+		graphWrapper.getPr().setFileOfProject(graphWrapper.getPr().getWorkingDir() + "defaultproject.xml");
+		graphWrapper.getPr().setOutputVideo(graphWrapper.getPr().getWorkingDir()+"output.avi");
 		FileUtils.copyInputStreamToFile(JMIF.class.getClassLoader().getResourceAsStream("defaultproject/1.JPG"),
-				new File(project.getPr().getWorkingDir() + "1.JPG"));
+				new File(graphWrapper.getPr().getWorkingDir() + "1.JPG"));
 		FileUtils.copyInputStreamToFile(JMIF.class.getClassLoader().getResourceAsStream("defaultproject/2.MP4"),
-				new File(project.getPr().getWorkingDir() + "2.MP4"));
+				new File(graphWrapper.getPr().getWorkingDir() + "2.MP4"));
 		FileUtils.copyInputStreamToFile(JMIF.class.getClassLoader().getResourceAsStream("defaultproject/3.JPG"),
-				new File(project.getPr().getWorkingDir() + "3.JPG"));
+				new File(graphWrapper.getPr().getWorkingDir() + "3.JPG"));
 		FileUtils.copyInputStreamToFile(JMIF.class.getClassLoader().getResourceAsStream("defaultproject/audio.mp3"),
-				new File(project.getPr().getWorkingDir() + "audio.mp3"));
+				new File(graphWrapper.getPr().getWorkingDir() + "audio.mp3"));
 		FileUtils.copyInputStreamToFile(JMIF.class.getClassLoader().getResourceAsStream("defaultproject/4.JPG"),
-				new File(project.getPr().getWorkingDir() + "4.JPG"));
+				new File(graphWrapper.getPr().getWorkingDir() + "4.JPG"));
 		FileUtils.copyInputStreamToFile(JMIF.class.getClassLoader().getResourceAsStream("defaultproject/audio2.mp3"),
-				new File(project.getPr().getWorkingDir() + "audio2.mp3"));
+				new File(graphWrapper.getPr().getWorkingDir() + "audio2.mp3"));
 		FileUtils.copyInputStreamToFile(JMIF.class.getClassLoader().getResourceAsStream("defaultproject/5.JPG"),
-				new File(project.getPr().getWorkingDir() + "5.JPG"));
+				new File(graphWrapper.getPr().getWorkingDir() + "5.JPG"));
 		
-		project.createMIFFile(new File(project.getPr().getWorkingDir() + "1.JPG"));
-		project.createMIFFile(new File(project.getPr().getWorkingDir() + "2.MP4"));
-		project.createMIFFile(new File(project.getPr().getWorkingDir() + "3.JPG"));
-		var audio = project.createMIFAudioFile(new File(project.getPr().getWorkingDir()+"audio.mp3"));
+		MIFFile image1 = graphWrapper.createMIFFile(new File(graphWrapper.getPr().getWorkingDir() + "1.JPG"));
+		MIFFile video2 = graphWrapper.createMIFFile(new File(graphWrapper.getPr().getWorkingDir() + "2.MP4"));
+		MIFFile image3 = graphWrapper.createMIFFile(new File(graphWrapper.getPr().getWorkingDir() + "3.JPG"));
+		var audio = graphWrapper.createMIFAudioFile(new File(graphWrapper.getPr().getWorkingDir()+"audio.mp3"));
 		audio.setEncodeEnde(10000); // [ms]
-		project.createMIFFile(new File(project.getPr().getWorkingDir() + "4.JPG"));
-		project.createMIFFile(new File(project.getPr().getWorkingDir() + "5.JPG"));
-		var audio2 = project.createMIFAudioFile(new File(project.getPr().getWorkingDir()+"audio2.mp3"));
+		MIFFile image4 = graphWrapper.createMIFFile(new File(graphWrapper.getPr().getWorkingDir() + "4.JPG"));
+		MIFFile image5 = graphWrapper.createMIFFile(new File(graphWrapper.getPr().getWorkingDir() + "5.JPG"));
+		var audio2 = graphWrapper.createMIFAudioFile(new File(graphWrapper.getPr().getWorkingDir()+"audio2.mp3"));
 		audio2.setEncodeEnde(14000); // [ms]
 		
-		var text = project.createMIFTextfile();
+		var text = graphWrapper.createMIFTextfile();
 		text.setLength(userConfig.getTEXT_DURATION()); // [ms]
 		text.setBgcolour(userConfig.getTEXT_BG());
 		text.setFgcolour(userConfig.getTEXT_FG());
 		text.setOlcolour(userConfig.getTEXT_OL());
 		
-		var text2 = project.createMIFTextfile();
+		var text2 = graphWrapper.createMIFTextfile();
 		text2.setLength(userConfig.getTEXT_DURATION()); // [ms]
 		text2.setBgcolour(userConfig.getTEXT_BG());
 		text2.setFgcolour(userConfig.getTEXT_FG());
 		text2.setOlcolour(userConfig.getTEXT_OL());
 		
-		project.redrawGraph();
-		project.createFramePreview();
+		graphWrapper.redrawGraph();
+		graphWrapper.createFramePreview();
 
-		return project;
+		var executor = Executors.newWorkStealingPool();
+		executor.submit(() -> {
+			try {
+				graphWrapper.getService().createPreview(image1, graphWrapper.getPr().getWorkingDir());
+				graphWrapper.getService().createPreview(video2, graphWrapper.getPr().getWorkingDir());
+				graphWrapper.getService().createPreview(image3, graphWrapper.getPr().getWorkingDir());
+				graphWrapper.getService().createPreview(image4, graphWrapper.getPr().getWorkingDir());
+				graphWrapper.getService().createPreview(image5, graphWrapper.getPr().getWorkingDir());
+			} catch (Exception e) {
+				LOGGER.error("", e);
+			}
+		});
 	}
 
 	private ProjectListener createChangeListener() {

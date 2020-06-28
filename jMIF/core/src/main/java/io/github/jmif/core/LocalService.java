@@ -45,7 +45,6 @@ public class LocalService {
 			throw new MIFException(e);
 		}
 	}
-
 	
 	public void convert(MIFProject pr, boolean preview) throws MIFException {
 		try {
@@ -54,7 +53,6 @@ public class LocalService {
 			throw new MIFException(e);
 		}
 	}
-
 	
 	public void updateProfile(MIFProject project) {
 		var framerate = -1;
@@ -89,7 +87,6 @@ public class LocalService {
 			logger.error("Unable to extract framerate for "+project.getProfile(), e);
 		}
 	}
-
 	
 	public void createWorkingDirs(MIFProject project) {
 		if (!project.getWorkingDir().endsWith("/")) {
@@ -113,7 +110,6 @@ public class LocalService {
 			logger.info("Created dir 'scaled' within {}", project.getWorkingDir());
 		}
 	}
-
 	
 	public MIFVideo createVideo(File file, String display, int frames, String dim, int overlay, String workingDir) throws MIFException {
 		var video = new MIFVideo(file, display, frames, dim, overlay);
@@ -192,13 +188,12 @@ public class LocalService {
 
 		return video;
 	}
-
 	
 	public MIFFile createPreview(MIFFile file, String workingDir) throws MIFException {
 		if (file instanceof MIFImage) {
-			return createImagePreview(MIFImage.class.cast(file), workingDir);
+			return createImagePreview((MIFImage)(file), workingDir);
 		} else if (file instanceof MIFVideo) {
-			return createVideoPreview(MIFVideo.class.cast(file), workingDir);
+			return createVideoPreview((MIFVideo)(file), workingDir);
 		}
 		throw new MIFException(new Exception("Cannot parse MIFFile"));
 	}
@@ -285,7 +280,6 @@ public class LocalService {
 		
 		return video;
 	}
-
 	
 	public void createManualPreview(MIFImage image) {
 		image.setStyle(ImageResizeStyle.MANUAL);
@@ -314,7 +308,6 @@ public class LocalService {
 			logger.error("Unable to create manual style image ",e);
 		}
 	}
-
 	
 	public MIFImage createImage(File file, String display, int frames, String dim, int overlay, String workingDir) throws MIFException {
 		var image = new MIFImage(file, display, frames, dim, overlay);
@@ -324,7 +317,7 @@ public class LocalService {
 		var copy = workingDir + "orig/" + filename;
 
 		if (image.getWidth() == -1 || image.getHeight() == -1) {
-			logger.debug("Init: Check Width/Height of '{}'", filename);
+			logger.debug("Init: Check Width/Height of '{}'", image);
 
 			var command = "ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "	+ copy;
 			Process process;
@@ -333,6 +326,7 @@ public class LocalService {
 					.directory(file.getParentFile())
 					.redirectErrorStream(true)
 					.start();
+				process.waitFor();
 				String output = null;
 
 				try (var reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
@@ -341,32 +335,36 @@ public class LocalService {
 						output = line;
 					}
 				}
+				if (!output.contains("x")) {
+					logger.error("Unexpected output: {}", output);
+				}
+				
 				image.setWidth(Integer.valueOf(output.substring(0, output.indexOf('x'))));
 				image.setHeight(Integer.valueOf(output.substring(output.indexOf('x') + 1)));
 				
+				image.setPreviewHeight(image.getHeight() / 16);
+				image.setPreviewWidth((int) (image.getPreviewHeight() * 1.78));
+				
+				var origHeight = 3888;
+				var aspectHeight = origHeight / 16;
+				var estimatedWith = (int) (aspectHeight * 1.78);
+				
+				var wxh = estimatedWith + "x" + aspectHeight;
+				var basename = FilenameUtils.getBaseName(image.getFile().getName());
+				var extension = image.getFileExtension();
+				image.setImagePreviewPath(Paths.get(workingDir).resolve("preview").resolve(basename + "_thumb."+wxh+"."+
+						extension));
+				image.setPreviewHardResizePath(Paths.get(workingDir).resolve("preview").resolve(basename+"_hard."+wxh+"."+extension));
+				image.setPreviewCropPath(Paths.get(workingDir).resolve("preview").resolve(basename+"_kill."+wxh+"."+extension));
+				image.setPreviewManualPath(Paths.get(workingDir).resolve("preview").resolve(basename+"_manual."+wxh+"."+extension));
 				logger.debug("Width/Height = {}/{}", image.getWidth(), image.getHeight());
-			} catch (IOException e) {
+			} catch (IOException | InterruptedException e) {
 				logger.error("Unable to get image dimension", e);
 			}
 		} else {
 			logger.debug("Init: Check Width/Height of '{}' already available", copy);
 		}
 
-		image.setPreviewHeight(image.getHeight() / 16);
-		image.setPreviewWidth((int) (image.getPreviewHeight() * 1.78));
-
-		var origHeight = 3888;
-		var aspectHeight = origHeight / 16;
-		var estimatedWith = (int) (aspectHeight * 1.78);
-
-		var wxh = estimatedWith + "x" + aspectHeight;
-		var basename = FilenameUtils.getBaseName(image.getFile().getName());
-		var extension = image.getFileExtension();
-		image.setImagePreviewPath(Paths.get(workingDir).resolve("preview").resolve(basename + "_thumb."+wxh+"."+
-				extension));
-		image.setPreviewHardResizePath(Paths.get(workingDir).resolve("preview").resolve(basename+"_hard."+wxh+"."+extension));
-		image.setPreviewCropPath(Paths.get(workingDir).resolve("preview").resolve(basename+"_kill."+wxh+"."+extension));
-		image.setPreviewManualPath(Paths.get(workingDir).resolve("preview").resolve(basename+"_manual."+wxh+"."+extension));
 		return image;
 	}
 
@@ -375,58 +373,35 @@ public class LocalService {
 
 		var original = workingDir + "orig/" + filename;
 
-		if (!new File(original).exists()) {
-			try {
-				new ProcessBuilder("bash", "-c", "cp "+image.getFile()+" "+original)
-				.directory(new File(workingDir))
-				.redirectErrorStream(true)
-				.start()
-				.waitFor();
-//				image.set TODO
-			} catch (InterruptedException | IOException e) {
-				throw new MIFException(e);
-			}
-		}
-
 		var origHeight = 3888;
 		var aspectHeight = origHeight / 16;
 		var estimatedWith = (int) (aspectHeight * 1.78);
 
-		if (image.getImagePreviewPath() == null) {
-			logger.error("Something went wrong with Threads....");
-			return image;
-		}
-		
-		if (image.getImagePreviewPath() == null || !Files.exists(image.getImagePreviewPath())) {
-			// Create preview: convert -thumbnail 200 abc.png thumb.abc.png
-			logger.info("Init: Create Preview-Image {}", image.getImagePreviewPath());
-			var command = "convert -geometry " + image.getPreviewWidth() + "x " + original + " " + image.getImagePreviewPath();
-			try {
-				var process = new ProcessBuilder("bash", "-c", command)
-						.directory(new File(workingDir))
-						.redirectErrorStream(true)
-						.start();
-				process.waitFor();
-				image.setImagePreview(ImageIO.read(image.getImagePreviewPath().toFile()));
+		// Create preview: convert -thumbnail 200 abc.png thumb.abc.png
+		logger.info("Init: Create Preview-Image {}", image);
+		var command = "convert -geometry " + image.getPreviewWidth() + "x " + original + " " + image.getImagePreviewPath();
+		try {
+			var process = new ProcessBuilder("bash", "-c", command)
+				.directory(new File(workingDir))
+				.redirectErrorStream(true)
+				.start();
+			process.waitFor();
 
-				try (var reader = new BufferedReader(
-						new InputStreamReader(process.getInputStream()))) {
-					String line;
-					while ((line = reader.readLine()) != null) {
-						logger.error(line);
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
+			try (var reader = new BufferedReader(
+					new InputStreamReader(process.getInputStream()))) {
+				String line;
+				while ((line = reader.readLine()) != null) {
+					logger.error(line);
 				}
-			} catch (IOException | InterruptedException e) {
-				throw new MIFException(e);
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-
-
-			// Preview: 324x243 (Aspect ration) from 5184/16 x 3888/16
-		} else {
-			logger.debug("Init: Preview-Image {} already exists", image.getImagePreviewPath());
+			
+			image.setImagePreview(ImageIO.read(image.getImagePreviewPath().toFile()));
+		} catch (IOException | InterruptedException e) {
+			throw new MIFException(e);
 		}
+		// Preview: 324x243 (Aspect ration) from 5184/16 x 3888/16
 
 		if (!Files.exists(image.getPreviewHardResizePath())) {
 			logger.info("Init: Create HARD-Preview-Image {}", image.getPreviewHardResizePath());
@@ -483,7 +458,6 @@ public class LocalService {
 		// TODO manual preview if exists
 		return image;
 	}
-
 	
 	public MIFAudio createAudio(String path) throws MIFException {
 		var audioFile = new MIFAudio();
@@ -703,7 +677,6 @@ public class LocalService {
 		}
 	}
 	
-	
 	public List<MeltFilterDetails> getMeltVideoFilterDetails(Melt melt) throws MIFException {
 		return getOrLoad(melt)
 			.stream()
@@ -712,7 +685,6 @@ public class LocalService {
 			.collect(Collectors.toList());
 	}
 	
-	
 	public List<MeltFilterDetails> getMeltAudioFilterDetails(Melt melt) throws MIFException {
 		return getOrLoad(melt)
 			.stream()
@@ -720,7 +692,6 @@ public class LocalService {
 			.filter(i -> i.getGeneralInformations().get("tags").equals("Audio"))
 			.collect(Collectors.toList());
 	}
-	
 	
 	public MeltFilterDetails getMeltFilterDetailsFor(Melt melt, MeltFilter meltFilter) throws MIFException {
 		return getOrLoad(melt).stream().filter(mdf -> mdf.getFiltername().contentEquals(meltFilter.getFiltername())).findAny().get();
@@ -767,10 +738,8 @@ public class LocalService {
 			}
 		}
 	}
-
 	
 	public MIFTextFile createText() {
-		var textFile = new MIFTextFile();
-		return textFile;
+		return new MIFTextFile();
 	}
 }

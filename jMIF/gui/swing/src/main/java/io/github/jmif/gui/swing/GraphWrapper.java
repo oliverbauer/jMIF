@@ -36,10 +36,8 @@ import io.github.jmif.config.Configuration;
 import io.github.jmif.core.MIFException;
 import io.github.jmif.entities.MIFAudio;
 import io.github.jmif.entities.MIFFile;
-import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFProject;
 import io.github.jmif.entities.MIFTextFile;
-import io.github.jmif.entities.MIFVideo;
 import io.github.jmif.gui.swing.config.UserConfig;
 import io.github.jmif.gui.swing.listener.AddRemoveListener;
 import io.github.jmif.gui.swing.listener.ProjectListener;
@@ -86,6 +84,10 @@ public class GraphWrapper {
 	private AddRemoveListener addRemoveListener;
 	
 	public GraphWrapper() {
+		
+	}
+	
+	public void init() {
 		pr = new MIFProject();
 		this.nodeToMIFFile = new LinkedHashMap<>();
 		this.nodeToMIFAudio = new LinkedHashMap<>();
@@ -215,85 +217,61 @@ public class GraphWrapper {
 		var file = fileToAdd.getAbsoluteFile().getAbsolutePath();
 		var extension = FilenameUtils.getExtension(file);
 
-		MIFFile mifFile = null;
-		
 		var display = file.substring(file.lastIndexOf('/') + 1);
 		if (Configuration.allowedImageTypes.contains(extension)) {
-			mifFile = new MIFImage();
-			mifFile.setFile(fileToAdd);
 			var result = service.createImage(
 				fileToAdd, 
 				display, 
-				5000, // userConfig.getIMAGE_DURATION(), // FIXME Config: Why no preview images are generated when loading from userConfig? 
+				userConfig.getIMAGE_DURATION(), 
 				"-1x-1", // Will be updated by thread
-				1000, // userConfig.getIMAGE_OVERLAY(),  // FIXME Config: Why no preview images are generated when loading from userConfig?
+				userConfig.getIMAGE_OVERLAY(),
 				pr.getWorkingDir()
 			);
-			var found = nodeToMIFFile.entrySet().stream().filter(es -> es.getValue().equals(result)).map(Map.Entry::getKey).findFirst();
-			if (found.isPresent()) {
-				var cell = found.get();
-				nodeToMIFFile.put(cell, result);
-				var x = 0;
-				var y = -1;
-				var w = getPixelwidth(result);
-				var h = Configuration.timelineentryHeight;
-				
-				resize(cell, new mxRectangle(x, y, w, h));
-			} else {
-				if (!pr.getMIFFiles().isEmpty()) {
-					currentLength -= (result.getOverlayToPrevious() / 1000d) * 25; // TODO Framerate?
-				}
+			result.setFile(fileToAdd);
 
-				var n = result.getDisplayName();
-				var x = currentLength + XOFFSET;
-				var y = pr.getMIFFiles().size() % 2 == 0 ? 0 + YOFFSET : Configuration.timelineentryHeight + YOFFSET;
-				var w = getPixelwidth(result);
-				var h = Configuration.timelineentryHeight;
-				
-				put(result, createVertex(n, x, y, w, h));
+			if (!pr.getMIFFiles().isEmpty()) {
+				currentLength -= (result.getOverlayToPrevious() / 1000d) * 25; // TODO Framerate?
 			}
 
-			service.createPreview(result, getPr().getWorkingDir());
-			redrawGraph();
-		} else if (Configuration.allowedVideoTypes.contains(extension)) {
-			mifFile = new MIFVideo();
-			mifFile.setFile(fileToAdd);
+			var n = result.getDisplayName();
+			var x = currentLength + XOFFSET;
+			var y = pr.getMIFFiles().size() % 2 == 0 ? 0 + YOFFSET : Configuration.timelineentryHeight + YOFFSET;
+			var w = getPixelwidth(result);
+			var h = Configuration.timelineentryHeight;
+			
+			put(result, createVertex(n, x, y, w, h));
 
+			redrawGraph();
+			
+			return result;
+		} else if (Configuration.allowedVideoTypes.contains(extension)) {
 			var result = service.createVideo(
 				fileToAdd, 
 				display, 
 				-1, 
 				"1920x1080", // Will be updated by thread
-				1000, // userConfig.getVIDEO_OVERLAY(),  // FIXME Config: Why no preview images are generated when loading from userConfig?
+				userConfig.getVIDEO_OVERLAY(),
 				pr.getWorkingDir()
 			);
-			var found = nodeToMIFFile.entrySet().stream().filter(es -> es.getValue().equals(result)).map(Map.Entry::getKey).findFirst();
-			if (found.isPresent()) {
-				var cell = found.get();
-				nodeToMIFFile.put(cell, result);
-				var x = 0;
-				var y = -1; // TODO -1 ?
-				var w = getPixelwidth(result);
-				var h = Configuration.timelineentryHeight;
-				
-				resize(cell, new mxRectangle(x, y, w, h));
-			} else {
-				if (!pr.getMIFFiles().isEmpty()) {
-					currentLength -= (result.getOverlayToPrevious() / 1000d) * 25;
-				}
-
-				var n = result.getDisplayName();
-				var x = currentLength + XOFFSET;
-				var y = pr.getMIFFiles().size() % 2 == 0 ? 0 + YOFFSET : Configuration.timelineentryHeight + YOFFSET;
-				var w = getPixelwidth(result);
-				var h = Configuration.timelineentryHeight;
-				
-				put(result, createVertex(n, x, y, w, h));
+			result.setFile(fileToAdd);
+			
+			if (!pr.getMIFFiles().isEmpty()) {
+				currentLength -= (result.getOverlayToPrevious() / 1000d) * 25;
 			}
-			service.createPreview(result, getPr().getWorkingDir());
+
+			var n = result.getDisplayName();
+			var x = currentLength + XOFFSET;
+			var y = pr.getMIFFiles().size() % 2 == 0 ? 0 + YOFFSET : Configuration.timelineentryHeight + YOFFSET;
+			var w = getPixelwidth(result);
+			var h = Configuration.timelineentryHeight;
+			
+			put(result, createVertex(n, x, y, w, h));
+
 			redrawGraph();
+			
+			return result;
 		}
-		return mifFile;
+		return null;
 	}
 	
 	public void initializeProject() {
