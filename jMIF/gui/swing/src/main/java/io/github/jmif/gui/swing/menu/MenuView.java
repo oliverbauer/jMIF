@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.io.IOException;
 
+import javax.inject.Inject;
 import javax.swing.Box;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import io.github.jmif.config.Configuration;
 import io.github.jmif.core.MIFException;
 import io.github.jmif.gui.swing.GraphWrapper;
+import io.github.jmif.gui.swing.config.UserConfigDialog;
 import io.github.jmif.gui.swing.listener.ProjectListener.type;
 import io.github.jmif.gui.swing.menu.util.ButtonFactory;
 
@@ -24,7 +26,10 @@ public class MenuView {
 
 	private JPanel panel;
 	
-	public MenuView(final GraphWrapper graphWrapper) {
+	@Inject
+	private UserConfigDialog userConfigDialog;
+	
+	public void init(final GraphWrapper graphWrapper) {
 		panel = new JPanel();
 		panel.setLayout(new BorderLayout());
 		panel.setBackground(Configuration.bgColor);
@@ -126,6 +131,16 @@ public class MenuView {
 		});
 		renderBox.add(renderButton);
 		horizontalBox.add(renderBox);
+		horizontalBox.add(Box.createHorizontalStrut(5));
+		
+		
+		var configBox = Box.createVerticalBox();
+		var configButton = ButtonFactory.newButton("/images/svg/menuButtonQuadConfig.svg", "/images/svg/menuButtonQuadConfigHover.svg");
+		configButton.addActionListener(e -> {
+			userConfigDialog.show();
+		});
+		configBox.add(configButton);
+		horizontalBox.add(configBox);
 		horizontalBox.add(Box.createHorizontalStrut(5));
 		
 		var exitBox = Box.createVerticalBox();

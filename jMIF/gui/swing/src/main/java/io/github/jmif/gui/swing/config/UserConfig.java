@@ -69,44 +69,48 @@ public class UserConfig {
 			}
 
 		} else {
-
-			
-			Configurations configs = new Configurations();
-			try {
-				new File(home + "/.jMIF").mkdirs();
-				new File(home + "/.jMIF/configuration.properties").createNewFile();
-				
-				FileBasedConfigurationBuilder<PropertiesConfiguration> builder = configs.propertiesBuilder(new File(home + "/.jMIF/configuration.properties"));
-				Configuration config = builder.getConfiguration();
-
-				// update property
-				config.addProperty("GENERAL_PROFILE", GENERAL_PROFILE);
-				config.addProperty("GENERAL_SHOW_SPLASHSCREEN", GENERAL_SHOW_SPLASHSCREEN);
-				
-				config.addProperty("IMAGE_DURATION", IMAGE_DURATION);
-				config.addProperty("IMAGE_OVERLAY", IMAGE_OVERLAY);
-				
-				config.addProperty("VIDEO_OVERLAY", VIDEO_OVERLAY);
-				
-				config.addProperty("AUDIO_FADE_IN", AUDIO_FADE_IN);
-				config.addProperty("AUDIO_FADE_OUT", AUDIO_FADE_OUT);
-				config.addProperty("AUDIO_NORMALIZE", AUDIO_NORMALIZE);
-				
-				config.addProperty("TEXT_DURATION", TEXT_DURATION);
-				config.addProperty("TEXT_BG", TEXT_BG);
-				config.addProperty("TEXT_FG", TEXT_FG);
-				config.addProperty("TEXT_OL", TEXT_OL);
-
-				// save configuration
-				builder.save();
-				
-				LoggerFactory.getLogger(getClass()).info("Config successfully stored in HOME-DIR");
-			} catch (ConfigurationException | IOException cex) {
-				LoggerFactory.getLogger(getClass()).error("Unable to store config in HOME-DIR", cex);
-			}
+			save();
 		}
 	}
 
+	public void save() {
+		Configurations configs = new Configurations();
+		try {
+			String home = System.getProperty("user.home");
+			
+			new File(home + "/.jMIF").mkdirs();
+			new File(home + "/.jMIF/configuration.properties").createNewFile();
+			
+			FileBasedConfigurationBuilder<PropertiesConfiguration> builder = configs.propertiesBuilder(new File(home + "/.jMIF/configuration.properties"));
+			Configuration config = builder.getConfiguration();
+
+			// update property
+			config.setProperty("GENERAL_PROFILE", GENERAL_PROFILE);
+			config.setProperty("GENERAL_SHOW_SPLASHSCREEN", GENERAL_SHOW_SPLASHSCREEN);
+			
+			config.setProperty("IMAGE_DURATION", IMAGE_DURATION);
+			config.setProperty("IMAGE_OVERLAY", IMAGE_OVERLAY);
+			
+			config.setProperty("VIDEO_OVERLAY", VIDEO_OVERLAY);
+			
+			config.setProperty("AUDIO_FADE_IN", AUDIO_FADE_IN);
+			config.setProperty("AUDIO_FADE_OUT", AUDIO_FADE_OUT);
+			config.setProperty("AUDIO_NORMALIZE", AUDIO_NORMALIZE);
+			
+			config.setProperty("TEXT_DURATION", TEXT_DURATION);
+			config.setProperty("TEXT_BG", TEXT_BG);
+			config.setProperty("TEXT_FG", TEXT_FG);
+			config.setProperty("TEXT_OL", TEXT_OL);
+
+			// save configuration
+			builder.save();
+			
+			LoggerFactory.getLogger(getClass()).info("Config successfully stored in HOME-DIR");
+		} catch (ConfigurationException | IOException cex) {
+			LoggerFactory.getLogger(getClass()).error("Unable to store config in HOME-DIR", cex);
+		}
+	}
+	
 	public String getGENERAL_PROFILE() {
 		return GENERAL_PROFILE;
 	}

@@ -53,6 +53,8 @@ public class JMIF {
 	private static final Logger LOGGER = LoggerFactory.getLogger(JMIF.class);
 
 	private GraphWrapper graphWrapper;
+	
+	@Inject
 	private MenuView mifMenuView;
 	
 	@Inject
@@ -106,7 +108,7 @@ public class JMIF {
 		graphWrapper.getGraph().getSelectionModel().addListener(mxEvent.CHANGE, (sender, evt) -> cellClicked(sender));
 
 		var panelBox = Box.createVerticalBox();
-		mifMenuView = new MenuView(graphWrapper);
+		mifMenuView.init(graphWrapper);
 		panelBox.add(mifMenuView.getJPanel());
 		if (Configuration.transperencyOffset > 0) {
 			panelBox.add(Box.createRigidArea(new Dimension(0, Configuration.transperencyOffset)));

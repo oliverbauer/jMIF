@@ -15,6 +15,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.inject.Inject;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingWorker;
 import javax.xml.bind.JAXBContext;
@@ -39,6 +40,7 @@ import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFProject;
 import io.github.jmif.entities.MIFTextFile;
 import io.github.jmif.entities.MIFVideo;
+import io.github.jmif.gui.swing.config.UserConfig;
 import io.github.jmif.gui.swing.entities.MIFAudioFileWrapper;
 import io.github.jmif.gui.swing.entities.MIFFileWrapper;
 import io.github.jmif.gui.swing.entities.MIFImageWrapper;
@@ -53,6 +55,9 @@ import io.github.jmif.util.TimeUtil;
 
 public class GraphWrapper {
 	private static final Logger logger = LoggerFactory.getLogger(GraphWrapper.class);
+	
+	@Inject
+	private UserConfig userConfig;
 	
 	private final CoreGateway service = new CoreGateway();
 	
@@ -223,7 +228,14 @@ public class GraphWrapper {
 			mifFile.setFile(fileToAdd);
 			executor.submit(() -> {
 					try {
-						var result = service.createImage(fileToAdd, display, 5000, "-1x-1", 1000, pr.getWorkingDir());
+						var result = service.createImage(
+							fileToAdd, 
+							display, 
+							5000, // userConfig.getIMAGE_DURATION(), // FIXME Config: Why no preview images are generated when loading from userConfig? 
+							"-1x-1", // Will be updated by thread
+							1000, // userConfig.getIMAGE_OVERLAY(),  // FIXME Config: Why no preview images are generated when loading from userConfig?
+							pr.getWorkingDir()
+						);
 						var found = nodeToMIFFile.entrySet().stream().filter(es -> es.getValue().equals(result)).map(Map.Entry::getKey).findFirst();
 						if (found.isPresent()) {
 							var cell = found.get();
@@ -236,7 +248,7 @@ public class GraphWrapper {
 							resize(cell, new mxRectangle(x, y, w, h));
 						} else {
 							if (!pr.getMIFFiles().isEmpty()) {
-								currentLength -= (result.getOverlayToPrevious() / 1000d) * 25;
+								currentLength -= (result.getOverlayToPrevious() / 1000d) * 25; // TODO Framerate?
 							}
 
 							var n = result.getDisplayName();
@@ -264,13 +276,20 @@ public class GraphWrapper {
 			mifFile.setFile(fileToAdd);
 			executor.submit(() -> {
 				try {
-					var result = service.createVideo(fileToAdd, display, -1, "1920x1080", 1000, pr.getWorkingDir());
+					var result = service.createVideo(
+						fileToAdd, 
+						display, 
+						-1, 
+						"1920x1080", // Will be updated by thread
+						1000, // userConfig.getVIDEO_OVERLAY(),  // FIXME Config: Why no preview images are generated when loading from userConfig?
+						pr.getWorkingDir()
+					);
 					var found = nodeToMIFFile.entrySet().stream().filter(es -> es.getValue().equals(result)).map(Map.Entry::getKey).findFirst();
 					if (found.isPresent()) {
 						var cell = found.get();
 						nodeToMIFFile.put(cell, result);
 						var x = 0;
-						var y = -1;
+						var y = -1; // TODO -1 ?
 						var w = getPixelwidth(result);
 						var h = Configuration.timelineentryHeight;
 						
@@ -299,12 +318,12 @@ public class GraphWrapper {
 				} catch (MIFException e) {
 					logger.error("", e);
 				}
-		});
+			});
 		}
 		
 		if (mifFile != null) {
 			if (!pr.getMIFFiles().isEmpty()) {
-				currentLength -= (mifFile.getOverlayToPrevious() / 1000d) * 25;
+				currentLength -= (mifFile.getOverlayToPrevious() / 1000d) * 25; // TODO Framerate?
 			}
 
 			var n = mifFile.getDisplayName();

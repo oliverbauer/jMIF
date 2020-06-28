@@ -45,11 +45,11 @@ public class ImageDetailsView {
 	    	try {
 	    		var i = Integer.parseInt(input);
 	    		
-	    		if (i<25) {
-	    			throw new IllegalArgumentException("Muss >= 25 Frames sein");
+	    		if (i<1000) {
+	    			throw new IllegalArgumentException("Must be at least 1 sec = 1000 ms");
 	    		}
-	    		if (i>250) {
-	    			throw new IllegalArgumentException("Muss <= 250 Frames sein");
+	    		if (i>15000) {
+	    			throw new IllegalArgumentException("Not allowed to be more that 15 sec = 15000 ms");
 	    		}
 	    		
 	    		meltFile.setDuration(i);

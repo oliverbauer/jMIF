@@ -163,9 +163,8 @@ public class ImageView {
 				var item = (ImageResizeStyle) e.getItem();
 				selectedMeltFile.setStyle(item);
 
-				logger.info("Switching over '{}'", item);
+				logger.info("Switching to style '{}'", item);
 				var mifImage = MIFImageWrapper.class.cast(selectedMeltFile);
-				final var previewCrop = mifImage.getPreviewCrop();
 				switch (item) {
 				case HARD:
 					final var previewHardResize = mifImage.getPreviewHardResize();
@@ -176,6 +175,7 @@ public class ImageView {
 					}
 					break;
 				case CROP:
+					final var previewCrop = mifImage.getPreviewCrop();
 					if (Objects.nonNull(previewCrop)) {
 						imgPicture[1].setIcon(new ImageIcon(previewCrop));
 						resizeStyleDetails.setVisible(true);
@@ -193,12 +193,7 @@ public class ImageView {
 					break;
 				default:
 					logger.error("Unknown style '{}' for image. Using 'CROP", item);
-					if (Objects.nonNull(previewCrop)) {
-						imgPicture[1].setIcon(new ImageIcon(previewCrop));
-						resizeStyleDetails.setVisible(true);
-						resizeStyleDetailsLabel.setVisible(true);
-						resizeStyleDetailsLabel.setText("Crop from where: ");
-					}
+					throw new RuntimeException("Unknown style for image: "+item);
 				}
 
 				panel.updateUI();
