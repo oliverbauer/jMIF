@@ -305,8 +305,6 @@ class MIFProjectExecutor {
 		var h = project.getProfileHeight(); // e.g. 1080
 
 		switch (image.getStyle()) {
-		case FILL:
-			// TODO Image Fill convert
 		case HARD:
 			execute("convert "+input+" -geometry "+w+"x"+h+"! -quality 100 "+output);
 			break;

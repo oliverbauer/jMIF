@@ -46,15 +46,7 @@ import io.github.jmif.util.TimeUtil;
  * TODO Disable click on node until Thread with preview images finished (otherwise image will not be displayed) 
  * TODO Release profile (bzip2) with example-Dir included 
  * TODO Config-Button (store config in HOME-Dir) 
- * TODO Menu: About (Used Software etc.) 
- * TODO Menu: How to Install/Use 
  * TODO Config: Allow in-memory-preview (byte-arrays of pictures - needs more RAM) or hd-preview (copy files - needs more HD/Time for IO) 
- * 
- * TODO Audio: "audiowaveform -i 001.mp3 -o test.png -w 1000 -h 200 -s 0 -e ${seconds} --no-axis-labels" (or (better?) use Sox).. needs optional check in SplashScreen 
- * 	$ sudo add-apt-repository ppa:chris-needham/ppa
- *	$ sudo apt-get update
- *	$ sudo apt-get install audiowaveform
- *
  * TODO Allow multiple files with same name
  */
 public class JMIF {
@@ -296,7 +288,7 @@ public class JMIF {
 			mifSelectionView.updateImageOrVideo(cell, graphWrapper.get(cell));
 		} else if (graphWrapper.getAudio(cell) != null) {
 			LOGGER.info("Selected {}", graphWrapper.getAudio(cell).getAudiofile());
-			mifSelectionView.updateAudio(cell, graphWrapper.getAudio(cell), graphWrapper);
+			mifSelectionView.updateAudio(cell, graphWrapper.getAudio(cell));
 		} else if (graphWrapper.isSingleFrameNode(cell)) {
 			mifSelectionView.setSingleFrameView();
 		} else if (graphWrapper.getText(cell) != null) {

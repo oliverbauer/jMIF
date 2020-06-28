@@ -30,10 +30,6 @@ public class MIFImageWrapper extends MIFFileWrapper<MIFImage> {
 		return toMIFFile().getPreviewCrop();
 	}
 
-	public Image getPreviewFillWColor() {
-		return toMIFFile().getPreviewFillWColor();
-	}
-	
 	public Image getPreviewHardResize() {
 		return toMIFFile().getPreviewHardResize();
 	}

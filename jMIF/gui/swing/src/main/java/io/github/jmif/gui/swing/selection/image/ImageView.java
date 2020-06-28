@@ -142,12 +142,6 @@ public class ImageView {
 				setSelectedPicture(previewCrop);
 			}
 			break;
-		case FILL:
-			final var previewFillWColor = meltFile.getPreviewFillWColor();
-			if (Objects.nonNull(previewFillWColor)) {
-				setSelectedPicture(previewFillWColor);
-			}
-			break;
 		case HARD:
 			final var previewHardResize = meltFile.getPreviewHardResize();
 			if (Objects.nonNull(previewHardResize)) {
@@ -179,15 +173,6 @@ public class ImageView {
 						imgPicture[1].setIcon(new ImageIcon(previewHardResize));
 						resizeStyleDetails.setVisible(false);
 						resizeStyleDetailsLabel.setVisible(false);
-					}
-					break;
-				case FILL:
-					final var previewFillWColor = mifImage.getPreviewFillWColor();
-					if (Objects.nonNull(previewFillWColor)) {
-						imgPicture[1].setIcon(new ImageIcon(previewFillWColor));
-						resizeStyleDetails.setVisible(true);
-						resizeStyleDetailsLabel.setVisible(true);
-						resizeStyleDetailsLabel.setText("Fill color:");
 					}
 					break;
 				case CROP:

@@ -20,7 +20,6 @@ public abstract class MIFFile {
 	private File file;
 	protected String displayName;
 
-	// TODO Overlay: Depends on #9 Configuration: Create properties-file
 	protected int overlayToPrevious = 1000; // 1 Second
 	protected int height = -1;
 	protected int width = -1;

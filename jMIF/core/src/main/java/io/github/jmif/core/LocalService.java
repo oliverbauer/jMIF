@@ -364,8 +364,6 @@ public class LocalService {
 		image.setImagePreviewPath(Paths.get(workingDir).resolve("preview").resolve(basename + "_thumb."+wxh+"."+
 				extension));
 		image.setPreviewHardResizePath(Paths.get(workingDir).resolve("preview").resolve(basename+"_hard."+wxh+"."+extension));
-		image.setPreviewFillWColorPath(Paths.get(workingDir).resolve("preview").resolve(basename+"_fill."+wxh+"."+
-				extension));
 		image.setPreviewCropPath(Paths.get(workingDir).resolve("preview").resolve(basename+"_kill."+wxh+"."+extension));
 		image.setPreviewManualPath(Paths.get(workingDir).resolve("preview").resolve(basename+"_manual."+wxh+"."+extension));
 		return image;
@@ -444,36 +442,6 @@ public class LocalService {
 			}
 		} else {
 			logger.debug("Init: HARD-Preview-Image {} already exists", image.getPreviewHardResizePath());
-		}
-
-		if (!Files.exists(image.getPreviewFillWColorPath())) {
-			logger.info("Init: Create FILL-Preview-Image {}", image.getPreviewFillWColorPath());
-
-			var fill = "convert " + image.getImagePreviewPath() + " -quality 100 -geometry x" + aspectHeight + " fill." + filename;
-			try {
-				var process = new ProcessBuilder("bash", "-c", fill).directory(new File(workingDir))
-						.redirectErrorStream(true).start();
-				process.waitFor();
-
-				var fill2 = "convert fill." + filename + " \\( -clone 0 -quality 100 -blur 0x5 -resize " + estimatedWith
-						+ "x" + aspectHeight + "\\! -fill black -quality 100 -colorize 100% \\) \\( -clone 0 -resize "
-						+ estimatedWith + "x" + aspectHeight + " \\) -delete 0 -gravity center -composite "
-						+ image.getPreviewFillWColorPath();
-				process = new ProcessBuilder("bash", "-c", fill2).directory(new File(workingDir)).redirectErrorStream(true)
-						.start();
-				process.waitFor();
-
-				// rm tempfile...
-				process = new ProcessBuilder("bash", "-c", "rm fill." + filename).directory(new File(workingDir))
-						.redirectErrorStream(true).start();
-				process.waitFor();
-
-				image.setPreviewFillWColor(ImageIO.read(image.getPreviewFillWColorPath().toFile()));
-			} catch (InterruptedException | IOException e) {
-				throw new MIFException(e);
-			}
-		} else {
-			logger.debug("Init: FILL-Preview-Image {} already exists", image.getPreviewFillWColorPath());
 		}
 
 		if (!Files.exists(image.getPreviewCropPath())) {

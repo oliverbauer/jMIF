@@ -148,7 +148,7 @@ public class SelectionView {
 		clearSelection();
 	}
 	
-	public void updateAudio(mxCell cell, MIFAudioFileWrapper audioFile, GraphWrapper project) {
+	public void updateAudio(mxCell cell, MIFAudioFileWrapper audioFile) {
 		clearSelection();
 
 		this.selectedAudioFile = audioFile;
@@ -163,7 +163,7 @@ public class SelectionView {
 		tabPane.setEnabledAt(5, true);  // ImageLibrary
 		
 		audioDetailsView.setDetails(audioFile);
-		filterViewAudio.setDetails(audioFile);
+		filterViewAudio.update(audioFile);
 		
 		panel.validate();
 		panel.updateUI();
@@ -206,7 +206,7 @@ public class SelectionView {
 			imageView.setPreviewPicture(((MIFImageWrapper)meltFile).getImagePreview());
 			imageView.update(cell, (MIFImageWrapper)meltFile);
 			imageDetailsView.setDetails(meltFile);
-			filterViewImage.setDetails(meltFile);
+			filterViewImage.update(meltFile);
 		} else if (meltFile instanceof MIFVideoWrapper) {
 			tabPane.setSelectedIndex(1);
 			tabPane.setEnabledAt(0, false);
@@ -217,7 +217,7 @@ public class SelectionView {
 			
 			videoView.setIcons(((MIFVideoWrapper)meltFile).getPreviewImages());
 			videoDetailsView.setDetails( ((MIFVideoWrapper)meltFile));
-			filterViewVideo.setDetails(meltFile);
+			filterViewVideo.update(meltFile);
 		} else {
 			logger.warn("Not supported yet...");
 		}

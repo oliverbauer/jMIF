@@ -12,7 +12,6 @@ public class MIFImage extends MIFFile {
 	public static enum ImageResizeStyle {
 		CROP,
 		HARD,
-		FILL,
 		MANUAL
 	}
 	
@@ -26,9 +25,6 @@ public class MIFImage extends MIFFile {
 	private Path previewHardResizePath;
 	
 	@XmlTransient
-	private Path previewFillWColorPath;
-	
-	@XmlTransient
 	private Path previewCropPath;
 	
 	@XmlTransient
@@ -39,9 +35,6 @@ public class MIFImage extends MIFFile {
 	
 	@XmlTransient
 	private Image previewHardResize;
-	
-	@XmlTransient
-	private Image previewFillWColor;
 	
 	@XmlTransient
 	private Image previewCrop;
@@ -88,10 +81,6 @@ public class MIFImage extends MIFFile {
 		return previewHardResizePath;
 	}
 
-	public Path getPreviewFillWColorPath() {
-		return previewFillWColorPath;
-	}
-
 	public Path getPreviewCropPath() {
 		return previewCropPath;
 	}
@@ -136,10 +125,6 @@ public class MIFImage extends MIFFile {
 		this.previewHardResizePath = previewHardResizPathe;
 	}
 	
-	public void setPreviewFillWColorPath(Path previewFillWColor) {
-		this.previewFillWColorPath = previewFillWColor;
-	}
-
 	public Image getImagePreview() {
 		return imagePreview;
 	}
@@ -154,14 +139,6 @@ public class MIFImage extends MIFFile {
 
 	public void setPreviewHardResize(Image previewHardResize) {
 		this.previewHardResize = previewHardResize;
-	}
-
-	public Image getPreviewFillWColor() {
-		return previewFillWColor;
-	}
-
-	public void setPreviewFillWColor(Image previewFillWColor) {
-		this.previewFillWColor = previewFillWColor;
 	}
 
 	public Image getPreviewCrop() {

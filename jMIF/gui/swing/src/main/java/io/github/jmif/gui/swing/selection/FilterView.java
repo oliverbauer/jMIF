@@ -34,22 +34,23 @@ public class FilterView {
 	private static final Logger logger = LoggerFactory.getLogger(FilterView.class);
 	private Melt melt = new Melt();
 	
-	private MeltFilter currentlySelectedFilter = null;
+	private MeltFilter selectedFilter = null;
+	private MIFFileWrapper<?> selectedMIFFile;
 	
 	private final GraphWrapper graphWrapper;
 	private final List<MeltFilterDetails> filters;
 	
 	private Box currentlyAppliedFilters;
 	private JLabel lblCurrentlyAppliedFilters;
-	private JComboBox<String> selectedFilter;
+	private JComboBox<String> filterCombobox;
 	private JButton addFilter;
+	// TODO Provide facility to disable this button (e.g. for audio files)
 	private JButton previewFilter;
 	private Box filterConfigurationContent;
 	private JScrollPane scrollPane;	
 	
 	private JPanel panel;
 	
-	private MIFFileWrapper<?> selectedMeltFile;
 	
 	public FilterView(final GraphWrapper graphWrapper, List<MeltFilterDetails> filters) throws MIFException {
 		this.graphWrapper = graphWrapper;
@@ -75,7 +76,7 @@ public class FilterView {
 		box.add(getSelectedFilterConfiguration());
 		box.add(Box.createVerticalGlue());
 
-		selectedFilter.setSelectedItem("oldfilm");
+		filterCombobox.setSelectedItem("oldfilm");
 
 		panel = new JPanel(new BorderLayout());
 		panel.add(box, BorderLayout.CENTER);
@@ -105,13 +106,13 @@ public class FilterView {
 
 	private void updateCurrentlyAppliedFilters() {
 		// TODO Filter: Each filter should be clickable: select from dropdown and set values as selected
-		if (selectedMeltFile != null) {
+		if (selectedMIFFile != null) {
 			currentlyAppliedFilters.removeAll();
 
 			lblCurrentlyAppliedFilters.setText("Currently applied filters: ");
 			currentlyAppliedFilters.add(lblCurrentlyAppliedFilters);
 
-			var filters = selectedMeltFile.getFilters();
+			var filters = selectedMIFFile.getFilters();
 			for (var i=0; i<=filters.size()-1; i++) {
 				var filterName = filters.get(i).getFiltername();
 				var filterNameLabel = new JLabel(filterName);
@@ -138,10 +139,10 @@ public class FilterView {
 	}
 
 	private void removeFilter(String filterName) {
-		var filter = selectedMeltFile.getFilters().stream().filter(f -> f.getFiltername().equals(filterName)).findAny().get();
-		selectedMeltFile.getFilters().remove(filter);
+		var filter = selectedMIFFile.getFilters().stream().filter(f -> f.getFiltername().equals(filterName)).findAny().get();
+		selectedMIFFile.getFilters().remove(filter);
 
-		if (filterName.equals(selectedFilter.getSelectedItem())) {
+		if (filterName.equals(filterCombobox.getSelectedItem())) {
 			addFilter.setEnabled(true);
 		}
 
@@ -155,18 +156,18 @@ public class FilterView {
 			filters.add(meltFilterDetails.getFiltername());
 		}
 
-		selectedFilter = new JComboBox<>(filters.toArray(new String[filters.size()]));
-		selectedFilter.addItemListener(e -> {
+		filterCombobox = new JComboBox<>(filters.toArray(new String[filters.size()]));
+		filterCombobox.addItemListener(e -> {
 			try {
 				if (e.getStateChange() == ItemEvent.DESELECTED) {
 					return;
 				}
 
-				var filter = (String)selectedFilter.getSelectedItem();
+				var filter = (String)filterCombobox.getSelectedItem();
 
-				if (selectedMeltFile != null) {
+				if (selectedMIFFile != null) {
 					// do not add a filter twice
-					if (selectedMeltFile.getFilters().stream().map(MeltFilter::getFiltername).collect(Collectors.toSet()).contains(filter)) {
+					if (selectedMIFFile.getFilters().stream().map(MeltFilter::getFiltername).collect(Collectors.toSet()).contains(filter)) {
 						addFilter.setEnabled(false);
 					} else {
 						addFilter.setEnabled(true);
@@ -175,22 +176,22 @@ public class FilterView {
 
 				var meltFilter = new MeltFilter(filter);
 				showFilterConfiguration(meltFilter);
-				currentlySelectedFilter = meltFilter;
+				selectedFilter = meltFilter;
 			} catch (MIFException e1) {
 				logger.error("", e);
 			}
 		});
-		currentlySelectedFilter = new MeltFilter((String)selectedFilter.getSelectedItem());
-		selectedFilter.setPreferredSize(new Dimension(240, 25));
-		selectedFilter.setMaximumSize(new Dimension(240, 25));
+		selectedFilter = new MeltFilter((String)filterCombobox.getSelectedItem());
+		filterCombobox.setPreferredSize(new Dimension(240, 25));
+		filterCombobox.setMaximumSize(new Dimension(240, 25));
 
 		var dropDownBoxesBox = Box.createHorizontalBox();
-		dropDownBoxesBox.add(selectedFilter);
+		dropDownBoxesBox.add(filterCombobox);
 		dropDownBoxesBox.add(Box.createHorizontalStrut(10));
 
 		addFilter = new JButton("add");
 		addFilter.addActionListener(e -> {
-			selectedMeltFile.addFilter(currentlySelectedFilter);
+			selectedMIFFile.addFilter(selectedFilter);
 			// TODO Filter: The image should be updated! Needs new creation and execution of melt file!
 			updateCurrentlyAppliedFilters();
 	
@@ -199,7 +200,7 @@ public class FilterView {
 		previewFilter = new JButton("preview");
 		previewFilter.addActionListener(e -> {
 			try {
-				graphWrapper.getService().applyFilter(graphWrapper.getPr(), selectedMeltFile, currentlySelectedFilter);
+				graphWrapper.getService().applyFilter(graphWrapper.getPr(), selectedMIFFile, selectedFilter);
 			} catch (MIFException e1) {
 				logger.error("", e1);
 			}			
@@ -284,8 +285,8 @@ public class FilterView {
 		}
 	}
 
-	public void setDetails(MIFFileWrapper<?> mifVideo) {
-		this.selectedMeltFile = mifVideo;
+	public void update(MIFFileWrapper<?> mifFile) {
+		this.selectedMIFFile = mifFile;
 		updateCurrentlyAppliedFilters();
 		this.panel.updateUI();
 	}
