@@ -26,10 +26,10 @@ import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.jmif.config.Configuration;
-
 public class Splashscreen {
 	private static final Logger logger = LoggerFactory.getLogger(Splashscreen.class);
+	
+	private final int splashSleepTime = 10;
 	
 	private JDialog dialog;
     private JProgressBar progress;
@@ -111,7 +111,7 @@ public class Splashscreen {
             
         	private void sleep() {
         		try {
-					Thread.sleep(Configuration.splashSleepTime);
+					Thread.sleep(splashSleepTime);
 				} catch (InterruptedException e) {
 					Thread.currentThread().interrupt();
 				}

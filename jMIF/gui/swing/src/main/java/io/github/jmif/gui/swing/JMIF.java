@@ -28,7 +28,6 @@ import com.mxgraph.model.mxCell;
 import com.mxgraph.util.mxEvent;
 import com.mxgraph.view.mxGraphSelectionModel;
 
-import io.github.jmif.config.Configuration;
 import io.github.jmif.core.MIFException;
 import io.github.jmif.gui.swing.config.UserConfig;
 import io.github.jmif.gui.swing.entities.MIFFileWrapper;
@@ -79,7 +78,7 @@ public class JMIF {
 	}
 	
 	public void show() throws Exception {
-		if (Configuration.showSplashscreen) {
+		if (userConfig.isGENERAL_SHOW_SPLASHSCREEN()) {
 			var splashscreen = new Splashscreen();
 			var worker = splashscreen.getWorker();
 			while (worker.getState() != StateValue.DONE) {
@@ -110,9 +109,6 @@ public class JMIF {
 		var panelBox = Box.createVerticalBox();
 		mifMenuView.init(graphWrapper);
 		panelBox.add(mifMenuView.getJPanel());
-		if (Configuration.transperencyOffset > 0) {
-			panelBox.add(Box.createRigidArea(new Dimension(0, Configuration.transperencyOffset)));
-		}
 
 		// Add Project stuff: name, output.file, render-profile
 		var horizontalBox = Box.createHorizontalBox();
@@ -148,19 +144,11 @@ public class JMIF {
 		mifSelectionView.init(graphWrapper);
 		mifGraphView.init(frame, graphWrapper, mifSelectionView);
 		panelBox.add(mifGraphView.getGraphPanel());
-		if (Configuration.transperencyOffset > 0) {
-			panelBox.add(Box.createRigidArea(new Dimension(0, Configuration.transperencyOffset)));
-		}
-
 		panelBox.add(mifSelectionView.getPanel());
-		if (Configuration.transperencyOffset > 0) {
-			panelBox.add(Box.createRigidArea(new Dimension(0, Configuration.transperencyOffset)));
-		}
 
 		frame.setLayout(new GridBagLayout());
 
 		frame.setContentPane(panelBox);
-		frame.setBackground(Configuration.bgColor);
 		frame.pack();
 		frame.setLocationRelativeTo(null);
 		

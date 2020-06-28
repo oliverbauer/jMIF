@@ -1,6 +1,7 @@
 package io.github.jmif.gui.swing.menu;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.io.IOException;
 
@@ -14,7 +15,6 @@ import javax.swing.SwingWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.jmif.config.Configuration;
 import io.github.jmif.core.MIFException;
 import io.github.jmif.gui.swing.GraphWrapper;
 import io.github.jmif.gui.swing.config.UserConfigDialog;
@@ -32,7 +32,6 @@ public class MenuView {
 	public void init(final GraphWrapper graphWrapper) {
 		panel = new JPanel();
 		panel.setLayout(new BorderLayout());
-		panel.setBackground(Configuration.bgColor);
 		
 		var verticalBox = Box.createVerticalBox();
 		verticalBox.add(Box.createVerticalStrut(10));
@@ -153,7 +152,7 @@ public class MenuView {
 		verticalBox.add(horizontalBox);
 		verticalBox.add(Box.createVerticalStrut(10));
 		
-		panel.setBackground(Configuration.menubarBackground);
+		panel.setBackground(new Color(135, 206, 250));
 		
 		panel.setMaximumSize(new Dimension(5200, 75));
 		

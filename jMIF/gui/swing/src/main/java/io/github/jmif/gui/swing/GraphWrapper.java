@@ -56,6 +56,9 @@ import io.github.jmif.util.TimeUtil;
 public class GraphWrapper {
 	private static final Logger logger = LoggerFactory.getLogger(GraphWrapper.class);
 	
+	/**
+	 * See tasks in {@link #createMIFFile(File)}
+	 */
 	@Inject
 	private UserConfig userConfig;
 	
@@ -676,7 +679,6 @@ public class GraphWrapper {
 		graphComponent.setConnectable(false); // Inhibit edge creation in the graph.
 		
 		graphComponent.getViewport().setOpaque(true);
-		graphComponent.getViewport().setBackground(Configuration.bgColor);
 		
 		graphComponent.setMinimumSize(new Dimension(10, 180)); // xdim ignore
 	}
