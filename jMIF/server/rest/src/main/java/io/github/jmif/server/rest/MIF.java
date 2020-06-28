@@ -1,4 +1,4 @@
-package io.github.jmif;
+package io.github.jmif.server.rest;
 
 import java.io.File;
 import java.util.concurrent.Future;

@@ -16,9 +16,7 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import io.github.jmif.MIF;
 import io.github.jmif.core.MIFException;
-import io.github.jmif.core.ServiceExecutor;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFProject;

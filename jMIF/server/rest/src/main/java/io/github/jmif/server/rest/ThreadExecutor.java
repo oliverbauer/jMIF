@@ -1,13 +1,15 @@
 /**
  * 
  */
-package io.github.jmif.core;
+package io.github.jmif.server.rest;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+
+import io.github.jmif.core.MIFException;
 
 /**
  * @author thebrunner

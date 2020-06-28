@@ -1,12 +1,13 @@
 /**
  * 
  */
-package io.github.jmif.core;
+package io.github.jmif.server.rest;
 
 import java.io.File;
 import java.util.concurrent.Future;
 
-import io.github.jmif.MIF;
+import io.github.jmif.core.LocalService;
+import io.github.jmif.core.MIFException;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFProject;
