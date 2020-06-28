@@ -120,11 +120,10 @@ public class SelectionView {
 		} else if (c2 != null && c3 != null) {
 			
 			var p = new JPanel(new BorderLayout());
-			p.add(c2, BorderLayout.NORTH);
+			p.add(new JScrollPane(c2), BorderLayout.NORTH);
 			p.add(c3, BorderLayout.CENTER);
-			
-			var scrollBar = new JScrollPane(p);
-			panel.add(scrollBar, BorderLayout.CENTER);
+
+			panel.add(p, BorderLayout.CENTER);
 			
 		}
 		return panel;
