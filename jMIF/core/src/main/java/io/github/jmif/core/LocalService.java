@@ -15,6 +15,7 @@ import javax.imageio.ImageIO;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -521,24 +522,12 @@ public class LocalService {
 	}
 
 	private void copy(MIFFile file, String workingDir) throws MIFException {
-		var target = workingDir+"orig/"+file.getFile().getName();
-		var command = "cp "+file.getFile()+" "+target;
-		
-		// Copy to working dir... make sure each file has different name...
-		if (!new File(target).exists()) {
-			logger.info("Copy to {} ({})", file.getFile().getName(), command);
-			try {
-				new ProcessBuilder("bash", "-c", command)
-					.directory(new File(workingDir))
-					.redirectErrorStream(true)
-					.start()
-					.waitFor();
-			} catch (InterruptedException | IOException e) {
-				throw new MIFException(e);
-			}
+		try {
+			FileUtils.copyFileToDirectory(file.getFile(), new File(workingDir+"orig/"));
+		} catch (IOException e1) {
+			throw new MIFException(e1);
 		}
 	}
-	
 	
 	public List<String> getProfiles() throws MIFException {
 		try {
