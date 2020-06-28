@@ -6,9 +6,10 @@ import java.nio.file.Files;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.jboss.weld.environment.se.Weld;
+import org.jboss.weld.environment.se.WeldContainer;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import io.github.jmif.entities.melt.MeltFilter;
@@ -26,7 +27,16 @@ public class ProjectXmlTests {
 	
 	@Test
 	public void simpleImage() throws Exception {
-		var project = new GraphWrapper();
+		Weld weld = new Weld()
+				.property("org.jboss.weld.construction.relaxed", true)
+				.property("org.jboss.weld.bootstrap.concurrentDeployment", false);
+			
+		GraphWrapper project = null;
+		try (WeldContainer container = weld.initialize()) {
+			project = container.select(GraphWrapper.class).get();
+		}
+		
+		project.init();
 		project.getPr().setProfile("atsc_1080p_25");
 		service.updateProfile(project.getPr());
 		project.getPr().setWorkingDir(tempDir);
@@ -42,7 +52,15 @@ public class ProjectXmlTests {
 	
 	@Test
 	public void simpleImageWithFilter() throws Exception {
-		var project = new GraphWrapper();
+		Weld weld = new Weld()
+				.property("org.jboss.weld.construction.relaxed", true)
+				.property("org.jboss.weld.bootstrap.concurrentDeployment", false);
+			
+		GraphWrapper project = null;
+		try (WeldContainer container = weld.initialize()) {
+			project = container.select(GraphWrapper.class).get();
+		}
+		project.init();
 		project.getPr().setProfile("atsc_1080p_25");
 		service.updateProfile(project.getPr());
 		project.getPr().setWorkingDir(tempDir);
@@ -77,7 +95,15 @@ public class ProjectXmlTests {
 	// TODO Problem with loading textfile from stored defaultproject.xml, see GraphWrapper.load
 	// TODO Problem with storing imageheight/imagewidth, but they have been set, see logfile
 	public void textLoaded() throws Exception {
-		var project = new GraphWrapper();
+		Weld weld = new Weld()
+				.property("org.jboss.weld.construction.relaxed", true)
+				.property("org.jboss.weld.bootstrap.concurrentDeployment", false);
+			
+		GraphWrapper project = null;
+		try (WeldContainer container = weld.initialize()) {
+			project = container.select(GraphWrapper.class).get();
+		}
+		project.init();
 		project.getPr().setProfile("atsc_1080p_25");
 		service.updateProfile(project.getPr());
 		project.getPr().setWorkingDir(tempDir);
@@ -94,8 +120,12 @@ public class ProjectXmlTests {
 		mifText.setText("Textcase");
 		project.save();
 
-		
-		var loadedProject = new GraphWrapper();
+		GraphWrapper loadedProject = null;
+		try (WeldContainer container = weld.initialize()) {
+			loadedProject = container.select(GraphWrapper.class).get();
+		}
+		loadedProject.init();
+		loadedProject.getPr().setWorkingDir(project.getPr().getWorkingDir());
 		loadedProject.getPr().setFileOfProject(project.getPr().getWorkingDir() + "defaultproject.xml");
 		loadedProject.load();
 		
