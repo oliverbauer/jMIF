@@ -17,12 +17,12 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.colorchooser.AbstractColorChooserPanel;
 
-import io.github.jmif.gui.swing.entities.MIFTextFileWrapper;
+import io.github.jmif.entities.MIFTextFile;
 
 public class PangoColorChooser extends Box {
 	private static final long serialVersionUID = 5368430354551770709L;
 	private File backgroundImage;
-	private MIFTextFileWrapper mifText;
+	private MIFTextFile mifText;
 	private TextDetailsView textDetailsView;
 	
 	private Box box;
@@ -115,7 +115,7 @@ public class PangoColorChooser extends Box {
 	    return resizedImg;
 	}
 	
-	public PangoColorChooser(File backgroundImage, MIFTextFileWrapper mifText) {
+	public PangoColorChooser(File backgroundImage, MIFTextFile mifText) {
 		super(BoxLayout.X_AXIS);
 		
 		this.backgroundImage = backgroundImage;
@@ -227,7 +227,7 @@ public class PangoColorChooser extends Box {
 		imagePreview.updateUI();
 	}
 
-	public void setMIFTextFile(MIFTextFileWrapper mifText2) {
+	public void setMIFTextFile(MIFTextFile mifText2) {
 		this.mifText = mifText2;
 		
     	if (mifText != null) {

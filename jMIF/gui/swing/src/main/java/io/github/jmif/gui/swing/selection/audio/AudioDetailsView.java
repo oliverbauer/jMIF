@@ -11,13 +11,13 @@ import javax.swing.JTextField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.github.jmif.entities.MIFAudio;
 import io.github.jmif.gui.swing.GraphWrapper;
-import io.github.jmif.gui.swing.entities.MIFAudioFileWrapper;
 
 public class AudioDetailsView {
 	private static final Logger logger = LoggerFactory.getLogger(AudioDetailsView.class);
 	
-	private MIFAudioFileWrapper audioFile;
+	private MIFAudio audioFile;
 
 	private Box box;
 	
@@ -132,7 +132,7 @@ public class AudioDetailsView {
 	    box.add(boxFilename);
 	}
 
-	public void setDetails(MIFAudioFileWrapper audioFile) {
+	public void setDetails(MIFAudio audioFile) {
 		this.audioFile = audioFile;
 		
 		file.setText(audioFile.getAudiofile());

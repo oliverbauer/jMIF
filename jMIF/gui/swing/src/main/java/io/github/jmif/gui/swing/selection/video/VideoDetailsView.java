@@ -10,14 +10,14 @@ import javax.swing.JTextField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.github.jmif.entities.MIFVideo;
 import io.github.jmif.gui.swing.GraphWrapper;
-import io.github.jmif.gui.swing.entities.MIFVideoWrapper;
 
 public class VideoDetailsView {
 	private static final Logger logger = LoggerFactory.getLogger(VideoDetailsView.class);
 	
 	private Box box;
-	private MIFVideoWrapper mifVideo;
+	private MIFVideo mifVideo;
 	
 	private JLabel filename = new JLabel();
 	private JTextField displayName = new JTextField();
@@ -114,7 +114,7 @@ public class VideoDetailsView {
 		return box;
 	}
 	
-	public void setDetails(MIFVideoWrapper mifVideo) {
+	public void setDetails(MIFVideo mifVideo) {
 		this.mifVideo = mifVideo;
 		this.filename.setText(mifVideo.getFile().getName());
 		this.displayName.setText(mifVideo.getDisplayName());

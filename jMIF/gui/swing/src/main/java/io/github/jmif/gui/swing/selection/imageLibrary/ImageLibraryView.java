@@ -24,9 +24,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.jmif.config.Configuration;
+import io.github.jmif.entities.MIFFile;
 import io.github.jmif.gui.swing.GraphWrapper;
 import io.github.jmif.gui.swing.config.UserConfig;
-import io.github.jmif.gui.swing.entities.MIFFileWrapper;
 
 public class ImageLibraryView {
 	@Inject
@@ -140,7 +140,7 @@ public class ImageLibraryView {
 				@Override
 				public void mouseClicked(MouseEvent e) {
 					try {
-						MIFFileWrapper<?> imageFile = graphWrapper.createMIFFile(f);
+						MIFFile imageFile = graphWrapper.createMIFFile(f);
 						imageFile.setDuration(userConfig.getIMAGE_DURATION());
 						imageFile.setOverlayToPrevious(userConfig.getIMAGE_OVERLAY());
 					} catch (Exception ex) {

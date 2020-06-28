@@ -23,11 +23,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.jmif.core.MIFException;
+import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.melt.Melt;
 import io.github.jmif.entities.melt.MeltFilter;
 import io.github.jmif.entities.melt.MeltFilterDetails;
 import io.github.jmif.gui.swing.GraphWrapper;
-import io.github.jmif.gui.swing.entities.MIFFileWrapper;
 import io.github.jmif.gui.swing.selection.image.ImageView;
 
 public class FilterView {
@@ -35,7 +35,7 @@ public class FilterView {
 	private Melt melt = new Melt();
 	
 	private MeltFilter selectedFilter = null;
-	private MIFFileWrapper<?> selectedMIFFile;
+	private MIFFile selectedMIFFile;
 	
 	private final GraphWrapper graphWrapper;
 	private final List<MeltFilterDetails> filters;
@@ -285,7 +285,7 @@ public class FilterView {
 		}
 	}
 
-	public void update(MIFFileWrapper<?> mifFile) {
+	public void update(MIFFile mifFile) {
 		this.selectedMIFFile = mifFile;
 		updateCurrentlyAppliedFilters();
 		this.panel.updateUI();

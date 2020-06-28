@@ -18,13 +18,13 @@ import org.slf4j.LoggerFactory;
 import com.mxgraph.model.mxCell;
 
 import io.github.jmif.core.MIFException;
+import io.github.jmif.entities.MIFAudio;
+import io.github.jmif.entities.MIFFile;
+import io.github.jmif.entities.MIFImage;
+import io.github.jmif.entities.MIFTextFile;
+import io.github.jmif.entities.MIFVideo;
 import io.github.jmif.gui.swing.GraphWrapper;
 import io.github.jmif.gui.swing.config.UserConfig;
-import io.github.jmif.gui.swing.entities.MIFAudioFileWrapper;
-import io.github.jmif.gui.swing.entities.MIFFileWrapper;
-import io.github.jmif.gui.swing.entities.MIFImageWrapper;
-import io.github.jmif.gui.swing.entities.MIFTextFileWrapper;
-import io.github.jmif.gui.swing.entities.MIFVideoWrapper;
 import io.github.jmif.gui.swing.listener.AddRemoveListener;
 import io.github.jmif.gui.swing.selection.SelectionView;
 
@@ -55,7 +55,7 @@ public class GraphView implements AddRemoveListener {
 		return graphPanel;
 	}
 	
-	public void remove(mxCell cell, MIFFileWrapper<?> meltfile) {
+	public void remove(mxCell cell, MIFFile meltfile) {
 		graphWrapper.remove(meltfile, cell);
 		graphWrapper.remove(cell);
 
@@ -64,7 +64,7 @@ public class GraphView implements AddRemoveListener {
 		graphWrapper.redrawGraph();
 	}
 	
-	public void remove(mxCell cell, MIFAudioFileWrapper meltfile) {
+	public void remove(mxCell cell, MIFAudio meltfile) {
 		graphWrapper.remove(meltfile, cell);
 		graphWrapper.remove(cell);
 
@@ -76,7 +76,7 @@ public class GraphView implements AddRemoveListener {
 	@Override
 	public void onRemoveFile() {
 		if (selectionView.getCurrentFile() != null) {
-			MIFFileWrapper<?> file = selectionView.getCurrentFile();
+			MIFFile file = selectionView.getCurrentFile();
 			var cell = selectionView.getCell();
 			remove(cell, file);
 		}
@@ -131,16 +131,16 @@ public class GraphView implements AddRemoveListener {
 					selectedFiles.add(fileToAdd);
 				}
 			}
-			List<MIFFileWrapper<?>> added = new ArrayList<>();
+			List<MIFFile> added = new ArrayList<>();
 			for (File fileToAdd : selectedFiles) {
-				MIFFileWrapper<?> f;
+				MIFFile f;
 				try {
 					f = graphWrapper.createMIFFile(fileToAdd);
-					if (f instanceof MIFImageWrapper) {
+					if (f instanceof MIFImage) {
 						f.setOverlayToPrevious(userConfig.getIMAGE_OVERLAY());
 						f.setDuration(userConfig.getIMAGE_DURATION());
 						
-					} else if (f instanceof MIFVideoWrapper) {
+					} else if (f instanceof MIFVideo) {
 						f.setOverlayToPrevious(userConfig.getVIDEO_OVERLAY());
 					}
 					
@@ -154,7 +154,7 @@ public class GraphView implements AddRemoveListener {
 			
 			// Exec background threads...
 			var executor = Executors.newWorkStealingPool();
-			for (MIFFileWrapper<?> f : added) {
+			for (MIFFile f : added) {
 				executor.submit(() -> {
 					try {
 						// TODO übergeben
@@ -174,7 +174,7 @@ public class GraphView implements AddRemoveListener {
 			
 			var returnVal = c.showOpenDialog(frame);
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
-				MIFAudioFileWrapper audioFile = graphWrapper.createMIFAudioFile(c.getSelectedFile());
+				MIFAudio audioFile = graphWrapper.createMIFAudioFile(c.getSelectedFile());
 				audioFile.setFadeIn(userConfig.getAUDIO_FADE_IN());
 				audioFile.setFadeOut(userConfig.getAUDIO_FADE_OUT());
 				audioFile.setNormalize(userConfig.isAUDIO_NORMALIZE());
@@ -189,7 +189,7 @@ public class GraphView implements AddRemoveListener {
 	@Override
 	public void onAddText() {
 		try {
-			MIFTextFileWrapper textfile = graphWrapper.createMIFTextfile();
+			MIFTextFile textfile = graphWrapper.createMIFTextfile();
 			textfile.setLength(userConfig.getTEXT_DURATION());
 			textfile.setBgcolour(userConfig.getTEXT_BG());
 			textfile.setFgcolour(userConfig.getTEXT_FG());

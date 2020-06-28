@@ -8,15 +8,15 @@ import java.util.List;
 
 import io.github.jmif.core.LocalService;
 import io.github.jmif.core.MIFException;
+import io.github.jmif.entities.MIFAudio;
+import io.github.jmif.entities.MIFFile;
+import io.github.jmif.entities.MIFImage;
+import io.github.jmif.entities.MIFProject;
+import io.github.jmif.entities.MIFTextFile;
+import io.github.jmif.entities.MIFVideo;
 import io.github.jmif.entities.melt.Melt;
 import io.github.jmif.entities.melt.MeltFilter;
 import io.github.jmif.entities.melt.MeltFilterDetails;
-import io.github.jmif.gui.swing.entities.MIFAudioFileWrapper;
-import io.github.jmif.gui.swing.entities.MIFFileWrapper;
-import io.github.jmif.gui.swing.entities.MIFImageWrapper;
-import io.github.jmif.gui.swing.entities.MIFProjectWrapper;
-import io.github.jmif.gui.swing.entities.MIFTextFileWrapper;
-import io.github.jmif.gui.swing.entities.MIFVideoWrapper;
 
 /**
  * @author thebrunner
@@ -26,48 +26,48 @@ public class CoreGateway {
 
 	private final LocalService service = new LocalService();
 
-	public void exportImage(MIFProjectWrapper pr, String output, int frame) throws MIFException {
-		service.exportImage(pr.toMIFProject(), output, frame);
+	public void exportImage(MIFProject pr, String output, int frame) throws MIFException {
+		service.exportImage(pr, output, frame);
 	}
 
 
-	public void convert(MIFProjectWrapper pr, boolean preview) throws MIFException {
-		service.convert(pr.toMIFProject(), preview);
+	public void convert(MIFProject pr, boolean preview) throws MIFException {
+		service.convert(pr, preview);
 	}
 
 
-	public void updateProfile(MIFProjectWrapper project) throws MIFException {
-		service.updateProfile(project.toMIFProject());
+	public void updateProfile(MIFProject project) throws MIFException {
+		service.updateProfile(project);
 	}
 
 
-	public void createWorkingDirs(MIFProjectWrapper project) throws MIFException {
-		service.createWorkingDirs(project.toMIFProject());
+	public void createWorkingDirs(MIFProject project) throws MIFException {
+		service.createWorkingDirs(project);
 	}
 
 
-	public MIFVideoWrapper createVideo(File file, String display, int frames, String dim, int overlay, String workingDir) throws MIFException {
-		return new MIFVideoWrapper(service.createVideo(file, display, frames, dim, overlay, workingDir));
+	public MIFVideo createVideo(File file, String display, int frames, String dim, int overlay, String workingDir) throws MIFException {
+		return service.createVideo(file, display, frames, dim, overlay, workingDir);
 	}
 
 
-	public MIFFileWrapper<?> createPreview(MIFFileWrapper<?> file, String workingDir) throws MIFException {
-		return MIFFileWrapper.wrap(service.createPreview(file.toMIFFile(), workingDir));
+	public MIFFile createPreview(MIFFile file, String workingDir) throws MIFException {
+		return service.createPreview(file, workingDir);
 	}
 
 
-	public void createManualPreview(MIFImageWrapper image) throws MIFException {
-		service.createManualPreview(image.toMIFFile());
+	public void createManualPreview(MIFImage image) throws MIFException {
+		service.createManualPreview(image);
 	}
 
 
-	public MIFImageWrapper createImage(File file, String display, int frames, String dim, int overlay, String workingDir) throws MIFException {
-		return new MIFImageWrapper(service.createImage(file, display, frames, dim, overlay, workingDir));
+	public MIFImage createImage(File file, String display, int frames, String dim, int overlay, String workingDir) throws MIFException {
+		return service.createImage(file, display, frames, dim, overlay, workingDir);
 	}
 
 
-	public MIFAudioFileWrapper createAudio(String path) throws MIFException {
-		return new MIFAudioFileWrapper(service.createAudio(path));
+	public MIFAudio createAudio(String path) throws MIFException {
+		return service.createAudio(path);
 	}
 
 
@@ -91,12 +91,12 @@ public class CoreGateway {
 	}
 
 
-	public void applyFilter(MIFProjectWrapper pr, MIFFileWrapper<?> mifImage, MeltFilter meltFilter) throws MIFException {
-		service.applyFilter(pr.toMIFProject(), mifImage.toMIFFile(), meltFilter);
+	public void applyFilter(MIFProject pr, MIFFile mifImage, MeltFilter meltFilter) throws MIFException {
+		service.applyFilter(pr, mifImage, meltFilter);
 	}
 
 
-	public MIFTextFileWrapper createText() throws MIFException {
-		return new MIFTextFileWrapper(service.createText());
+	public MIFTextFile createText() throws MIFException {
+		return service.createText();
 	}
 }

@@ -23,9 +23,9 @@ import org.slf4j.LoggerFactory;
 import com.mxgraph.model.mxCell;
 
 import io.github.jmif.core.MIFException;
+import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFImage.ImageResizeStyle;
 import io.github.jmif.gui.swing.GraphWrapper;
-import io.github.jmif.gui.swing.entities.MIFImageWrapper;
 
 public class ImageView {
 	private static final Logger logger = LoggerFactory.getLogger(ImageView.class);
@@ -43,7 +43,7 @@ public class ImageView {
 	private JPanel panel;
 
 	private mxCell selectedCell;
-	private MIFImageWrapper selectedMeltFile;
+	private MIFImage selectedMeltFile;
 
 	public void init(final GraphWrapper graphWrapper) throws MIFException {
 		this.graphWrapper = graphWrapper;
@@ -129,7 +129,7 @@ public class ImageView {
 		update(selectedCell, selectedMeltFile);
 	}
 
-	public void update(mxCell cell, MIFImageWrapper meltFile) {
+	public void update(mxCell cell, MIFImage meltFile) {
 		this.selectedMeltFile = meltFile;
 		this.selectedCell = cell;
 
@@ -164,7 +164,7 @@ public class ImageView {
 				selectedMeltFile.setStyle(item);
 
 				logger.info("Switching to style '{}'", item);
-				var mifImage = MIFImageWrapper.class.cast(selectedMeltFile);
+				var mifImage = MIFImage.class.cast(selectedMeltFile);
 				switch (item) {
 				case HARD:
 					final var previewHardResize = mifImage.getPreviewHardResize();

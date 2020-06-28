@@ -12,8 +12,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.inject.Inject;
 import javax.swing.ScrollPaneConstants;
@@ -36,17 +34,13 @@ import com.mxgraph.view.mxGraphSelectionModel;
 
 import io.github.jmif.config.Configuration;
 import io.github.jmif.core.MIFException;
+import io.github.jmif.entities.MIFAudio;
+import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFProject;
 import io.github.jmif.entities.MIFTextFile;
 import io.github.jmif.entities.MIFVideo;
 import io.github.jmif.gui.swing.config.UserConfig;
-import io.github.jmif.gui.swing.entities.MIFAudioFileWrapper;
-import io.github.jmif.gui.swing.entities.MIFFileWrapper;
-import io.github.jmif.gui.swing.entities.MIFImageWrapper;
-import io.github.jmif.gui.swing.entities.MIFProjectWrapper;
-import io.github.jmif.gui.swing.entities.MIFTextFileWrapper;
-import io.github.jmif.gui.swing.entities.MIFVideoWrapper;
 import io.github.jmif.gui.swing.listener.AddRemoveListener;
 import io.github.jmif.gui.swing.listener.ProjectListener;
 import io.github.jmif.gui.swing.listener.ProjectListener.type;
@@ -64,11 +58,9 @@ public class GraphWrapper {
 	
 	private final CoreGateway service = new CoreGateway();
 	
-	private final ExecutorService executor = Executors.newWorkStealingPool();
-	
-	private Map<mxCell, MIFFileWrapper<?>> nodeToMIFFile;
-	private Map<mxCell, MIFAudioFileWrapper> nodeToMIFAudio;
-	private Map<mxCell, MIFTextFileWrapper> nodeToMIFText;
+	private Map<mxCell, MIFFile> nodeToMIFFile;
+	private Map<mxCell, MIFAudio> nodeToMIFAudio;
+	private Map<mxCell, MIFTextFile> nodeToMIFText;
 
 	private List<ProjectListener> listenerProjectChanged;
 	private List<SingleFrameCreatedListener> listenerSingleFrameCreated;
@@ -82,7 +74,7 @@ public class GraphWrapper {
 	private Object parent;
 
 	private mxCell singleframeSlider;
-	private MIFProjectWrapper pr;
+	private MIFProject pr;
 	
 	private mxCell addFile;
 	private mxCell removeFile;
@@ -94,7 +86,7 @@ public class GraphWrapper {
 	private AddRemoveListener addRemoveListener;
 	
 	public GraphWrapper() {
-		pr = new MIFProjectWrapper(new MIFProject());
+		pr = new MIFProject();
 		this.nodeToMIFFile = new LinkedHashMap<>();
 		this.nodeToMIFAudio = new LinkedHashMap<>();
 		this.nodeToMIFText = new LinkedHashMap<>();
@@ -111,7 +103,7 @@ public class GraphWrapper {
 		this.addRemoveListener = l;
 	}
 	
-	public MIFProjectWrapper getPr() {
+	public MIFProject getPr() {
 		return this.pr;
 	}
 	
@@ -123,7 +115,7 @@ public class GraphWrapper {
 			var context = JAXBContext.newInstance(MIFProject.class);
 			var marshaller = context.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			marshaller.marshal(pr.toMIFProject(), file);
+			marshaller.marshal(pr, file);
 
 			logger.info("Successfully saved project {} in {}", pr.getFileOfProject(), TimeUtil.getMessage(time));
 		} catch (JAXBException ex) {
@@ -139,18 +131,18 @@ public class GraphWrapper {
 			var context = JAXBContext.newInstance(MIFProject.class);
 			var unmarshaller = context.createUnmarshaller();
 
-			var project = new MIFProjectWrapper((MIFProject) unmarshaller.unmarshal(file));
+			var project = (MIFProject) unmarshaller.unmarshal(file);
 			// FIXME jaxb: textfiles not loaded, but they exists in projectfile.xml!
 			getCells().clear();
 			getTextCells().clear();
-			pr.clearMIFFiles();
-			pr.clearAudiofiles();
-			pr.clearTextfiles();
+			pr.getMIFFiles().clear();
+			pr.getAudiotrack().getAudiofiles().clear();
+			pr.getTexttrack().getEntries().clear();
 			
 			// TODO Add Audio or Text????
 			
-			for (MIFFileWrapper<?> f : project.getMIFFiles()) {
-				createMIFFile(f.toMIFFile().getFile()).getFilters().addAll(f.getFilters());
+			for (MIFFile f : project.getMIFFiles()) {
+				createMIFFile(f.getFile()).getFilters().addAll(f.getFilters());
 			}
 			
 			// TODO jaxb: textfiles not loaded, but they exists in projectfile.xml!
@@ -183,7 +175,7 @@ public class GraphWrapper {
 		listenerProjectChanged.stream().forEach(c -> c.projectChanged(t));
 	}
 	
-	public MIFAudioFileWrapper createMIFAudioFile(File fileToAdd) throws MIFException {
+	public MIFAudio createMIFAudioFile(File fileToAdd) throws MIFException {
 		var file = fileToAdd.getAbsoluteFile().getAbsolutePath();
 		
 		if (file.endsWith("mp3") || file.endsWith("MP3")) {
@@ -203,7 +195,7 @@ public class GraphWrapper {
 		return null;
 	}
 	
-	public MIFTextFileWrapper createMIFTextfile() throws MIFException {
+	public MIFTextFile createMIFTextfile() throws MIFException {
 		var textFile = service.createText();
 
 		var n = "text";
@@ -217,137 +209,96 @@ public class GraphWrapper {
 		return textFile;
 	}
 	
-	public MIFFileWrapper<?> createMIFFile(File fileToAdd) throws MIFException, InterruptedException, IOException {
+	public MIFFile createMIFFile(File fileToAdd) throws MIFException, InterruptedException, IOException {
 		logger.info("Create node for {}", fileToAdd);
 		
 		var file = fileToAdd.getAbsoluteFile().getAbsolutePath();
 		var extension = FilenameUtils.getExtension(file);
 
-		MIFFileWrapper<?> mifFile = null;
+		MIFFile mifFile = null;
 		
 		var display = file.substring(file.lastIndexOf('/') + 1);
 		if (Configuration.allowedImageTypes.contains(extension)) {
-			mifFile = new MIFImageWrapper(new MIFImage());
+			mifFile = new MIFImage();
 			mifFile.setFile(fileToAdd);
-			executor.submit(() -> {
-					try {
-						var result = service.createImage(
-							fileToAdd, 
-							display, 
-							5000, // userConfig.getIMAGE_DURATION(), // FIXME Config: Why no preview images are generated when loading from userConfig? 
-							"-1x-1", // Will be updated by thread
-							1000, // userConfig.getIMAGE_OVERLAY(),  // FIXME Config: Why no preview images are generated when loading from userConfig?
-							pr.getWorkingDir()
-						);
-						var found = nodeToMIFFile.entrySet().stream().filter(es -> es.getValue().equals(result)).map(Map.Entry::getKey).findFirst();
-						if (found.isPresent()) {
-							var cell = found.get();
-							nodeToMIFFile.put(cell, result);
-							var x = 0;
-							var y = -1;
-							var w = getPixelwidth(result);
-							var h = Configuration.timelineentryHeight;
-							
-							resize(cell, new mxRectangle(x, y, w, h));
-						} else {
-							if (!pr.getMIFFiles().isEmpty()) {
-								currentLength -= (result.getOverlayToPrevious() / 1000d) * 25; // TODO Framerate?
-							}
-
-							var n = result.getDisplayName();
-							var x = currentLength + XOFFSET;
-							var y = pr.getMIFFiles().size() % 2 == 0 ? 0 + YOFFSET : Configuration.timelineentryHeight + YOFFSET;
-							var w = getPixelwidth(result);
-							var h = Configuration.timelineentryHeight;
-							
-							put(result, createVertex(n, x, y, w, h));
-						}
-						executor.submit(() -> {
-							try {
-								service.createPreview(result, getPr().getWorkingDir());
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-						});
-						redrawGraph();
-					} catch (MIFException e) {
-						logger.error("", e);
-					}
-			});
-		} else if (Configuration.allowedVideoTypes.contains(extension)) {
-			mifFile = new MIFVideoWrapper(new MIFVideo());
-			mifFile.setFile(fileToAdd);
-			executor.submit(() -> {
-				try {
-					var result = service.createVideo(
-						fileToAdd, 
-						display, 
-						-1, 
-						"1920x1080", // Will be updated by thread
-						1000, // userConfig.getVIDEO_OVERLAY(),  // FIXME Config: Why no preview images are generated when loading from userConfig?
-						pr.getWorkingDir()
-					);
-					var found = nodeToMIFFile.entrySet().stream().filter(es -> es.getValue().equals(result)).map(Map.Entry::getKey).findFirst();
-					if (found.isPresent()) {
-						var cell = found.get();
-						nodeToMIFFile.put(cell, result);
-						var x = 0;
-						var y = -1; // TODO -1 ?
-						var w = getPixelwidth(result);
-						var h = Configuration.timelineentryHeight;
-						
-						resize(cell, new mxRectangle(x, y, w, h));
-					} else {
-						if (!pr.getMIFFiles().isEmpty()) {
-							currentLength -= (result.getOverlayToPrevious() / 1000d) * 25;
-						}
-
-						var n = result.getDisplayName();
-						var x = currentLength + XOFFSET;
-						var y = pr.getMIFFiles().size() % 2 == 0 ? 0 + YOFFSET : Configuration.timelineentryHeight + YOFFSET;
-						var w = getPixelwidth(result);
-						var h = Configuration.timelineentryHeight;
-						
-						put(result, createVertex(n, x, y, w, h));
-					}
-					executor.submit(() -> {
-						try {
-							service.createPreview(result, getPr().getWorkingDir());
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					});
-					redrawGraph();
-				} catch (MIFException e) {
-					logger.error("", e);
+			var result = service.createImage(
+				fileToAdd, 
+				display, 
+				5000, // userConfig.getIMAGE_DURATION(), // FIXME Config: Why no preview images are generated when loading from userConfig? 
+				"-1x-1", // Will be updated by thread
+				1000, // userConfig.getIMAGE_OVERLAY(),  // FIXME Config: Why no preview images are generated when loading from userConfig?
+				pr.getWorkingDir()
+			);
+			var found = nodeToMIFFile.entrySet().stream().filter(es -> es.getValue().equals(result)).map(Map.Entry::getKey).findFirst();
+			if (found.isPresent()) {
+				var cell = found.get();
+				nodeToMIFFile.put(cell, result);
+				var x = 0;
+				var y = -1;
+				var w = getPixelwidth(result);
+				var h = Configuration.timelineentryHeight;
+				
+				resize(cell, new mxRectangle(x, y, w, h));
+			} else {
+				if (!pr.getMIFFiles().isEmpty()) {
+					currentLength -= (result.getOverlayToPrevious() / 1000d) * 25; // TODO Framerate?
 				}
-			});
-		}
-		
-		if (mifFile != null) {
-			if (!pr.getMIFFiles().isEmpty()) {
-				currentLength -= (mifFile.getOverlayToPrevious() / 1000d) * 25; // TODO Framerate?
+
+				var n = result.getDisplayName();
+				var x = currentLength + XOFFSET;
+				var y = pr.getMIFFiles().size() % 2 == 0 ? 0 + YOFFSET : Configuration.timelineentryHeight + YOFFSET;
+				var w = getPixelwidth(result);
+				var h = Configuration.timelineentryHeight;
+				
+				put(result, createVertex(n, x, y, w, h));
 			}
 
-			var n = mifFile.getDisplayName();
-			var x = currentLength + XOFFSET;
-			var y = pr.getMIFFiles().size() % 2 == 0 ? 0 + YOFFSET : Configuration.timelineentryHeight + YOFFSET;
-			var w = getPixelwidth(mifFile);
-			var h = Configuration.timelineentryHeight;
-			
-			put(mifFile, createVertex(n, x, y, w, h));
-			
-			currentLength += w;
-			
-			return mifFile;
-		}			
-		
-		return null;
+			service.createPreview(result, getPr().getWorkingDir());
+			redrawGraph();
+		} else if (Configuration.allowedVideoTypes.contains(extension)) {
+			mifFile = new MIFVideo();
+			mifFile.setFile(fileToAdd);
+
+			var result = service.createVideo(
+				fileToAdd, 
+				display, 
+				-1, 
+				"1920x1080", // Will be updated by thread
+				1000, // userConfig.getVIDEO_OVERLAY(),  // FIXME Config: Why no preview images are generated when loading from userConfig?
+				pr.getWorkingDir()
+			);
+			var found = nodeToMIFFile.entrySet().stream().filter(es -> es.getValue().equals(result)).map(Map.Entry::getKey).findFirst();
+			if (found.isPresent()) {
+				var cell = found.get();
+				nodeToMIFFile.put(cell, result);
+				var x = 0;
+				var y = -1; // TODO -1 ?
+				var w = getPixelwidth(result);
+				var h = Configuration.timelineentryHeight;
+				
+				resize(cell, new mxRectangle(x, y, w, h));
+			} else {
+				if (!pr.getMIFFiles().isEmpty()) {
+					currentLength -= (result.getOverlayToPrevious() / 1000d) * 25;
+				}
+
+				var n = result.getDisplayName();
+				var x = currentLength + XOFFSET;
+				var y = pr.getMIFFiles().size() % 2 == 0 ? 0 + YOFFSET : Configuration.timelineentryHeight + YOFFSET;
+				var w = getPixelwidth(result);
+				var h = Configuration.timelineentryHeight;
+				
+				put(result, createVertex(n, x, y, w, h));
+			}
+			service.createPreview(result, getPr().getWorkingDir());
+			redrawGraph();
+		}
+		return mifFile;
 	}
 	
 	public void initializeProject() {
 		var current = 0;
-		for (MIFFileWrapper<?> file : pr.getMIFFiles()) {
+		for (MIFFile file : pr.getMIFFiles()) {
 			logger.info("Adding file {}", file.getFile());
 
 			if (current > 0) {
@@ -367,7 +318,7 @@ public class GraphWrapper {
 		}
 		var audioLength = 0;
 		current = 0;
-		for (Entry<mxCell, MIFAudioFileWrapper> audioEntry : nodeToMIFAudio.entrySet()) {
+		for (Entry<mxCell, MIFAudio> audioEntry : nodeToMIFAudio.entrySet()) {
 			current++;
 			
 			var mxCell = audioEntry.getKey();
@@ -387,7 +338,7 @@ public class GraphWrapper {
 		
 		var textLength = 0;
 		current = 0;
-		for (Entry<mxCell, MIFTextFileWrapper> textEntry : nodeToMIFText.entrySet()) {
+		for (Entry<mxCell, MIFTextFile> textEntry : nodeToMIFText.entrySet()) {
 			current++;
 			
 			var mxCell = textEntry.getKey();
@@ -436,7 +387,7 @@ public class GraphWrapper {
 		}
 		var audioLength = 0;
 		current = 0;
-		for (Entry<mxCell, MIFAudioFileWrapper> audioEntry : nodeToMIFAudio.entrySet()) {
+		for (Entry<mxCell, MIFAudio> audioEntry : nodeToMIFAudio.entrySet()) {
 			current++;
 			
 			var mxCell = audioEntry.getKey();
@@ -460,7 +411,7 @@ public class GraphWrapper {
 		
 		var textLength = 0;
 		current = 0;
-		for (Entry<mxCell, MIFTextFileWrapper> textEntry : nodeToMIFText.entrySet()) {
+		for (Entry<mxCell, MIFTextFile> textEntry : nodeToMIFText.entrySet()) {
 			current++;
 			
 			var mxCell = textEntry.getKey();
@@ -514,11 +465,11 @@ public class GraphWrapper {
 				return new mxGraphControl() {
 					@Override
 					public void paintComponent(Graphics g) {
-						if (!pr.getMIFFiles().isEmpty() || !pr.isAudioFilesEmpty()) {
+						if (!pr.getMIFFiles().isEmpty() || !pr.getAudiotrack().getAudiofiles().isEmpty()) {
 							// 1. Timeline
 							var length = 0;
 							var current = 0;
-							for (MIFFileWrapper<?> file : pr.getMIFFiles()) {
+							for (MIFFile file : pr.getMIFFiles()) {
 								if (current > 0) {
 									length -= getOverlaywidth(file);
 								}
@@ -527,7 +478,7 @@ public class GraphWrapper {
 							}
 							var audioLength = 0;
 							current = 0;
-							for (Entry<mxCell, MIFAudioFileWrapper> audioEntry : nodeToMIFAudio.entrySet()) {
+							for (Entry<mxCell, MIFAudio> audioEntry : nodeToMIFAudio.entrySet()) {
 								if (current > 0) {
 									audioLength -= getOverlaywidth(audioEntry.getValue());
 								}
@@ -536,7 +487,7 @@ public class GraphWrapper {
 							}
 							var textLength = 0;
 							current = 0;
-							for (Entry<mxCell, MIFTextFileWrapper> textEntry : nodeToMIFText.entrySet()) {
+							for (Entry<mxCell, MIFTextFile> textEntry : nodeToMIFText.entrySet()) {
 								if (current > 0) {
 									textLength -= getOverlaywidth(textEntry.getValue());
 								}
@@ -711,27 +662,27 @@ public class GraphWrapper {
 		return (mxCell) graph.insertVertex(parent, null, label, x, y, w, h);
 	}
 
-	private int getPixelwidth(MIFAudioFileWrapper audioFile) {
+	private int getPixelwidth(MIFAudio audioFile) {
 		return (int)(Configuration.pixelwidth_per_second * ((audioFile.getEncodeEnde() - audioFile.getEncodeStart()) / 1000d));
 	}
 	
-	private int getPixelwidth(MIFTextFileWrapper textFile) {
+	private int getPixelwidth(MIFTextFile textFile) {
 		return (int)(Configuration.pixelwidth_per_second * (textFile.getLength() / 1000d));
 	}
 	
-	private int getPixelwidth(MIFFileWrapper<?> mifFile) {
+	private int getPixelwidth(MIFFile mifFile) {
 		return (int)(Configuration.pixelwidth_per_second  * (mifFile.getDuration() / 1000d));
 	}
 	
-	private int getOverlaywidth(MIFFileWrapper<?> mifFile) {
+	private int getOverlaywidth(MIFFile mifFile) {
 		return (int)(Configuration.pixelwidth_per_second * (mifFile.getOverlayToPrevious() / 1000d));
 	}
 	
-	private int getOverlaywidth(MIFTextFileWrapper textfield) {
+	private int getOverlaywidth(MIFTextFile textfield) {
 		return 0; // TODO Text: Overlay
 	}
 	
-	private int getOverlaywidth(MIFAudioFileWrapper audioFiles) {
+	private int getOverlaywidth(MIFAudio audioFiles) {
 		return 25;
 	}
 	
@@ -759,27 +710,27 @@ public class GraphWrapper {
 		this.listenerSingleFrameCreated.add(listener);
 	}
 	
-	public void remove(MIFFileWrapper<?> mifFile, mxCell cell) {
-		pr.removeMIFFile(mifFile);
+	public void remove(MIFFile mifFile, mxCell cell) {
+		pr.getMIFFiles().remove(mifFile);
 		nodeToMIFFile.remove(cell);
 	}
 
-	public void remove(MIFTextFileWrapper meltFile, mxCell cell) {
-		pr.removeTextFile(meltFile);
+	public void remove(MIFTextFile meltFile, mxCell cell) {
+		pr.getTexttrack().getEntries().remove(meltFile);
 		nodeToMIFFile.remove(cell);
 	}
 	
-	public void put(MIFFileWrapper<?> meltFile, mxCell cell) {
-		pr.addMIFFile(meltFile);
+	public void put(MIFFile meltFile, mxCell cell) {
+		pr.getMIFFiles().add(meltFile);
 		this.nodeToMIFFile.put(cell, meltFile);
 	}
 	
-	public void put(MIFTextFileWrapper textFile, mxCell cell) {
-		pr.addTextFile(textFile);
+	public void put(MIFTextFile textFile, mxCell cell) {
+		pr.getTexttrack().getEntries().add(textFile);
 		nodeToMIFText.put(cell, textFile);
 	}
 
-	public MIFFileWrapper<?> get(mxCell cell) {
+	public MIFFile get(mxCell cell) {
 		return this.nodeToMIFFile.get(cell);
 	}
 
@@ -787,21 +738,21 @@ public class GraphWrapper {
 		return new ArrayList<>(this.nodeToMIFFile.keySet());
 	}
 	
-	public void remove(MIFAudioFileWrapper audioFile, mxCell cell) {
-		pr.removeAudiofile(audioFile);
+	public void remove(MIFAudio audioFile, mxCell cell) {
+		pr.getAudiotrack().getAudiofiles().remove(audioFile);
 		nodeToMIFAudio.remove(cell);
 	}
 
-	public void put(MIFAudioFileWrapper audioFile, mxCell cell) {
-		pr.addAudiofile(audioFile);
+	public void put(MIFAudio audioFile, mxCell cell) {
+		pr.getAudiotrack().getAudiofiles().add(audioFile);
 		this.nodeToMIFAudio.put(cell, audioFile);
 	}
 
-	public MIFAudioFileWrapper getAudio(mxCell cell) {
+	public MIFAudio getAudio(mxCell cell) {
 		return this.nodeToMIFAudio.get(cell);
 	}
 	
-	public MIFTextFileWrapper getText(mxCell cell) {
+	public MIFTextFile getText(mxCell cell) {
 		return this.nodeToMIFText.get(cell);
 	}
 

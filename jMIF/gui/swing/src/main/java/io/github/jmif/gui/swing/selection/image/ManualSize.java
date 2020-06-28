@@ -25,15 +25,15 @@ import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 
 import io.github.jmif.core.MIFException;
+import io.github.jmif.entities.MIFImage;
 import io.github.jmif.gui.swing.GraphWrapper;
-import io.github.jmif.gui.swing.entities.MIFImageWrapper;
 
 public class ManualSize {
 	private static final Logger logger = LoggerFactory.getLogger(ManualSize.class);
 
 	private String command = null;
 	
-	public void showFrame(final GraphWrapper graphWrapper, MIFImageWrapper mifImage, ImageView imageView) {
+	public void showFrame(final GraphWrapper graphWrapper, MIFImage mifImage, ImageView imageView) {
 		var frame = new JFrame();
 		var panel = new JPanel(new BorderLayout());
 

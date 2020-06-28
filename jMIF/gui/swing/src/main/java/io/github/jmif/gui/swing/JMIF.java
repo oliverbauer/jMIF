@@ -29,8 +29,8 @@ import com.mxgraph.util.mxEvent;
 import com.mxgraph.view.mxGraphSelectionModel;
 
 import io.github.jmif.core.MIFException;
+import io.github.jmif.entities.MIFFile;
 import io.github.jmif.gui.swing.config.UserConfig;
-import io.github.jmif.gui.swing.entities.MIFFileWrapper;
 import io.github.jmif.gui.swing.graph.GraphView;
 import io.github.jmif.gui.swing.listener.ProjectListener;
 import io.github.jmif.gui.swing.listener.ProjectListener.type;
@@ -232,7 +232,8 @@ public class JMIF {
 
 					// Exec background threads...
 					var executor = Executors.newWorkStealingPool();
-					for (MIFFileWrapper<?> f : graphWrapper.getPr().getMIFFiles()) {
+					
+					for (MIFFile f : graphWrapper.getPr().getMIFFiles()) {
 						executor.submit(() -> {
 							try {
 //								TODO übergeben
