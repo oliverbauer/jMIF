@@ -22,18 +22,7 @@ import io.github.jmif.gui.swing.entities.MIFTextFileWrapper;
 public class TextDetailsView {
 	private static final Logger logger = LoggerFactory.getLogger(TextDetailsView.class);
 	
-	private Box panel;
-	
-	private JLabel labelText = new JLabel("Text");
-	private JLabel labelLength = new JLabel("Length [ms]");
-	private JLabel labelSize = new JLabel("Size");
-	private JLabel labelWeight = new JLabel("Weight");
-	private JLabel labelFgColor = new JLabel("Foreground color");
-	private JLabel labelBgColor = new JLabel("Background color");
-	private JLabel labelOlColor = new JLabel("Outline color");
-	
-	private JLabel labelVAlign = new JLabel("Vertical alignment");
-	private JLabel labelHAlign = new JLabel("Horizontal alignment");
+	private Box box;
 	
 	private JTextField text = new JTextField();
 	private JTextField length = new JTextField();
@@ -49,15 +38,15 @@ public class TextDetailsView {
 	private MIFTextFileWrapper mifText;
 	
 	public TextDetailsView(GraphWrapper graphwrapper) {
-		var box = Box.createVerticalBox();
+		var vBox = Box.createVerticalBox();
 		
-	    wrap(box, labelText, text);
-	    wrap(box, labelLength, length);
-	    wrap(box, labelSize, size);
-	    wrap(box, labelWeight, weight);
-	    wrap(box, labelBgColor, bgColor);
-	    wrap(box, labelFgColor, fgColor);
-	    wrap(box, labelOlColor, olColor);
+	    wrap(vBox, new JLabel("Text"), text);
+	    wrap(vBox, new JLabel("Length [ms]"), length);
+	    wrap(vBox, new JLabel("Size"), size);
+	    wrap(vBox, new JLabel("Weight"), weight);
+	    wrap(vBox, new JLabel("Background color"), bgColor);
+	    wrap(vBox, new JLabel("Foreground color"), fgColor);
+	    wrap(vBox, new JLabel("Outline color"), olColor);
 	    
 	    bgColor.addActionListener(e -> {
 	    	logger.info("Changed bgcolor to {}", bgColor.getText());
@@ -83,7 +72,7 @@ public class TextDetailsView {
 			mifText.setValign(value);
 			chooser.updateImagePreview();
 		});
-		wrap(box, labelVAlign, valign);
+		wrap(vBox, new JLabel("Vertical alignment"), valign);
 		
 		// -attach affine transition.valign=top transition.halign=center
 		var halignValues = Arrays.asList("left", "center", "right").toArray(new String[3]);
@@ -93,7 +82,7 @@ public class TextDetailsView {
 			mifText.setHalign(value);
 			chooser.updateImagePreview();
 		});
-		wrap(box, labelHAlign, halign);
+		wrap(vBox, new JLabel("Horizontal alignment"), halign);
 
 		
 		File file = null;
@@ -115,7 +104,7 @@ public class TextDetailsView {
 	    boxFilename.add(Box.createRigidArea(new Dimension(10, 0)));
 	    boxFilename.add(chooser);
 	    boxFilename.add(Box.createHorizontalGlue());
-	    box.add(boxFilename);
+	    vBox.add(boxFilename);
 		
 	    text.addActionListener(e -> { mifText.setText(text.getText()); });
 	    length.addActionListener(e -> { mifText.setLength(Integer.parseInt(length.getText())); graphwrapper.redrawGraph();});
@@ -134,13 +123,11 @@ public class TextDetailsView {
 	    	chooser.updateImagePreview();
 	    });
 	    
-	    // TODO Audio: Alignment
-	    
-	    box.add(Box.createRigidArea(new Dimension(0, 10)));
+	    vBox.add(Box.createRigidArea(new Dimension(0, 10)));
 		
-		panel = Box.createHorizontalBox();
-		panel.add(box);
-		panel.add(Box.createHorizontalGlue());
+		box = Box.createHorizontalBox();
+		box.add(vBox);
+		box.add(Box.createHorizontalGlue());
 	}
 
 	private void wrap(Box box, JComponent c1, JComponent c2) {
@@ -157,7 +144,7 @@ public class TextDetailsView {
 	}
 	
 	public Box getBox() {
-		return panel;
+		return box;
 	}
 	
 	public void setDetails(MIFTextFileWrapper mifText) {
@@ -176,6 +163,6 @@ public class TextDetailsView {
 		valign.setSelectedItem(mifText.getValign());
 		halign.setSelectedItem(mifText.getHalign());
 		
-		panel.updateUI();
+		box.updateUI();
 	}
 }

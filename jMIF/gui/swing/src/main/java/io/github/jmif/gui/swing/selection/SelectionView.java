@@ -28,7 +28,6 @@ import io.github.jmif.gui.swing.selection.image.ImageDetailsView;
 import io.github.jmif.gui.swing.selection.image.ImageView;
 import io.github.jmif.gui.swing.selection.imageLibrary.ImageLibraryView;
 import io.github.jmif.gui.swing.selection.text.TextDetailsView;
-import io.github.jmif.gui.swing.selection.text.TextView;
 import io.github.jmif.gui.swing.selection.video.VideoDetailsView;
 import io.github.jmif.gui.swing.selection.video.VideoView;
 
@@ -59,7 +58,6 @@ public class SelectionView {
 	private AudioDetailsView audioDetailsView;
 	private FilterView filterViewAudio;
 	
-	private TextView textView;
 	private TextDetailsView textDetailsView;
 	
 	private FrameView singleFrameView;
@@ -88,14 +86,11 @@ public class SelectionView {
 		graphWrapper.addSingleFrameCreatedListener(singleFrameView);
 		var singleFrameBox = singleFrameView.getBox();
 		
-		textView = new TextView();
-		var textPanel = textView.getPanel();
-		
 		imageLibraryView.init(graphWrapper);
 		
 		tabPane.addTab("ImageView", wrap(imageDetailsView.getBox(), imageView.getJPanel(),       filterViewImage.getJPanel()));
 		tabPane.addTab("VideoView", wrap(videoDetailsView.getBox(), videoPanel,                  filterViewVideo.getJPanel()));
-		tabPane.addTab("TextView",  wrap(textDetailsView.getBox(),  textPanel,                   null));
+		tabPane.addTab("TextView",  wrap(textDetailsView.getBox(),  null,                   null));
 		tabPane.addTab("AudioView", wrap(audioDetailsView.getBox(), filterViewAudio.getJPanel(), null));
 		tabPane.addTab("FrameView", wrap(null,                      singleFrameBox,              null));
 		tabPane.addTab("ImageLibrary", wrap(imageLibraryView.getBox(), null, null));

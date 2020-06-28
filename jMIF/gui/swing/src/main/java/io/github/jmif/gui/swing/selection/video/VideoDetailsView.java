@@ -16,7 +16,7 @@ import io.github.jmif.gui.swing.entities.MIFVideoWrapper;
 public class VideoDetailsView {
 	private static final Logger logger = LoggerFactory.getLogger(VideoDetailsView.class);
 	
-	private Box panel;
+	private Box box;
 	private MIFVideoWrapper mifVideo;
 	
 	private JLabel filename = new JLabel();
@@ -32,35 +32,22 @@ public class VideoDetailsView {
 	private JLabel aCodec = new JLabel();
 	private JLabel aBitrate = new JLabel();
 
-	private JLabel labelFile = new JLabel("File");
-	private JLabel labelDisplayname = new JLabel("Displayname");
-	// TODO shows the length of video file in milliseconds.... the textfield should not be editable...create two new fileds for start from, end at... 
-	private JLabel labelFrames = new JLabel("Frames [ms]");
-	private JLabel labelOVerlay = new JLabel("Overlay [ms]");
-	private JLabel labelFPS = new JLabel("V.fps");
-	private JLabel labelVideoCodec = new JLabel("V.codec");
-	private JLabel labelVideoAR = new JLabel("V.aspect ratio");
-	private JLabel labelVideoBitrate = new JLabel("V.bitrate");
-	private JLabel labelDimension = new JLabel("V.dimension (wxh)");
-	private JLabel labelAudioCodec = new JLabel("A.codec");
-	private JLabel labelAudioBitrate = new JLabel("A.bitrate");
-
 	public VideoDetailsView(GraphWrapper mifProject) {
-		Box box = Box.createVerticalBox();
+		Box vBox = Box.createVerticalBox();
 		
-	    wrap(box, labelFile, filename);
-	    wrap(box, labelDisplayname, displayName);
-	    wrap(box, labelFrames, framelengthToDisplay);
-	    wrap(box, labelOVerlay, overlay);
+	    wrap(vBox, new JLabel("File"), filename);
+	    wrap(vBox, new JLabel("Displayname"), displayName);
+	    wrap(vBox, new JLabel("Frames [ms]"), framelengthToDisplay);
+	    wrap(vBox, new JLabel("Overlay [ms]"), overlay);
 
-	    wrap(box, labelVideoCodec, vCodec);
-	    wrap(box, labelVideoBitrate, vBitrate);
-	    wrap(box, labelDimension, vDimension);
-	    wrap(box, labelVideoAR, vAspectRatio);
-	    wrap(box, labelFPS, vFps);
+	    wrap(vBox, new JLabel("V.codec"), vCodec);
+	    wrap(vBox, new JLabel("V.bitrate"), vBitrate);
+	    wrap(vBox, new JLabel("V.dimension (wxh)"), vDimension);
+	    wrap(vBox, new JLabel("V.aspect ratio"), vAspectRatio);
+	    wrap(vBox, new JLabel("V.fps"), vFps);
 
-	    wrap(box, labelAudioCodec, aCodec);
-	    wrap(box, labelAudioBitrate, aBitrate);
+	    wrap(vBox, new JLabel("A.codec"), aCodec);
+	    wrap(vBox, new JLabel("A.bitrate"), aBitrate);
 	    
 	    framelengthToDisplay.addActionListener(e -> {
 	    	String input = framelengthToDisplay.getText();
@@ -99,15 +86,15 @@ public class VideoDetailsView {
 	    	}
 	    });
 	    
-		box.add(Box.createRigidArea(new Dimension(0, 10)));
+		vBox.add(Box.createRigidArea(new Dimension(0, 10)));
 		
-		panel = Box.createHorizontalBox();
-		panel.add(box);
-		panel.add(Box.createHorizontalGlue());
+		box = Box.createHorizontalBox();
+		box.add(vBox);
+		box.add(Box.createHorizontalGlue());
 		Dimension dim = new Dimension(5200, 200);
-		panel.setPreferredSize(dim);
-		panel.setMinimumSize(dim);
-		panel.setMaximumSize(dim);
+		box.setPreferredSize(dim);
+		box.setMinimumSize(dim);
+		box.setMaximumSize(dim);
 	}
 	
 	private void wrap(Box box, JComponent c1, JComponent c2) {
@@ -124,7 +111,7 @@ public class VideoDetailsView {
 	}
 	
 	public Box getBox() {
-		return panel;
+		return box;
 	}
 	
 	public void setDetails(MIFVideoWrapper mifVideo) {
@@ -140,6 +127,6 @@ public class VideoDetailsView {
 		this.vAspectRatio.setText(mifVideo.getAr());
 		this.vBitrate.setText(String.valueOf(mifVideo.getVideoBitrate())+" kbps");
 		this.vDimension.setText(mifVideo.getWidth()+"x"+mifVideo.getHeight());
-		this.panel.updateUI();
+		this.box.updateUI();
 	}
 }

@@ -19,7 +19,7 @@ public class AudioDetailsView {
 	
 	private MIFAudioFileWrapper audioFile;
 
-	private Box panel;
+	private Box box;
 	
 	private JLabel file = new JLabel();
 	private JLabel length = new JLabel();
@@ -31,28 +31,18 @@ public class AudioDetailsView {
 	private JTextField fadeIn = new JTextField();
 	private JTextField fadeOut = new JTextField();
 
-	private JLabel labelFile = new JLabel("File");
-	private JLabel labelLength = new JLabel("Length [ms]");
-	private JLabel labelBitrate = new JLabel("Bitrate");
-	private JLabel labelEncodeStart = new JLabel("Encode from [ms]");
-	private JLabel labelEncodeEnd = new JLabel("Encode to [ms]");
-	private JLabel labelEncodeLength = new JLabel("Encode length [ms]");
-	private JLabel labelNormalize = new JLabel("Normalize");
-	private JLabel labelFadeIn = new JLabel("FadeIn");
-	private JLabel labelFadeOut = new JLabel("FadeOut");
-
 	public AudioDetailsView(GraphWrapper mifProject) {
-		var box = Box.createVerticalBox();
+		var vBox = Box.createVerticalBox();
 		
-	    wrap(box, labelFile, file);
-	    wrap(box, labelLength, length);
-	    wrap(box, labelBitrate, bitrate);
-	    wrap(box, labelEncodeStart, encodeStart);
-	    wrap(box, labelEncodeEnd, encodeEnd);
-	    wrap(box, labelEncodeLength, encodeLength);
-	    wrap(box, labelNormalize, normalize);
-	    wrap(box, labelFadeIn, fadeIn);
-	    wrap(box, labelFadeOut, fadeOut);
+	    wrap(vBox, new JLabel("File"), file);
+	    wrap(vBox, new JLabel("Length [ms]"), length);
+	    wrap(vBox, new JLabel("Bitrate"), bitrate);
+	    wrap(vBox, new JLabel("Encode from [ms]"), encodeStart);
+	    wrap(vBox, new JLabel("Encode to [ms]"), encodeEnd);
+	    wrap(vBox, new JLabel("Encode length [ms]"), encodeLength);
+	    wrap(vBox, new JLabel("Normalize"), normalize);
+	    wrap(vBox, new JLabel("FadeIn"), fadeIn);
+	    wrap(vBox, new JLabel("FadeOut"), fadeOut);
 	    
 	    normalize.addActionListener(e -> audioFile.setNormalize(normalize.isSelected()));
 	    
@@ -120,12 +110,12 @@ public class AudioDetailsView {
 	    	}
 	    });
 	    
-	    box.add(Box.createRigidArea(new Dimension(0,10)));
-		box.add(Box.createHorizontalGlue());
+	    vBox.add(Box.createRigidArea(new Dimension(0,10)));
+		vBox.add(Box.createHorizontalGlue());
 		
-		panel = Box.createHorizontalBox();
-		panel.add(box);
-		panel.add(Box.createHorizontalGlue());
+		box = Box.createHorizontalBox();
+		box.add(vBox);
+		box.add(Box.createHorizontalGlue());
 	}
 	
 	private void wrap(Box box, JComponent c1, JComponent c2) {
@@ -141,7 +131,6 @@ public class AudioDetailsView {
 	    boxFilename.add(Box.createHorizontalGlue());
 	    box.add(boxFilename);
 	}
-	
 
 	public void setDetails(MIFAudioFileWrapper audioFile) {
 		this.audioFile = audioFile;
@@ -156,10 +145,10 @@ public class AudioDetailsView {
 		fadeOut.setText(String.valueOf(audioFile.getFadeOut()));
 		normalize.setSelected(audioFile.isNormalize());
 		
-		panel.updateUI();
+		box.updateUI();
 	}
 	
 	public Box getBox() {
-		return panel;
+		return box;
 	}
 }

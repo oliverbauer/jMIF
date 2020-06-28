@@ -33,11 +33,6 @@ public class Splashscreen {
 	
 	private JDialog dialog;
     private JProgressBar progress;
-    private JLabel lblLinux = new JLabel("Linux?");
-    private JLabel lblJava = new JLabel("Java?");
-    private JLabel lblMLT = new JLabel("MLT?");
-    private JLabel lblFFmpeg = new JLabel("FFmpeg?");
-    private JLabel lblImageMagick = new JLabel("ImageMagick?");
     
     private JTextField fldlLinux = new JTextField();
     private JTextField fldJava = new JTextField();
@@ -50,7 +45,6 @@ public class Splashscreen {
     
     private SwingWorker<Void, Integer> worker;
     
-    private final Font font = new Font("SansSerif", Font.BOLD, 20);
     // Requirement fulfilled
     private final Color myGreen = new Color(0,180,0);
     // Requirement fulfilled, but a newer software version exists (only checked for melt)
@@ -297,23 +291,18 @@ public class Splashscreen {
         
         fldlLinux.setPreferredSize(dim);
         fldlLinux.setEditable(false);
-        fldlLinux.setFont(font);
         
         fldJava.setPreferredSize(dim);
         fldJava.setEditable(false);
-        fldJava.setFont(font);
         
         fldMLT.setPreferredSize(dim);
         fldMLT.setEditable(false);
-        fldMLT.setFont(font);
         
         fldFFmpeg.setPreferredSize(dim);
         fldFFmpeg.setEditable(false);
-        fldFFmpeg.setFont(font);
         
         fldImageMagick.setPreferredSize(dim);
         fldImageMagick.setEditable(false);
-        fldImageMagick.setFont(font);
         
         var infoPanel = new JPanel(new GridBagLayout());
         var gbc = new GridBagConstraints();
@@ -328,15 +317,15 @@ public class Splashscreen {
         gbc.gridwidth = 1;
         gbc.gridx = 0;
         gbc.gridy = 1;
-        infoPanel.add(lblLinux, gbc);
+        infoPanel.add(new JLabel("Linux?"), gbc);
         gbc.gridy = 2;
-        infoPanel.add(lblJava, gbc);
+        infoPanel.add(new JLabel("Java?"), gbc);
         gbc.gridy = 3;
-        infoPanel.add(lblMLT, gbc);
+        infoPanel.add(new JLabel("MLT?"), gbc);
         gbc.gridy = 4;
-        infoPanel.add(lblFFmpeg, gbc);
+        infoPanel.add(new JLabel("FFmpeg?"), gbc);
         gbc.gridy = 5;
-        infoPanel.add(lblImageMagick, gbc);
+        infoPanel.add(new JLabel("ImageMagick?"), gbc);
         
         gbc.gridx = 1;
         gbc.gridy = 1;
