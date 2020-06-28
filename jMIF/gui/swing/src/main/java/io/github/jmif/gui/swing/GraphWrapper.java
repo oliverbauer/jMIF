@@ -45,7 +45,7 @@ import io.github.jmif.gui.swing.entities.MIFImageWrapper;
 import io.github.jmif.gui.swing.entities.MIFProjectWrapper;
 import io.github.jmif.gui.swing.entities.MIFTextFileWrapper;
 import io.github.jmif.gui.swing.entities.MIFVideoWrapper;
-import io.github.jmif.gui.swing.graph.AddRemoveListener;
+import io.github.jmif.gui.swing.listener.AddRemoveListener;
 import io.github.jmif.gui.swing.listener.ProjectListener;
 import io.github.jmif.gui.swing.listener.ProjectListener.type;
 import io.github.jmif.gui.swing.listener.SingleFrameCreatedListener;
@@ -69,7 +69,6 @@ public class GraphWrapper {
 	private static final int YOFFSET = 10;
 	private int currentLength = 0;
 
-	
 	private mxGraph graph;
 	private mxGraphComponent graphComponent;
 	private Object parent;

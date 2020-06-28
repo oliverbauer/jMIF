@@ -30,6 +30,7 @@ import com.mxgraph.view.mxGraphSelectionModel;
 
 import io.github.jmif.config.Configuration;
 import io.github.jmif.core.MIFException;
+import io.github.jmif.gui.swing.config.UserConfig;
 import io.github.jmif.gui.swing.entities.MIFFileWrapper;
 import io.github.jmif.gui.swing.graph.GraphView;
 import io.github.jmif.gui.swing.listener.ProjectListener;
@@ -61,7 +62,12 @@ public class JMIF {
 
 	private GraphWrapper graphWrapper;
 	private MenuView mifMenuView;
+	
+	@Inject
 	private GraphView mifGraphView;
+	
+	@Inject
+	private UserConfig userConfig;
 	
 	@Inject
 	private SelectionView mifSelectionView;
@@ -104,7 +110,7 @@ public class JMIF {
 		frame.setTitle("MIF-enizer (MLT/ImageMagickFFMPEG/)");
 
 		// TODO Menu: disbale save-button, preview and gen-button on start...
-		graphWrapper = createMIFProject("atsc_1080p_25");
+		graphWrapper = createMIFProject(userConfig.getGENERAL_PROFILE());
 		graphWrapper.getGraph().getSelectionModel().addListener(mxEvent.CHANGE, (sender, evt) -> cellClicked(sender));
 
 		var panelBox = Box.createVerticalBox();
@@ -146,8 +152,7 @@ public class JMIF {
 		panelBox.add(horizontalBox);
 		
 		mifSelectionView.init(graphWrapper);
-		mifGraphView = new GraphView(frame, graphWrapper, mifSelectionView);
-		mifGraphView.init();
+		mifGraphView.init(frame, graphWrapper, mifSelectionView);
 		panelBox.add(mifGraphView.getGraphPanel());
 		if (Configuration.transperencyOffset > 0) {
 			panelBox.add(Box.createRigidArea(new Dimension(0, Configuration.transperencyOffset)));
@@ -218,10 +223,16 @@ public class JMIF {
 		audio2.setEncodeEnde(14000); // [ms]
 		
 		var text = project.createMIFTextfile();
-		text.setLength(4000); // [ms]
+		text.setLength(userConfig.getTEXT_DURATION()); // [ms]
+		text.setBgcolour(userConfig.getTEXT_BG());
+		text.setFgcolour(userConfig.getTEXT_FG());
+		text.setOlcolour(userConfig.getTEXT_OL());
 		
 		var text2 = project.createMIFTextfile();
-		text2.setLength(4000); // [ms]
+		text2.setLength(userConfig.getTEXT_DURATION()); // [ms]
+		text2.setBgcolour(userConfig.getTEXT_BG());
+		text2.setFgcolour(userConfig.getTEXT_FG());
+		text2.setOlcolour(userConfig.getTEXT_OL());
 		
 		project.redrawGraph();
 		project.createFramePreview();

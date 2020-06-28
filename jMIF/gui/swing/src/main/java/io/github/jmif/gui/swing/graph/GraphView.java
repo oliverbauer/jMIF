@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 
+import javax.inject.Inject;
 import javax.swing.Box;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -18,11 +19,19 @@ import com.mxgraph.model.mxCell;
 
 import io.github.jmif.core.MIFException;
 import io.github.jmif.gui.swing.GraphWrapper;
+import io.github.jmif.gui.swing.config.UserConfig;
 import io.github.jmif.gui.swing.entities.MIFAudioFileWrapper;
 import io.github.jmif.gui.swing.entities.MIFFileWrapper;
+import io.github.jmif.gui.swing.entities.MIFImageWrapper;
+import io.github.jmif.gui.swing.entities.MIFTextFileWrapper;
+import io.github.jmif.gui.swing.entities.MIFVideoWrapper;
+import io.github.jmif.gui.swing.listener.AddRemoveListener;
 import io.github.jmif.gui.swing.selection.SelectionView;
 
 public class GraphView implements AddRemoveListener {
+	@Inject
+	private UserConfig userConfig;
+	
 	private static final Logger logger = LoggerFactory.getLogger(GraphView.class);
 	
 	private JFrame frame;
@@ -31,15 +40,13 @@ public class GraphView implements AddRemoveListener {
 	
 	private Box graphPanel;
 	
-	public GraphView(JFrame frame, GraphWrapper graphWrapper, SelectionView mifPanel) {
+	public void init(JFrame frame, GraphWrapper graphWrapper, SelectionView mifPanel) {
 		this.frame = frame;
 		this.graphWrapper = graphWrapper;
 		this.selectionView = mifPanel;
 		
 		this.graphWrapper.setAddRemoveActionListener(this);
-	}
-	
-	public void init() {
+
 		graphPanel = Box.createVerticalBox();
 		graphPanel.add(graphWrapper.getGraphComponent());
 	}
@@ -129,6 +136,14 @@ public class GraphView implements AddRemoveListener {
 				MIFFileWrapper<?> f;
 				try {
 					f = graphWrapper.createMIFFile(fileToAdd);
+					if (f instanceof MIFImageWrapper) {
+						f.setOverlayToPrevious(userConfig.getIMAGE_OVERLAY());
+						f.setDuration(userConfig.getIMAGE_DURATION());
+						
+					} else if (f instanceof MIFVideoWrapper) {
+						f.setOverlayToPrevious(userConfig.getVIDEO_OVERLAY());
+					}
+					
 					added.add(f);
 				} catch (MIFException | IOException | InterruptedException e1) {
 					logger.error("Unable to create file", e1);
@@ -159,7 +174,11 @@ public class GraphView implements AddRemoveListener {
 			
 			var returnVal = c.showOpenDialog(frame);
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
-				graphWrapper.createMIFAudioFile(c.getSelectedFile());
+				MIFAudioFileWrapper audioFile = graphWrapper.createMIFAudioFile(c.getSelectedFile());
+				audioFile.setFadeIn(userConfig.getAUDIO_FADE_IN());
+				audioFile.setFadeOut(userConfig.getAUDIO_FADE_OUT());
+				audioFile.setNormalize(userConfig.isAUDIO_NORMALIZE());
+				
 				graphWrapper.redrawGraph();
 			}
 		} catch (HeadlessException | MIFException e1) {
@@ -170,7 +189,12 @@ public class GraphView implements AddRemoveListener {
 	@Override
 	public void onAddText() {
 		try {
-			graphWrapper.createMIFTextfile();
+			MIFTextFileWrapper textfile = graphWrapper.createMIFTextfile();
+			textfile.setLength(userConfig.getTEXT_DURATION());
+			textfile.setBgcolour(userConfig.getTEXT_BG());
+			textfile.setFgcolour(userConfig.getTEXT_FG());
+			textfile.setOlcolour(userConfig.getTEXT_OL());
+			
 			// Select the new created cell, it is always last on list 
 			List<mxCell> textCells = graphWrapper.getTextCells();
 			graphWrapper.getGraph().getSelectionModel().setCell(textCells.get(textCells.size()-1));

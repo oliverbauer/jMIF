@@ -45,6 +45,9 @@ public class SelectionView {
 	private JTabbedPane tabPane;
 	
 	@Inject
+	private ImageLibraryView imageLibraryView;
+	
+	@Inject
 	private ImageView imageView;
 	private ImageDetailsView imageDetailsView;
 	private FilterView filterViewImage;
@@ -88,12 +91,14 @@ public class SelectionView {
 		textView = new TextView();
 		var textPanel = textView.getPanel();
 		
+		imageLibraryView.init(graphWrapper);
+		
 		tabPane.addTab("ImageView", wrap(imageDetailsView.getBox(), imageView.getJPanel(),       filterViewImage.getJPanel()));
 		tabPane.addTab("VideoView", wrap(videoDetailsView.getBox(), videoPanel,                  filterViewVideo.getJPanel()));
 		tabPane.addTab("TextView",  wrap(textDetailsView.getBox(),  textPanel,                   null));
 		tabPane.addTab("AudioView", wrap(audioDetailsView.getBox(), filterViewAudio.getJPanel(), null));
 		tabPane.addTab("FrameView", wrap(null,                      singleFrameBox,              null));
-		tabPane.addTab("ImageLibrary", wrap(new ImageLibraryView(graphWrapper).getBox(), null, null));
+		tabPane.addTab("ImageLibrary", wrap(imageLibraryView.getBox(), null, null));
 		tabPane.setSelectedIndex(5);
 		tabPane.setEnabledAt(0, false); // Image
 		tabPane.setEnabledAt(1, false); // Video

@@ -1,4 +1,4 @@
-package io.github.jmif.gui.swing.graph;
+package io.github.jmif.gui.swing.listener;
 
 public interface AddRemoveListener {
 	void onRemoveFile();

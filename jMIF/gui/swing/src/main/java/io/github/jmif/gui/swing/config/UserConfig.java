@@ -11,6 +11,11 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/*
+ * TODO Weld: Why: Exception in thread "AWT-EventQueue-0" org.jboss.weld.exceptions.IllegalStateException: WELD-000229: Contextual reference of Managed Bean [class io.github.jmif.gui.swing.config.UserConfig] with qualifiers [@Any @Default] is not valid after container 386b5c1e-554e-4ee1-8461-c9c4876cf5db shutdown
+ *      on @ApplicationScoped ? 
+ *      Without scope (@Dependent is default) this class gets instanciated three times (inefficient) 
+ */
 public class UserConfig {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserConfig.class);
 
@@ -100,5 +105,101 @@ public class UserConfig {
 				LoggerFactory.getLogger(getClass()).error("Unable to store config in HOME-DIR", cex);
 			}
 		}
+	}
+
+	public String getGENERAL_PROFILE() {
+		return GENERAL_PROFILE;
+	}
+
+	public void setGENERAL_PROFILE(String gENERAL_PROFILE) {
+		GENERAL_PROFILE = gENERAL_PROFILE;
+	}
+
+	public boolean isGENERAL_SHOW_SPLASHSCREEN() {
+		return GENERAL_SHOW_SPLASHSCREEN;
+	}
+
+	public void setGENERAL_SHOW_SPLASHSCREEN(boolean gENERAL_SHOW_SPLASHSCREEN) {
+		GENERAL_SHOW_SPLASHSCREEN = gENERAL_SHOW_SPLASHSCREEN;
+	}
+
+	public int getIMAGE_DURATION() {
+		return IMAGE_DURATION;
+	}
+
+	public void setIMAGE_DURATION(int iMAGE_DURATION) {
+		IMAGE_DURATION = iMAGE_DURATION;
+	}
+
+	public int getIMAGE_OVERLAY() {
+		return IMAGE_OVERLAY;
+	}
+
+	public void setIMAGE_OVERLAY(int iMAGE_OVERLAY) {
+		IMAGE_OVERLAY = iMAGE_OVERLAY;
+	}
+
+	public int getVIDEO_OVERLAY() {
+		return VIDEO_OVERLAY;
+	}
+
+	public void setVIDEO_OVERLAY(int vIDEO_OVERLAY) {
+		VIDEO_OVERLAY = vIDEO_OVERLAY;
+	}
+
+	public int getAUDIO_FADE_IN() {
+		return AUDIO_FADE_IN;
+	}
+
+	public void setAUDIO_FADE_IN(int aUDIO_FADE_IN) {
+		AUDIO_FADE_IN = aUDIO_FADE_IN;
+	}
+
+	public int getAUDIO_FADE_OUT() {
+		return AUDIO_FADE_OUT;
+	}
+
+	public void setAUDIO_FADE_OUT(int aUDIO_FADE_OUT) {
+		AUDIO_FADE_OUT = aUDIO_FADE_OUT;
+	}
+
+	public boolean isAUDIO_NORMALIZE() {
+		return AUDIO_NORMALIZE;
+	}
+
+	public void setAUDIO_NORMALIZE(boolean aUDIO_NORMALIZE) {
+		AUDIO_NORMALIZE = aUDIO_NORMALIZE;
+	}
+
+	public int getTEXT_DURATION() {
+		return TEXT_DURATION;
+	}
+
+	public void setTEXT_DURATION(int tEXT_DURATION) {
+		TEXT_DURATION = tEXT_DURATION;
+	}
+
+	public String getTEXT_BG() {
+		return TEXT_BG;
+	}
+
+	public void setTEXT_BG(String tEXT_BG) {
+		TEXT_BG = tEXT_BG;
+	}
+
+	public String getTEXT_FG() {
+		return TEXT_FG;
+	}
+
+	public void setTEXT_FG(String tEXT_FG) {
+		TEXT_FG = tEXT_FG;
+	}
+
+	public String getTEXT_OL() {
+		return TEXT_OL;
+	}
+
+	public void setTEXT_OL(String tEXT_OL) {
+		TEXT_OL = tEXT_OL;
 	}
 }

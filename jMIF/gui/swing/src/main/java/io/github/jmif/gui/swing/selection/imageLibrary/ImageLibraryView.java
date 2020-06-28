@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.inject.Inject;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -24,8 +25,13 @@ import org.slf4j.LoggerFactory;
 
 import io.github.jmif.config.Configuration;
 import io.github.jmif.gui.swing.GraphWrapper;
+import io.github.jmif.gui.swing.config.UserConfig;
+import io.github.jmif.gui.swing.entities.MIFFileWrapper;
 
 public class ImageLibraryView {
+	@Inject
+	private UserConfig userConfig;
+	
 	private static final Logger logger = LoggerFactory.getLogger(ImageLibraryView.class);
 
 	private Box box;
@@ -34,7 +40,7 @@ public class ImageLibraryView {
 
 	private Box newBox;
 
-	public ImageLibraryView(GraphWrapper graphWrapper) {
+	public void init(GraphWrapper graphWrapper) {
 		this.graphWrapper = graphWrapper;
 		box = Box.createVerticalBox();
 
@@ -134,7 +140,9 @@ public class ImageLibraryView {
 				@Override
 				public void mouseClicked(MouseEvent e) {
 					try {
-						graphWrapper.createMIFFile(f);
+						MIFFileWrapper<?> imageFile = graphWrapper.createMIFFile(f);
+						imageFile.setDuration(userConfig.getIMAGE_DURATION());
+						imageFile.setOverlayToPrevious(userConfig.getIMAGE_OVERLAY());
 					} catch (Exception ex) {
 						logger.error("", ex);
 					}
