@@ -180,6 +180,7 @@ public class FilterView {
 				logger.error("", e);
 			}
 		});
+		currentlySelectedFilter = new MeltFilter((String)selectedFilter.getSelectedItem());
 		selectedFilter.setPreferredSize(new Dimension(240, 25));
 		selectedFilter.setMaximumSize(new Dimension(240, 25));
 
@@ -192,7 +193,7 @@ public class FilterView {
 			selectedMeltFile.addFilter(currentlySelectedFilter);
 			// TODO Filter: The image should be updated! Needs new creation and execution of melt file!
 			updateCurrentlyAppliedFilters();
-
+	
 			addFilter.setEnabled(false); // since now added... do not add twice...
 		});
 		previewFilter = new JButton("preview");
