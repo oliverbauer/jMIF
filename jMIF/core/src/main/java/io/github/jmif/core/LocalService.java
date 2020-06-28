@@ -19,7 +19,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.jmif.entities.MIFAudioFile;
+import io.github.jmif.entities.MIFAudio;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFImage.ImageResizeStyle;
@@ -484,8 +484,8 @@ public class LocalService {
 	}
 
 	
-	public MIFAudioFile createAudio(String path) throws MIFException {
-		var audioFile = new MIFAudioFile();
+	public MIFAudio createAudio(String path) throws MIFException {
+		var audioFile = new MIFAudio();
 		audioFile.setAudiofile(path);
 		checkLengthInSeconds(audioFile);
 		audioFile.setEncodeStart(0);
@@ -493,7 +493,7 @@ public class LocalService {
 		return audioFile;
 	}
 	
-	private void checkLengthInSeconds(MIFAudioFile audio) {
+	private void checkLengthInSeconds(MIFAudio audio) {
 		Process process;
 		try {
 			var command = "ffprobe -v error -select_streams a:0 -show_entries stream=duration,bit_rate -of default=noprint_wrappers=1:nokey=1 "+audio.getAudiofile();

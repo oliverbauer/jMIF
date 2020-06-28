@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.jmif.config.Configuration;
-import io.github.jmif.entities.MIFAudioFile;
+import io.github.jmif.entities.MIFAudio;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFProject;
@@ -80,7 +80,7 @@ class MIFProjectExecutor {
 	private void copyMP3() throws IOException {
 		if (project.getAudiotrack() != null) {
 			var count = 0;
-			for (MIFAudioFile audio : project.getAudiotrack().getAudiofiles()) {
+			for (MIFAudio audio : project.getAudiotrack().getAudiofiles()) {
 				count++;
 				
 				execute("cp "+audio.getAudiofile()+" "+project.getWorkingDir()+"temp.mp3");

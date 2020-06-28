@@ -7,17 +7,17 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "audiotrack")
 public class MIFAudioTrack {
-	private List<MIFAudioFile> audiofiles;
+	private List<MIFAudio> audiofiles;
 
 	public MIFAudioTrack() {
 		this.audiofiles = new ArrayList<>();
 	}
 	
-	public List<MIFAudioFile> getAudiofiles() {
+	public List<MIFAudio> getAudiofiles() {
 		return audiofiles;
 	}
 
-	public void setAudiofiles(List<MIFAudioFile> audiofiles) {
+	public void setAudiofiles(List<MIFAudio> audiofiles) {
 		this.audiofiles = audiofiles;
 	}
 }

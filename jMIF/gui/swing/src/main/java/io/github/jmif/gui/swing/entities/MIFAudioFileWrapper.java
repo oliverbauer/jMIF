@@ -1,10 +1,10 @@
 package io.github.jmif.gui.swing.entities;
 
-import io.github.jmif.entities.MIFAudioFile;
+import io.github.jmif.entities.MIFAudio;
 
-public class MIFAudioFileWrapper extends MIFFileWrapper<MIFAudioFile> {
+public class MIFAudioFileWrapper extends MIFFileWrapper<MIFAudio> {
 
-	public MIFAudioFileWrapper(MIFAudioFile mifFile) {
+	public MIFAudioFileWrapper(MIFAudio mifFile) {
 		super(mifFile);
 	}
 

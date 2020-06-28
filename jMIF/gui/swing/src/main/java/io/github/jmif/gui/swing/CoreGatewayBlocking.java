@@ -11,7 +11,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import io.github.jmif.MIF;
 import io.github.jmif.core.MIFException;
 import io.github.jmif.core.ServiceExecutor;
-import io.github.jmif.entities.MIFAudioFile;
+import io.github.jmif.entities.MIFAudio;
 import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFTextFile;
@@ -121,7 +121,7 @@ public class CoreGatewayBlocking {
 	public MIFAudioFileWrapper createAudio(String path) throws MIFException {
 		final var id = service.createAudio(path);
 		try {
-			return new MIFAudioFileWrapper(MIFAudioFile.class.cast(executor.submit(() -> service.get(id)).get().get()));
+			return new MIFAudioFileWrapper(MIFAudio.class.cast(executor.submit(() -> service.get(id)).get().get()));
 		} catch (InterruptedException | ExecutionException e) {
 			throw new MIFException(e);
 		}
