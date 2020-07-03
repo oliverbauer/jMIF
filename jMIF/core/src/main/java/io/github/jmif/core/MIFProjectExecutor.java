@@ -402,7 +402,13 @@ class MIFProjectExecutor {
 						(textFile.getLength()/1000)*project.getProfileFramerate(), 
 						textFile.getSize(), 
 						textFile.getWeight()));
-					sb.append("  -attach affine transition.valign="+textFile.getValign()+" transition.halign="+textFile.getHalign()+" transition.fill=0 \\\n");
+					if (textFile.isUseAffineTransition()) {
+						sb.append("  -attach affine transition.fill=0 transition.distort=1 transition.geometry=\" \n");
+						sb.append(textFile.getAffineTransition());
+						sb.append("\" \\\n");
+					} else {
+						sb.append("  -attach affine transition.valign="+textFile.getValign()+" transition.halign="+textFile.getHalign()+" transition.fill=0 \\\n");
+					}
 				}
 			}
 			
