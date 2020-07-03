@@ -210,6 +210,18 @@ public class JMIF {
 		text.setBgcolour(userConfig.getTEXT_BG());
 		text.setFgcolour(userConfig.getTEXT_FG());
 		text.setOlcolour(userConfig.getTEXT_OL());
+		text.setUseAffineTransition(true);
+		
+		int milliseconds = userConfig.getTEXT_DURATION();
+		int frame = (milliseconds / 1000) * graphWrapper.getPr().getProfileFramerate();
+		int f = frame/4;
+		StringBuilder sb = new StringBuilder();
+		sb.append(0+    "=-500 0    500 -1!; \n");
+		sb.append(f-1+  "=1420 0    500 -1!; \n"); 
+		sb.append(2*f-1+"=1420 1000 500 -1!; \n"); 
+		sb.append(3*f-1+"=0    1000 500 -1!; \n"); 
+		sb.append(4*f-1+"=0    0    500 -1!; \n"); 
+		text.setAffineTransition(sb.toString());
 		
 		var text2 = graphWrapper.createMIFTextfile();
 		text2.setLength(userConfig.getTEXT_DURATION()); // [ms]

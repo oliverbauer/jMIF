@@ -233,23 +233,15 @@ public class TextDetailsView {
 		valign.setSelectedItem(mifText.getValign());
 		halign.setSelectedItem(mifText.getHalign());
 		
-		int millis = mifText.getLength();
-		int framesPerSecond = 25;
+		if (mifText.isUseAffineTransition()) {
+			affineTransition.setVisible(true);
+			affineTransitonCB.setSelected(true);
+		} else {
+			affineTransition.setVisible(false);
+			affineTransitonCB.setSelected(false);
+		}
 		
-		int frames = (millis*framesPerSecond/1000);
-		System.err.println("frames="+frames);
-		
-		StringBuilder sb = new StringBuilder();
-	    sb.append("0=-500   0 500 100!; \n");
-	    sb.append((frames-1)+"=1920 0 500 100!; \n");
-	    
-	    /*
-	     * 0    =- 50%   0% 50% 100%; 
-	     * 174   = 1920  0% 50% 100%; 
-	     */
-	    
-	    affineGeometry = sb.toString();
-	    
+	    affineGeometry = mifText.getAffineTransition();
 		affineTransition.setText(affineGeometry);
 		mifText.setAffineTransition(affineGeometry);
 		
