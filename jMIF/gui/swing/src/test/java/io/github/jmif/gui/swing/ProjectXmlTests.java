@@ -91,7 +91,6 @@ public class ProjectXmlTests {
 	}
 	
 	@Test
-	// TODO Problem with storing imageheight/imagewidth, but they have been set, see logfile
 	public void textLoaded() throws Exception {
 		Weld weld = new Weld()
 				.property("org.jboss.weld.construction.relaxed", true)
