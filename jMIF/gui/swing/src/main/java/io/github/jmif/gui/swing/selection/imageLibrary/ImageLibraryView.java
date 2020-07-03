@@ -6,6 +6,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
@@ -143,6 +144,16 @@ public class ImageLibraryView {
 						MIFFile imageFile = graphWrapper.createMIFFile(f);
 						imageFile.setDuration(userConfig.getIMAGE_DURATION());
 						imageFile.setOverlayToPrevious(userConfig.getIMAGE_OVERLAY());
+						
+						var executor = Executors.newWorkStealingPool();
+						executor.submit(() -> {
+							try {
+								graphWrapper.getService().createPreview(imageFile, graphWrapper.getPr().getWorkingDir());
+							} catch (Exception ex) {
+								ex.printStackTrace();
+							}
+						});
+						
 					} catch (Exception ex) {
 						logger.error("", ex);
 					}
