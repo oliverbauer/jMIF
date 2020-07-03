@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 
 import org.apache.commons.io.FileUtils;
+import org.jboss.weld.environment.se.Weld;
+import org.jboss.weld.environment.se.WeldContainer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,15 +18,27 @@ public class DefaultProjectTests {
 	private final CoreGateway service = new CoreGateway();
 	
 	private String tempDir;
+	private GraphWrapper project;
+	
 	@Before
 	public void before() throws IOException {
 		tempDir = Files.createTempDirectory("jMIF").toFile().getAbsolutePath()+"/";
+		
+		Weld weld = new Weld()
+				.property("org.jboss.weld.construction.relaxed", true)
+				.property("org.jboss.weld.bootstrap.concurrentDeployment", false);
+			
+		try (WeldContainer container = weld.initialize()) {
+			project = container.select(GraphWrapper.class).get();
+		}
+		
+		project.init();
 	}
 	
 	@Test
 	public void convertCheckProfile1080o25() throws Exception {
 		copy(tempDir, "1.JPG");
-		var project = new GraphWrapper();
+		
 		var pr = project.getPr();
 		pr.setWorkingDir(tempDir);
 		service.createWorkingDirs(pr);
@@ -54,7 +68,7 @@ public class DefaultProjectTests {
 	@Test
 	public void convertCheckProfile1080p50() throws Exception {
 		copy(tempDir, "1.JPG");
-		var project = new GraphWrapper();
+
 		var pr = project.getPr();
 		pr.setWorkingDir(tempDir);
 		service.createWorkingDirs(pr);
@@ -86,7 +100,6 @@ public class DefaultProjectTests {
 		// melt -query "profile"=svcd_pal
 		
 		copy(tempDir, "1.JPG");
-		var project = new GraphWrapper();
 		var pr = project.getPr();
 		pr.setWorkingDir(tempDir);
 		service.createWorkingDirs(pr);
@@ -121,7 +134,6 @@ public class DefaultProjectTests {
 		copy(tempDir, "3.JPG");
 
 		// Create a project of 2 pics, 1 video and 1 audio file
-		var project = new GraphWrapper();
 		var pr = project.getPr();
 		pr.setWorkingDir(tempDir);
 		service.createWorkingDirs(pr);
@@ -158,7 +170,6 @@ public class DefaultProjectTests {
 		copy(tempDir, "3.JPG");
 
 		// Create a project of 2 pics, 1 video and 1 audio file
-		var project = new GraphWrapper();
 		var pr = project.getPr();
 		pr.setWorkingDir(tempDir);
 		service.createWorkingDirs(pr);
@@ -194,7 +205,6 @@ public class DefaultProjectTests {
 		copy(tempDir, "audio.mp3");
 
 		// Create a project of 2 pics, 1 video and 1 audio file
-		var project = new GraphWrapper();
 		var pr = project.getPr();
 		pr.setWorkingDir(tempDir);
 		service.createWorkingDirs(pr);
@@ -228,7 +238,6 @@ public class DefaultProjectTests {
 		copy(tempDir, "audio2.mp3");
 
 		// Create a project of 2 pics, 1 video and 1 audio file
-		var project = new GraphWrapper();
 		var pr = project.getPr();
 		pr.setWorkingDir(tempDir);
 		service.createWorkingDirs(pr);
