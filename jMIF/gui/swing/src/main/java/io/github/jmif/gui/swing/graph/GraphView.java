@@ -94,7 +94,7 @@ public class GraphView implements AddRemoveListener {
 
 	@Override
 	public void onRemoveText() {
-		if (selectionView.getCurrentAudio() != null) {
+		if (selectionView.getCurrentText() != null) {
 			var file = selectionView.getCurrentText();
 			var cell = selectionView.getCell();
 			
