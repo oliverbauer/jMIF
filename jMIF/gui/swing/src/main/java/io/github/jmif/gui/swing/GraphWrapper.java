@@ -134,20 +134,36 @@ public class GraphWrapper {
 			var unmarshaller = context.createUnmarshaller();
 
 			var project = (MIFProject) unmarshaller.unmarshal(file);
-			// FIXME jaxb: textfiles not loaded, but they exists in projectfile.xml!
 			getCells().clear();
 			getTextCells().clear();
 			pr.getMIFFiles().clear();
 			pr.getAudiotrack().getAudiofiles().clear();
 			pr.getTexttrack().getEntries().clear();
 			
-			// TODO Add Audio or Text????
-			
 			for (MIFFile f : project.getMIFFiles()) {
 				createMIFFile(f.getFile()).getFilters().addAll(f.getFilters());
 			}
 			
-			// TODO jaxb: textfiles not loaded, but they exists in projectfile.xml!
+			for (MIFAudio audio : project.getAudiotrack().getAudiofiles()) {
+				MIFAudio audioFile = createMIFAudioFile(new File(audio.getAudiofile()));
+				audioFile.setAudiofile(audio.getAudiofile());
+				audioFile.setBitrate(audio.getBitrate());
+				audioFile.setDisplayName(audio.getDisplayName());
+				audioFile.setDuration(audio.getDuration());
+				audioFile.setEncodeEnde(audio.getEncodeEnde());
+				audioFile.setEncodeStart(audio.getEncodeStart());
+				audioFile.setFadeIn(audio.getFadeIn());
+				audioFile.setFadeOut(audio.getFadeOut());
+				audioFile.setFile(audio.getFile());
+				audioFile.setFilters(audio.getFilters());
+				audioFile.setHeight(audio.getHeight());
+				audioFile.setInitialized(audio.isInitialized());
+				audioFile.setLengthOfInput(audio.getLengthOfInput());
+				audioFile.setNormalize(audio.isNormalize());
+				audioFile.setOverlayToPrevious(audio.getOverlayToPrevious());
+				audioFile.setWidth(audio.getWidth());
+			}
+			
 			for (MIFTextFile t : project.getTexttrack().getEntries()) {
 				var textfile = createMIFTextfile();
 				textfile.setBgcolour(t.getBgcolour());
@@ -198,6 +214,8 @@ public class GraphWrapper {
 	}
 	
 	public MIFTextFile createMIFTextfile() throws MIFException {
+		logger.info("Create textnode");
+		
 		var textFile = service.createText();
 
 		var n = "text";

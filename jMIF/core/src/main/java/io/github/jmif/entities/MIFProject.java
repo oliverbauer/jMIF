@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -17,7 +16,7 @@ public class MIFProject {
 	@XmlElements({ @XmlElement(name = "mifImages", type = MIFImage.class),
 			@XmlElement(name = "mifVideos", type = MIFVideo.class) })
 	private List<MIFFile> mifFiles;
-	
+
 	private MIFAudioTrack audiotrack;
 	private MIFTextTrack texttrack;
 
@@ -58,12 +57,18 @@ public class MIFProject {
 		return outputVideo;
 	}
 	
-	@XmlElementRef
 	public MIFAudioTrack getAudiotrack() {
 		return audiotrack;
 	}
 	
-	@XmlElementRef
+	public void setAudiotrack(MIFAudioTrack audiotrack) {
+		this.audiotrack = audiotrack;
+	}
+
+	public void setTexttrack(MIFTextTrack texttrack) {
+		this.texttrack = texttrack;
+	}
+
 	public MIFTextTrack getTexttrack() {
 		return texttrack;
 	}

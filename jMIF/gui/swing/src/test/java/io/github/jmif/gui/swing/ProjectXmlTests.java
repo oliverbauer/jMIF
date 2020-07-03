@@ -91,8 +91,6 @@ public class ProjectXmlTests {
 	}
 	
 	@Test
-//	@Ignore 
-	// TODO Problem with loading textfile from stored defaultproject.xml, see GraphWrapper.load
 	// TODO Problem with storing imageheight/imagewidth, but they have been set, see logfile
 	public void textLoaded() throws Exception {
 		Weld weld = new Weld()
@@ -112,14 +110,27 @@ public class ProjectXmlTests {
 		project.getPr().setOutputVideo(project.getPr().getWorkingDir()+"output.avi");
 		FileUtils.copyInputStreamToFile(JMIF.class.getClassLoader().getResourceAsStream("defaultproject/1.JPG"),
 				new File(project.getPr().getWorkingDir() + "1.JPG"));
+		FileUtils.copyInputStreamToFile(JMIF.class.getClassLoader().getResourceAsStream("defaultproject/audio.mp3"),
+				new File(project.getPr().getWorkingDir() + "audio.mp3"));
 		
 		var mifFile = project.createMIFFile(new File(project.getPr().getWorkingDir() + "1.JPG"));
 		mifFile.setDuration(10000); // 10 sec
 		
 		var mifText = project.createMIFTextfile();
 		mifText.setText("Textcase");
+
+		var audio = project.createMIFAudioFile(new File(project.getPr().getWorkingDir()+"audio.mp3"));
+		audio.setEncodeEnde(10000); // [ms]
+		
+		Assert.assertTrue(project.getPr().getTexttrack().getEntries().size() == 1);
+		Assert.assertTrue(project.getPr().getTexttrack().getEntries().get(0).getText().equals("Textcase"));
+		Assert.assertTrue(project.getPr().getAudiotrack().getAudiofiles().size() == 1);
+		
 		project.save();
 
+		String projectXml = project.getPr().getWorkingDir() + "defaultproject.xml";
+		Assert.assertTrue(new File(projectXml).exists());
+		
 		GraphWrapper loadedProject = null;
 		try (WeldContainer container = weld.initialize()) {
 			loadedProject = container.select(GraphWrapper.class).get();
@@ -129,6 +140,7 @@ public class ProjectXmlTests {
 		loadedProject.getPr().setFileOfProject(project.getPr().getWorkingDir() + "defaultproject.xml");
 		loadedProject.load();
 		
+		Assert.assertTrue(loadedProject.getPr().getAudiotrack().getAudiofiles().size() == 1);
 		Assert.assertTrue(loadedProject.getPr().getTexttrack().getEntries().size() == 1);
 		Assert.assertTrue(loadedProject.getPr().getTexttrack().getEntries().get(0).getText().equals("Textcase"));
 		Assert.assertTrue(loadedProject.getPr().getMIFFiles().size() == 1);
