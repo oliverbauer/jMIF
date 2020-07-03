@@ -5,6 +5,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -14,7 +15,7 @@ import javax.xml.bind.annotation.XmlTransient;
 public class MIFVideo extends MIFFile {
 
 	@XmlTransient
-	private Map<Path, Image> previewImages = new HashMap<>();
+	private Map<Path, Image> previewImages = new LinkedHashMap<>();
 	
 	private int fps;
 	private String videoCodec;

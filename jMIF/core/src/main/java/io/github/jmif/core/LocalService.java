@@ -17,6 +17,7 @@ import javax.xml.bind.Marshaller;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -239,52 +240,37 @@ public class LocalService {
 			logger.debug("Init: Width/Height already known");
 		}
 
-		/*
-		 * Preview-Video in low quality 
-		 */
-
-		var videoLowQuality = workingDir+"/preview/_low_"+filename;
-		if (!new File(videoLowQuality).exists()) {
-			logger.info("Init: Create Preview-Video (low quality) {}", videoLowQuality);
-			var command = "ffmpeg -y -i " + videoFileName + " -vf scale=320:-1 -c:v libx264 -crf 0 -an -r 25 -preset ultrafast "+videoLowQuality;
-			try {
-				new ProcessBuilder("bash", "-c", command)
-				.directory(new File(workingDir))
-				.redirectErrorStream(true)
-				.start()
-				.waitFor();
-			} catch (InterruptedException | IOException e) {
-				throw new MIFException(e);
-			}
-		} else {
-			logger.debug("Init: Preview-Video already computed");
-		}
-
-		/*
-		 * 10 images from the video 
-		 */
 		video.getPreviewImagesPath().clear();
-		var cnt = (int) (video.getDuration() / 1000d);
+		
+		logger.info("Init: Create preview images for video");
 		for (var i = 1; i <= 10; i++) {
 			var image = Paths.get(workingDir).resolve("preview").resolve("_low_"+filename+"_"+i+".png");
-			if (!Files.exists(image)) {
-				logger.info("Init: Create Preview-Video-Image {}", image);
 
-				var command = "ffmpeg -y -i " + videoLowQuality + " -vf \"select=eq(n\\," + (i * cnt) + ")\" -vframes 1 "+ videoLowQuality + "_" + i + ".png";
-				try {
-					new ProcessBuilder("bash", "-c", command)
+			try {
+				var output = workingDir+"/preview/_low_"+filename+"_"+i+".png";
+				
+				/** See https://trac.ffmpeg.org/wiki/Seeking */
+				
+				// ffmpeg sexagesimal format (HOURS:MM:SS.MILLISECONDS)
+				var sexagesimal = DurationFormatUtils.formatDuration(
+					i*(video.getDuration()/11), 
+					"HH:mm:ss.SSS"
+				);
+				
+				var command2 = "ffmpeg -ss "+sexagesimal+" -i "+videoFileName+" -frames:v 1 -vf \"scale=iw/4:ih/4\" "+output;
+				logger.info("Execute {}", command2);
+				Process process = new ProcessBuilder("bash", "-c", command2)
 					.directory(new File(workingDir))
 					.redirectErrorStream(true)
-					.start()
-					.waitFor();
-					video.addPreviewImage(image, ImageIO.read(image.toFile()));
-				} catch (InterruptedException | IOException e) {
-					throw new MIFException(e);
-				}
-			} else {
-				logger.debug("Init: Preview-Video-Image {} already computed", image);
+					.start();
+				process.waitFor();
+					
+				video.addPreviewImage(image, ImageIO.read(image.toFile()));
+			} catch (IOException | InterruptedException e) {
+				throw new MIFException(e);
 			}
 		}
+		logger.info("Init: Create preview images for video: Done...");
 		
 		return video;
 	}
