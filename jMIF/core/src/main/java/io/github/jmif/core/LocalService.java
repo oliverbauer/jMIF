@@ -54,6 +54,14 @@ public class LocalService {
 		}
 	}
 	
+	public void affineTextPreview(MIFProject pr, MIFTextFile textFile) throws MIFException {
+		try {
+			new MIFProjectExecutor(pr).affineTextPreview(pr, textFile); 
+		} catch (IOException e) {
+			throw new MIFException(e);
+		}		
+	}
+	
 	public void updateProfile(MIFProject project) {
 		var framerate = -1;
 		var height = -1;
@@ -354,7 +362,6 @@ public class LocalService {
 				var extension = image.getFileExtension();
 				image.setImagePreviewPath(Paths.get(workingDir).resolve("preview").resolve(basename + "_thumb."+wxh+"."+
 						extension));
-				image.setPreviewHardResizePath(Paths.get(workingDir).resolve("preview").resolve(basename+"_hard."+wxh+"."+extension));
 				image.setPreviewCropPath(Paths.get(workingDir).resolve("preview").resolve(basename+"_kill."+wxh+"."+extension));
 				image.setPreviewManualPath(Paths.get(workingDir).resolve("preview").resolve(basename+"_manual."+wxh+"."+extension));
 				logger.debug("Width/Height = {}/{}", image.getWidth(), image.getHeight());
@@ -403,44 +410,24 @@ public class LocalService {
 		}
 		// Preview: 324x243 (Aspect ration) from 5184/16 x 3888/16
 
-		if (!Files.exists(image.getPreviewHardResizePath())) {
-			logger.info("Init: Create HARD-Preview-Image {}", image.getPreviewHardResizePath());
-
-			var hardRescale = "convert " + image.getImagePreviewPath() + " -quality 100 -resize " + estimatedWith + "x"
-					+ aspectHeight + "! " + image.getPreviewHardResizePath();
-			try {
-				var process = new ProcessBuilder("bash", "-c", hardRescale).directory(new File(workingDir))
-						.redirectErrorStream(true).start();
-				process.waitFor();
-				image.setPreviewHardResize(ImageIO.read(image.getPreviewHardResizePath().toFile()));
-			} catch (IOException | InterruptedException e) {
-				throw new MIFException(e);
-			}
-		} else {
-			logger.debug("Init: HARD-Preview-Image {} already exists", image.getPreviewHardResizePath());
-		}
-
 		if (!Files.exists(image.getPreviewCropPath())) {
 			logger.info("Init: Create CROP-Preview-Image {}", image.getPreviewCropPath());
 
-			var kill = "convert " + image.getImagePreviewPath() + " -quality 100 -geometry " + estimatedWith + "x kill." + filename;
+		    // E.g. "convert input.jpg -geometry 1920x -crop 1920x1080+0+180 -quality 100 output.jpg"
+			command = new StringBuilder()
+				.append("convert ")
+				.append(image.getImagePreviewPath())
+				.append(" -quality 100 -geometry ")
+				.append(estimatedWith)
+				.append("x -crop ")
+				.append(estimatedWith)
+				.append("x")
+				.append(aspectHeight)
+				.append("+0+46 ")
+				.append(image.getPreviewCropPath())
+				.toString();
 			try {
-				new ProcessBuilder("bash", "-c", kill)
-				.directory(new File(workingDir))
-				.redirectErrorStream(true)
-				.start()
-				.waitFor();
-
-				var kill2 = "convert kill." + filename + " -quality 100 -crop " + estimatedWith + "x" + aspectHeight
-						+ "+0+46 " + image.getPreviewCropPath();
-				new ProcessBuilder("bash", "-c", kill2)
-				.directory(new File(workingDir))
-				.redirectErrorStream(true)
-				.start()
-				.waitFor();
-
-				// rm tempfile...
-				new ProcessBuilder("bash", "-c", "rm kill." + filename)
+				new ProcessBuilder("bash", "-c", command)
 				.directory(new File(workingDir))
 				.redirectErrorStream(true)
 				.start()

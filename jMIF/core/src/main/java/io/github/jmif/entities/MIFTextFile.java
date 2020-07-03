@@ -18,6 +18,9 @@ public class MIFTextFile {
 	// top, middle, bottom
 	private String valign = "bottom";
 	
+	private boolean useAffineTransition = false;
+	private String affineTransition = "";
+	
 	public MIFTextFile() {
 		
 	}
@@ -92,5 +95,21 @@ public class MIFTextFile {
 
 	public void setLength(int length) {
 		this.length = length;
+	}
+
+	public boolean isUseAffineTransition() {
+		return useAffineTransition;
+	}
+
+	public void setUseAffineTransition(boolean useAffineTransition) {
+		this.useAffineTransition = useAffineTransition;
+	}
+
+	public String getAffineTransition() {
+		return affineTransition;
+	}
+
+	public void setAffineTransition(String affineTransition) {
+		this.affineTransition = affineTransition;
 	}
 }

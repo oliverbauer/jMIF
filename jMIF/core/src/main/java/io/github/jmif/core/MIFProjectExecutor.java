@@ -5,7 +5,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
@@ -75,6 +79,165 @@ class MIFProjectExecutor {
 		executeMELT("sh melt.sh");
 		
 		LOGGER.info("Runtime for {}: {}", project.getOutputVideo(), TimeUtil.getMessage(startTime));
+	}
+	
+	/**
+	 * All {@link MIFFile} that are reflected with this {@link MIFTextFile} needs to be provided.
+	 * 
+	 * @param files
+	 * @param geometry
+	 * @throws IOException
+	 */
+	public void affineTextPreview(MIFProject pr, MIFTextFile textFile) throws IOException {
+		int skipFramesOfFirstMIFFile = -1;
+		
+		int millis = textFile.getLength();
+		int framesPerSecond = pr.getProfileFramerate();
+		int framelengthOfText = (millis*framesPerSecond/1000);
+		
+		int startframeoftext = 0;
+		if (!project.getTexttrack().getEntries().isEmpty()) {
+			for (MIFTextFile t : project.getTexttrack().getEntries()) {
+				if (t == textFile) {
+					break;
+				}
+				int f = (t.getLength()/1000)*pr.getProfileFramerate();
+				startframeoftext += f;
+			}
+		}
+		System.err.println("startframe of text="+startframeoftext);
+		System.err.println("num frames of text="+framelengthOfText);
+		int currentF = 0;
+		List<MIFFile> involvedFiles = new ArrayList<>();
+		Map<MIFFile, Integer> from = new HashMap<>();
+		Map<MIFFile, Integer> to = new HashMap<>();
+
+		for (MIFFile meltfile : this.project.getMIFFiles()) {
+			var f = (int)((meltfile.getDuration() / 1000d) * project.getProfileFramerate());
+			
+//			System.err.println("-check "+meltfile.getDisplayName());
+//			System.err.println("- currentF = "+currentF+", f = "+f);
+			
+			if (currentF >= framelengthOfText+startframeoftext) {
+//				involvedFiles.add(meltfile);
+				break;
+			}
+			
+			if (currentF + f < startframeoftext) {
+				// to early...
+				currentF += f;
+				
+			} else if (currentF + f > startframeoftext) {
+				involvedFiles.add(meltfile);
+				from.put(meltfile, currentF);
+				currentF += f;
+				to.put(meltfile, currentF);
+			} else if (currentF >= startframeoftext) {
+				from.put(meltfile, currentF);
+				involvedFiles.add(meltfile);
+				to.put(meltfile, currentF);
+				currentF += f;
+			} else {
+				currentF += f;
+			}
+			// TODO aber nur wenn es nicht das erste file ist oder?
+			currentF -= (int)((meltfile.getOverlayToPrevious() / 1000d) * project.getProfileFramerate());
+		}
+		for (MIFFile f : involvedFiles) {
+			System.err.println("Invoved files: "+f.getDisplayName()+" "+from.get(f)+"->"+to.get(f));
+		}
+		// So skip 125 frames of fist video...
+		skipFramesOfFirstMIFFile = startframeoftext - from.get(involvedFiles.get(0));
+		System.err.println("Skip "+skipFramesOfFirstMIFFile+" frames of first file...");
+		
+		// TODO Skip some frames of last frame...
+		
+		
+		var sb = new StringBuilder();
+		sb.append("#/!/usr/bin/env bash\n\n");
+		sb.append("melt \\\n");
+		
+		sb.append("color:black out=1 \\\n"); // FIXME what is the overall framelength?
+		
+		sb.append("-track \\\n");
+		for (int i=0; i<=involvedFiles.size()-1; i++) {
+			var meltfile = involvedFiles.get(i);
+			var file = meltfile.getFile();
+			var input = project.getWorkingDir()+"scaled/"+file.getName();
+			var extension = FilenameUtils.getExtension(file.getName());
+			
+			var useMixer = i != 0;
+			var frames = (int)((meltfile.getDuration() / 1000d) * project.getProfileFramerate());
+			
+			if (Configuration.allowedImageTypes.contains(extension) || Configuration.allowedVideoTypes.contains(extension)) {
+				if (i== 0) {
+					sb.append("   ").append(input).append(" in="+skipFramesOfFirstMIFFile+" out=").append(frames - 1);
+				} else {
+					sb.append("   ").append(input).append(" in=0 out=").append(frames - 1);
+				}
+				
+				for (MeltFilter currentlyAddedFilters : meltfile.getFilters()) {
+					sb.append(" -attach ");
+					sb.append(currentlyAddedFilters.getFiltername());
+					sb.append(" ");
+					var filterUsage = currentlyAddedFilters.getFilterUsage();
+					for (String v : filterUsage.keySet()) {
+						sb.append(v).append("=").append(filterUsage.get(v)).append(" ");
+					}				
+				}
+				
+			} else {
+				// Exception
+				LOGGER.error("Unsupported file extension {}", extension);
+			}
+			if (useMixer && meltfile.getOverlayToPrevious() > 0) {
+				var overlay = (int)((meltfile.getOverlayToPrevious() / 1000d) * project.getProfileFramerate());
+				sb.append(" -mix ").append(overlay).append(" -mixer luma");
+			}
+			sb.append(" \\\n");
+		}
+		sb.append("\\\n");
+		sb.append("-track \\\n");
+		
+		sb.append(" pango: \\\n");
+			
+		sb.append(String.format(" text=\"%s\" bgcolour=%s fgcolour=%s olcolour=%s out=%s size=%s weight=%s \\\n", 
+			textFile.getText(), 
+			textFile.getBgcolour(), 
+			textFile.getFgcolour(),
+			textFile.getOlcolour(), 
+			(textFile.getLength()/1000)*project.getProfileFramerate(), 
+			textFile.getSize(), 
+			textFile.getWeight()));
+		sb.append("  -attach affine transition.fill=0 transition.distort=1 transition.geometry=\" \n");
+		sb.append(textFile.getAffineTransition());
+		sb.append("\" \\\n");
+		
+		
+		sb.append(" -transition mix:-1 always_active=1 a_track=0 b_track=1 sum=1  \\\n");
+		sb.append(" -transition frei0r.cairoblend a_track=0 b_track=1 disable=0 \\\n");
+		if (!project.getTexttrack().getEntries().isEmpty()) {
+			sb.append(" -transition affine a_track=0 b_track=2 \\\n");
+		}
+		
+		sb.append(" -profile "+project.getProfile()+" \\\n");
+		sb.append(" -consumer sdl2 terminate_on_pause=1");
+		
+		String meltFile = sb.toString();
+		
+		
+		LOGGER.info(meltFile);
+		
+		FileUtils
+			.writeStringToFile(
+				new File(project.getWorkingDir()+"test.sh"), 
+				meltFile,
+				Charset.defaultCharset()
+		);
+		
+		adjustImagesIfNecessary();
+		
+		executeMELT("sh test.sh");
 	}
 	
 	private void copyMP3() throws IOException {
@@ -305,9 +468,6 @@ class MIFProjectExecutor {
 		var h = project.getProfileHeight(); // e.g. 1080
 
 		switch (image.getStyle()) {
-		case HARD:
-			execute("convert "+input+" -geometry "+w+"x"+h+"! -quality 100 "+output);
-			break;
 		case CROP:
 			/*
 			 * Cf. 

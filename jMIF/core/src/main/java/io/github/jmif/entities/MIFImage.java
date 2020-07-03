@@ -11,7 +11,6 @@ import javax.xml.bind.annotation.XmlTransient;
 public class MIFImage extends MIFFile {
 	public static enum ImageResizeStyle {
 		CROP,
-		HARD,
 		MANUAL
 	}
 	
@@ -20,9 +19,6 @@ public class MIFImage extends MIFFile {
 	
 	@XmlTransient
 	private Path imagePreviewPath;
-	
-	@XmlTransient
-	private Path previewHardResizePath;
 	
 	@XmlTransient
 	private Path previewCropPath;
@@ -77,10 +73,6 @@ public class MIFImage extends MIFFile {
 		this.style = style;
 	}
 
-	public Path getPreviewHardResizePath() {
-		return previewHardResizePath;
-	}
-
 	public Path getPreviewCropPath() {
 		return previewCropPath;
 	}
@@ -119,10 +111,6 @@ public class MIFImage extends MIFFile {
 	
 	public void setImagePreviewPath(Path imagePreview) {
 		this.imagePreviewPath = imagePreview;
-	}
-	
-	public void setPreviewHardResizePath(Path previewHardResizPathe) {
-		this.previewHardResizePath = previewHardResizPathe;
 	}
 	
 	public Image getImagePreview() {

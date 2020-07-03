@@ -142,12 +142,6 @@ public class ImageView {
 				setSelectedPicture(previewCrop);
 			}
 			break;
-		case HARD:
-			final var previewHardResize = meltFile.getPreviewHardResize();
-			if (Objects.nonNull(previewHardResize)) {
-				setSelectedPicture(previewHardResize);
-			}
-			break;
 		case MANUAL:
 			final var previewManual = meltFile.getPreviewManual();
 			if (Objects.nonNull(previewManual)) {
@@ -166,14 +160,6 @@ public class ImageView {
 				logger.info("Switching to style '{}'", item);
 				var mifImage = MIFImage.class.cast(selectedMeltFile);
 				switch (item) {
-				case HARD:
-					final var previewHardResize = mifImage.getPreviewHardResize();
-					if (Objects.nonNull(previewHardResize)) {
-						imgPicture[1].setIcon(new ImageIcon(previewHardResize));
-						resizeStyleDetails.setVisible(false);
-						resizeStyleDetailsLabel.setVisible(false);
-					}
-					break;
 				case CROP:
 					final var previewCrop = mifImage.getPreviewCrop();
 					if (Objects.nonNull(previewCrop)) {
