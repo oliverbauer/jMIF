@@ -1,0 +1,4 @@
+sudo docker build . -t jmif.docker
+sudo xhost +
+sudo docker run --tty --interactive --network=host --env DISPLAY=$DISPLAY --volume $XAUTH:/root/.Xauthority jmif.docker:latest
+
