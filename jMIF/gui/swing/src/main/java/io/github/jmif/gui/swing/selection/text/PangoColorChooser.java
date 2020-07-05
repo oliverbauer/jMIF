@@ -259,6 +259,11 @@ public class PangoColorChooser extends Box {
     		olACCP.getColorSelectionModel().setSelectedColor(olColor);
     	}
 	}
+	
+	public void setBackgroundFile(File file) {
+		this.backgroundImage = file;
+		imagePreview.updateUI();
+	}
 
 	public void setTextDetailsView(TextDetailsView textDetailsView) {
 		this.textDetailsView = textDetailsView;

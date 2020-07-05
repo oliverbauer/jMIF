@@ -1,8 +1,10 @@
 package io.github.jmif.gui.swing.selection.text;
 
 import java.awt.Dimension;
-import java.io.File;
 import java.util.Arrays;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -15,9 +17,6 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.mxgraph.model.mxCell;
 
 import io.github.jmif.core.LocalService;
@@ -27,7 +26,7 @@ import io.github.jmif.entities.MIFTextFile;
 import io.github.jmif.gui.swing.GraphWrapper;
 
 public class TextDetailsView {
-	private static final Logger logger = LoggerFactory.getLogger(TextDetailsView.class);
+	private GraphWrapper graphwrapper;
 	
 	private Box box;
 	
@@ -38,8 +37,10 @@ public class TextDetailsView {
 	private JTextField fgColor = new JTextField();
 	private JTextField bgColor = new JTextField();
 	private JTextField olColor = new JTextField();
-	private JComboBox<String> valign;
-	private JComboBox<String> halign;
+	private JComboBox<String> valign = new JComboBox<>(Arrays.asList("top", "middle", "bottom").toArray(new String[3]));
+	private JComboBox<String> halign = new JComboBox<>(Arrays.asList("left", "center", "right").toArray(new String[3]));;
+	
+	private JButton previewButton = new JButton("Preview");
 	
 	private PangoColorChooser chooser;
 	private MIFTextFile mifText;
@@ -49,6 +50,8 @@ public class TextDetailsView {
 	private String affineGeometry = "";
 	
 	public TextDetailsView(GraphWrapper graphwrapper) {
+		this.graphwrapper = graphwrapper;
+		
 		var vBox = Box.createVerticalBox();
 		
 	    wrap(vBox, new JLabel("Text"), text);
@@ -58,54 +61,10 @@ public class TextDetailsView {
 	    wrap(vBox, new JLabel("Background color"), bgColor);
 	    wrap(vBox, new JLabel("Foreground color"), fgColor);
 	    wrap(vBox, new JLabel("Outline color"), olColor);
-	    
-	    bgColor.addActionListener(e -> {
-	    	logger.info("Changed bgcolor to {}", bgColor.getText());
-	    	mifText.setBgcolour(bgColor.getText());
-	    	chooser.setMIFTextFile(mifText);
-	    });
-	    fgColor.addActionListener(e -> {
-	    	logger.info("Changed fgcolor to {}", fgColor.getText());
-	    	mifText.setFgcolour(fgColor.getText());
-	    	chooser.setMIFTextFile(mifText);
-	    });
-	    olColor.addActionListener(e -> {
-	    	logger.info("Changed olcolor to {}", olColor.getText());
-	    	mifText.setOlcolour(olColor.getText());
-	    	chooser.setMIFTextFile(mifText);
-	    });
-	    
-	    // -attach affine transition.valign=top transition.halign=center
-		var valignValues = Arrays.asList("top", "middle", "bottom").toArray(new String[3]);
-		valign = new JComboBox<>(valignValues);
-		valign.addItemListener(e -> {
-			var value = (String)valign.getSelectedItem();
-			mifText.setValign(value);
-			chooser.updateImagePreview();
-		});
-		wrap(vBox, new JLabel("Vertical alignment"), valign);
-		
-		// -attach affine transition.valign=top transition.halign=center
-		var halignValues = Arrays.asList("left", "center", "right").toArray(new String[3]);
-		halign = new JComboBox<>(halignValues);
-		halign.addItemListener(e -> {
-			var value = (String)halign.getSelectedItem();
-			mifText.setHalign(value);
-			chooser.updateImagePreview();
-		});
-		wrap(vBox, new JLabel("Horizontal alignment"), halign);
+	    wrap(vBox, new JLabel("Vertical alignment"), valign);
+	    wrap(vBox, new JLabel("Horizontal alignment"), halign);
 
-		
-		File file = null;
-		for (mxCell c : graphwrapper.getCells()) {
-			var f = graphwrapper.get(c);
-			if (f instanceof MIFImage) {
-				file = f.getFile();
-				break;
-			}
-		}
-		
-		chooser = new PangoColorChooser(file, mifText);
+		chooser = new PangoColorChooser(null, mifText);
 	    var boxFilename = Box.createHorizontalBox();
 	    boxFilename.add(Box.createRigidArea(new Dimension(10, 0)));
 	    var label = new JLabel();
@@ -116,90 +75,89 @@ public class TextDetailsView {
 	    boxFilename.add(chooser);
 	    boxFilename.add(Box.createHorizontalGlue());
 	    vBox.add(boxFilename);
-		
-	    text.addActionListener(e -> { mifText.setText(text.getText()); });
-	    length.addActionListener(e -> { 
-	    	mifText.setLength(Integer.parseInt(length.getText()));
-	    	
-	    	setDetails(mifText); // to update affine transition TODO user should be asked for that!
-	    	
-	    	graphwrapper.redrawGraph();
-	    });
-	    size.addActionListener(e -> { mifText.setSize(Integer.parseInt(size.getText())); });
-	    weight.addActionListener(e -> { mifText.setWeight(Integer.parseInt(weight.getText())); });
-	    fgColor.addActionListener(e -> { 
-	    	mifText.setFgcolour(fgColor.getText());
-	    	chooser.updateImagePreview();
-	    });
-	    bgColor.addActionListener(e -> { 
-	    	mifText.setBgcolour(bgColor.getText());
-	    	chooser.updateImagePreview();
-	    });
-	    olColor.addActionListener(e -> { 
-	    	mifText.setOlcolour(olColor.getText());
-	    	chooser.updateImagePreview();
-	    });
-	    
 	    vBox.add(Box.createRigidArea(new Dimension(0, 10)));
-		
+	    
+	    wrap(vBox, affineTransitonCB, new JLabel());
+	    wrap(vBox, new JLabel(""), affineTransition);
+	    wrap(vBox, new JLabel(""), previewButton);
+	    
 		box = Box.createHorizontalBox();
 		box.add(vBox);
 		
-		
-		wrap(vBox, affineTransitonCB, new JLabel());
 		affineTransition.setVisible(false); // initial: do not add affine transition
-		affineTransitonCB.addActionListener(e -> {
-			boolean show = affineTransitonCB.isSelected();
-			if (show) {
-				affineTransition.setVisible(true);
-				mifText.setUseAffineTransition(true);
-			} else {
-				affineTransition.setVisible(false);
-				mifText.setUseAffineTransition(false);
-			}
-			box.updateUI();
-		});
 		affineTransition.setWrapStyleWord(true);
 		affineTransition.setLineWrap(true);
+
+		initListeners();
+		
+		box.add(Box.createHorizontalGlue());
+	}
+	
+	private void initListeners() {
+		valign.addItemListener(e -> updateValueAndChooser(mifText::setValign, valign::getSelectedItem, Object::toString));
+		halign.addItemListener(e -> updateValueAndChooser(mifText::setHalign, halign::getSelectedItem, Object::toString));
+		
+	    text.addActionListener(e -> { mifText.setText(text.getText()); });
+	    length.addActionListener(e -> { 
+	    	updateValueAndChooser(mifText::setLength, length::getText, Integer::parseInt);
+
+	    	setDetails(mifText); // to update affine transition TODO user should be asked for that!
+	    	graphwrapper.redrawGraph();
+	    });
+	    size.addActionListener(e -> updateValueAndChooser(mifText::setSize, size::getText, Integer::parseInt));
+	    weight.addActionListener(e -> updateValueAndChooser(mifText::setWeight, weight::getText, Integer::parseInt));
+	    fgColor.addActionListener(e -> updateValueAndChooser(mifText::setFgcolour, fgColor::getText));
+	    bgColor.addActionListener(e -> updateValueAndChooser(mifText::setBgcolour, bgColor::getText));
+	    olColor.addActionListener(e -> updateValueAndChooser(mifText::setOlcolour, olColor::getText));
+		
+		previewButton.addActionListener(e -> createAffineTextPreview(LocalService::new, mifText));
+		
+		affineTransitonCB.addActionListener(e -> {
+			updateValueAndChooser(affineTransition::setVisible, affineTransitonCB::isSelected);
+			updateValueAndChooser(mifText::setUseAffineTransition, affineTransitonCB::isSelected);
+			box.updateUI();
+		});
+		
 		affineTransition.getDocument().addDocumentListener(new DocumentListener() {
 	        @Override
 	        public void removeUpdate(DocumentEvent e) {
-	        	affineGeometry = affineTransition.getText();
-	        	mifText.setAffineTransition(affineGeometry);
+	        	updateValueAndChooser(mifText::setAffineTransition, affineTransition::getText);
 	        }
 
 	        @Override
 	        public void insertUpdate(DocumentEvent e) {
-	        	affineGeometry = affineTransition.getText();
-	        	mifText.setAffineTransition(affineGeometry);
+	        	updateValueAndChooser(mifText::setAffineTransition, affineTransition::getText);
 	        }
 
 	        @Override
 	        public void changedUpdate(DocumentEvent e) {
-	        	affineGeometry = affineTransition.getText();
-	        	mifText.setAffineTransition(affineGeometry);
+	        	updateValueAndChooser(mifText::setAffineTransition, affineTransition::getText);
 	        }
 	    });
-		JButton previewButton = new JButton("Preview");
-		previewButton.addActionListener(e -> {
-			System.err.println("preview for "+affineGeometry);
-			
-			try {
-				new LocalService().affineTextPreview(graphwrapper.getPr(), mifText);
-			} catch (MIFException e1) {
-				e1.printStackTrace();
-			}
-			
-		});
-		
-		// TODO Preview Button for affine transition
-		
-		wrap(vBox, new JLabel(""), affineTransition);
-		wrap(vBox, new JLabel(""), previewButton);
-		
-		box.add(Box.createHorizontalGlue());
 	}
-
+	
+	private void createAffineTextPreview(Supplier<LocalService> supplier, MIFTextFile text) {
+		try {
+			supplier.get().affineTextPreview(graphwrapper.getPr(), text);
+		} catch (MIFException e1) {
+			e1.printStackTrace();
+		}
+	}
+	
+	private <S,T> void updateValueAndChooser(Consumer<T> consumer, Supplier<S> producer, Function<S,T> function) {
+		consumer.accept(function.apply(producer.get()));
+		chooser.setMIFTextFile(mifText);
+    	chooser.updateImagePreview();
+    	graphwrapper.redrawGraph();
+	}
+	
+	private <T> void updateValueAndChooser(Consumer<T> consumer, Supplier<T> producer) {
+    	consumer.accept(producer.get());
+    	chooser.setMIFTextFile(mifText);
+    	chooser.updateImagePreview();
+    	graphwrapper.redrawGraph();
+	}
+	
 	private void wrap(Box box, JComponent c1, JComponent c2) {
 	    var boxFilename = Box.createHorizontalBox();
 	    boxFilename.add(Box.createRigidArea(new Dimension(10, 0)));
@@ -244,6 +202,15 @@ public class TextDetailsView {
 	    affineGeometry = mifText.getAffineTransition();
 		affineTransition.setText(affineGeometry);
 		mifText.setAffineTransition(affineGeometry);
+		
+		for (mxCell c : graphwrapper.getCells()) {
+			var f = graphwrapper.get(c);
+			if (f instanceof MIFImage) {
+				chooser.setBackgroundFile(f.getFile());
+				chooser.updateUI();
+				break;
+			}
+		}
 		
 		box.updateUI();
 	}
