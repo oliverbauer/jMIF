@@ -548,7 +548,9 @@ public class GraphWrapper {
 									
 									var t = String.valueOf(i / Configuration.pixelwidth_per_second)+"s";
 									if ((i/Configuration.pixelwidth_per_second) >= 60) {
-										t = i/60+"m "+i%60+"s";
+										int sec = i/Configuration.pixelwidth_per_second;
+										
+										t = sec/60+"m "+sec%60+"s";
 									}
 											
 									g.drawString(t, i + XOFFSET/2, 130);
