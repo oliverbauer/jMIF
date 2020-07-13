@@ -105,8 +105,8 @@ class MIFProjectExecutor {
 				startframeoftext += f;
 			}
 		}
-		System.err.println("startframe of text="+startframeoftext);
-		System.err.println("num frames of text="+framelengthOfText);
+		LOGGER.debug("startframe of text="+startframeoftext);
+		LOGGER.debug("num frames of text="+framelengthOfText);
 		int currentF = 0;
 		List<MIFFile> involvedFiles = new ArrayList<>();
 		Map<MIFFile, Integer> from = new HashMap<>();
@@ -144,11 +144,11 @@ class MIFProjectExecutor {
 			currentF -= (int)((meltfile.getOverlayToPrevious() / 1000d) * project.getProfileFramerate());
 		}
 		for (MIFFile f : involvedFiles) {
-			System.err.println("Invoved files: "+f.getDisplayName()+" "+from.get(f)+"->"+to.get(f));
+			LOGGER.debug("Invoved files: "+f.getDisplayName()+" "+from.get(f)+"->"+to.get(f));
 		}
 		// So skip 125 frames of fist video...
 		skipFramesOfFirstMIFFile = startframeoftext - from.get(involvedFiles.get(0));
-		System.err.println("Skip "+skipFramesOfFirstMIFFile+" frames of first file...");
+		LOGGER.debug("Skip "+skipFramesOfFirstMIFFile+" frames of first file...");
 		
 		// TODO Skip some frames of last frame...
 		
