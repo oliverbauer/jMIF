@@ -28,7 +28,7 @@ public interface MIF {
 
 	long createImage(File file, String display, int frames, int overlay, String workingDir) throws MIFException;
 
-	long createAudio(String path) throws MIFException;
+	long createAudio(File file) throws MIFException;
 
 	long createText() throws MIFException;
 	

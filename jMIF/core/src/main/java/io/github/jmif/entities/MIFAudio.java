@@ -1,11 +1,13 @@
 package io.github.jmif.entities;
 
+import java.io.File;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "audiofile")
 public class MIFAudio extends MIFFile {
 	
-	private String audiofile;
+	private File audiofile;
 	private int lengthOfInput = -1;
 	private int encodeStart = 0;
 	private int encodeEnde = -1;
@@ -47,11 +49,11 @@ public class MIFAudio extends MIFFile {
 		this.fadeOut = fadeOut;
 	}
 
-	public String getAudiofile() {
+	public File getAudiofile() {
 		return audiofile;
 	}
 
-	public void setAudiofile(String audiofile) {
+	public void setAudiofile(File audiofile) {
 		this.audiofile = audiofile;
 	}
 

@@ -246,7 +246,12 @@ class MIFProjectExecutor {
 			for (MIFAudio audio : project.getAudiotrack().getAudiofiles()) {
 				count++;
 				
-				execute("cp "+audio.getAudiofile()+" "+project.getWorkingDir()+"temp.mp3");
+				var filename = audio.getAudiofile().getAbsolutePath()
+					.replace(" ", "\\ ")
+					.replace("(", "\\(")
+					.replace(")", "\\)");
+				
+				execute("cp "+filename+" "+project.getWorkingDir()+"temp.mp3");
 				
 				var input = project.getWorkingDir()+"temp.mp3";
 				var output = project.getWorkingDir()+count+"_mp3.mp3";
@@ -355,9 +360,12 @@ class MIFProjectExecutor {
 			var count = 0;
 			sb.append("-track \\\n");
 			for (MIFFile meltfile : this.project.getMIFFiles()) {
-				var file = meltfile.getFile();
-				var input = project.getWorkingDir()+"scaled/"+file.getName();
-				var extension = FilenameUtils.getExtension(file.getName());
+				var filename = meltfile.getFile().getName()
+					.replace(" ", "\\ ")
+					.replace("(", "\\(")
+					.replace(")", "\\)");
+				var input = project.getWorkingDir()+"scaled/"+filename;
+				var extension = FilenameUtils.getExtension(filename);
 				
 				var useMixer = count != 0;
 				var frames = (int)((meltfile.getDuration() / 1000d) * project.getProfileFramerate());
@@ -449,7 +457,11 @@ class MIFProjectExecutor {
 	private void adjustImagesIfNecessary() throws IOException {
 		var workingDir = project.getWorkingDir();
 		for (MIFFile f : project.getMIFFiles()) {
-			var filename = f.getFile().getName();
+			var filename = f.getFile().getName()
+					.replace(" ", "\\ ")
+					.replace("(", "\\(")
+					.replace(")", "\\)");
+			
 			var input = workingDir+"orig/"+filename;
 			var output = workingDir + "scaled/" + filename;
 

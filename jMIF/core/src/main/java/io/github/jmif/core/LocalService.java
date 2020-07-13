@@ -123,7 +123,10 @@ public class LocalService {
 	public MIFVideo createVideo(File file, String display, int frames, int overlay, String workingDir) throws MIFException {
 		var video = new MIFVideo(file, display, frames, overlay);
 		copy(video, workingDir);
-		var filename = video.getFile().getName();
+		var filename = video.getFile().getName()
+				.replace(" ", "\\ ")
+				.replace("(", "\\(")
+				.replace(")", "\\)");
 
 		logger.info("Init: Video {}", filename);
 		Process process;
@@ -132,7 +135,7 @@ public class LocalService {
 			// Audio Stream
 			// codec_long_name=AAC (Advanced Audio Coding)
 			// bit_rate=128771 => 128 kbps
-			command = "ffprobe -v error -select_streams a:0 -show_entries stream=bit_rate,codec_long_name -of default=noprint_wrappers=1 " + video.getFile();
+			command = "ffprobe -v error -select_streams a:0 -show_entries stream=bit_rate,codec_long_name -of default=noprint_wrappers=1 " + filename;
 			process = new ProcessBuilder("bash", "-c", command)
 					.directory(file.getParentFile())
 					.redirectErrorStream(true)
@@ -155,7 +158,7 @@ public class LocalService {
 			// display_aspect_ratio=16:9
 			// duration=7.000000
 			// bit_rate=2504857  => 2504 kbps
-			command = "ffprobe -v error -select_streams v:0 -show_entries stream=width,height,duration,bit_rate,codec_long_name,display_aspect_ratio,r_frame_rate -of default=noprint_wrappers=1 " + video.getFile();
+			command = "ffprobe -v error -select_streams v:0 -show_entries stream=width,height,duration,bit_rate,codec_long_name,display_aspect_ratio,r_frame_rate -of default=noprint_wrappers=1 " + filename;
 			process = new ProcessBuilder("bash", "-c", command)
 					.directory(file.getParentFile())
 					.redirectErrorStream(true)
@@ -208,7 +211,10 @@ public class LocalService {
 	}
 
 	private MIFVideo createVideoPreview(MIFVideo video, String workingDir) throws MIFException {
-		var filename = video.getFile().getName();
+		var filename = video.getFile().getName()
+				.replace(" ", "\\ ")
+				.replace("(", "\\(")
+				.replace(")", "\\)");
 		var videoFileName = workingDir+"/orig/"+filename;
 
 		if (video.getWidth() == -1 || video.getHeight() == -1) {
@@ -244,7 +250,7 @@ public class LocalService {
 		
 		logger.info("Init: Create preview images for video");
 		for (var i = 1; i <= 10; i++) {
-			var image = Paths.get(workingDir).resolve("preview").resolve("_low_"+filename+"_"+i+".png");
+			var image = Paths.get(workingDir).resolve("preview").resolve("_low_"+video.getFile().getName()+"_"+i+".png");
 
 			try {
 				var output = workingDir+"/preview/_low_"+filename+"_"+i+".png";
@@ -432,9 +438,9 @@ public class LocalService {
 		return image;
 	}
 	
-	public MIFAudio createAudio(String path) throws MIFException {
+	public MIFAudio createAudio(File file) throws MIFException {
 		var audioFile = new MIFAudio();
-		audioFile.setAudiofile(path);
+		audioFile.setAudiofile(file);
 		checkLengthInSeconds(audioFile);
 		audioFile.setEncodeStart(0);
 		audioFile.setEncodeEnde(audioFile.getLengthOfInput());
@@ -444,7 +450,12 @@ public class LocalService {
 	private void checkLengthInSeconds(MIFAudio audio) {
 		Process process;
 		try {
-			var command = "ffprobe -v error -select_streams a:0 -show_entries stream=duration,bit_rate -of default=noprint_wrappers=1:nokey=1 "+audio.getAudiofile();
+			var filename = audio.getAudiofile().getAbsolutePath()
+					.replace(" ", "\\ ")
+					.replace("(", "\\(")
+					.replace(")", "\\)");
+			
+			var command = "ffprobe -v error -select_streams a:0 -show_entries stream=duration,bit_rate -of default=noprint_wrappers=1:nokey=1 "+filename;
 
 			process = new ProcessBuilder("bash", "-c", command)
 					.redirectErrorStream(true)

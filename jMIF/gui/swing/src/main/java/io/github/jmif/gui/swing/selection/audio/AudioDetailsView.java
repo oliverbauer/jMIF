@@ -135,7 +135,7 @@ public class AudioDetailsView {
 	public void setDetails(MIFAudio audioFile) {
 		this.audioFile = audioFile;
 		
-		file.setText(audioFile.getAudiofile());
+		file.setText(audioFile.getAudiofile().getName());
 		length.setText(String.valueOf(audioFile.getLengthOfInput()));
 		bitrate.setText(String.valueOf(audioFile.getBitrate()/1000)+" kb/s");
 		encodeStart.setText(String.valueOf(audioFile.getEncodeStart()));

@@ -57,8 +57,8 @@ public class CoreGateway {
 		return service.createImage(file, display, frames, overlay, workingDir);
 	}
 
-	public MIFAudio createAudio(String path) throws MIFException {
-		return service.createAudio(path);
+	public MIFAudio createAudio(File file) throws MIFException {
+		return service.createAudio(file);
 	}
 
 	public List<String> getProfiles() throws MIFException {

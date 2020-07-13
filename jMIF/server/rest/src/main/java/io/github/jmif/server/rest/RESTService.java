@@ -96,8 +96,8 @@ public class RESTService extends Application {
 	@POST
 	@Path("/createAudio")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response createAudio(String path) throws MIFException {
-		return Response.accepted(delegate.createAudio(path)).build();
+	public Response createAudio(File file) throws MIFException {
+		return Response.accepted(delegate.createAudio(file)).build();
 	}
 
 	@POST

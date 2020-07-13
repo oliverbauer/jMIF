@@ -86,9 +86,9 @@ public class ServiceExecutor implements MIF {
 	}
 
 	@Override
-	public long createAudio(String path) throws MIFException {
+	public long createAudio(File file) throws MIFException {
 		return executor.doIt(() -> {
-			return service.createAudio(path);
+			return service.createAudio(file);
 		});
 	}
 

@@ -145,7 +145,7 @@ public class GraphWrapper {
 			}
 			
 			for (MIFAudio audio : project.getAudiotrack().getAudiofiles()) {
-				MIFAudio audioFile = createMIFAudioFile(new File(audio.getAudiofile()));
+				MIFAudio audioFile = createMIFAudioFile(audio.getAudiofile());
 				audioFile.setAudiofile(audio.getAudiofile());
 				audioFile.setBitrate(audio.getBitrate());
 				audioFile.setDisplayName(audio.getDisplayName());
@@ -197,7 +197,7 @@ public class GraphWrapper {
 		var file = fileToAdd.getAbsoluteFile().getAbsolutePath();
 		
 		if (file.endsWith("mp3") || file.endsWith("MP3")) {
-			var audioFile = service.createAudio(fileToAdd.getAbsolutePath());
+			var audioFile = service.createAudio(fileToAdd);
 			
 			var n = "mp3";
 			var x = currentLength + XOFFSET;
