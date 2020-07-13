@@ -41,8 +41,8 @@ public class CoreGateway {
 		service.createWorkingDirs(project);
 	}
 
-	public MIFVideo createVideo(File file, String display, int frames, String dim, int overlay, String workingDir) throws MIFException {
-		return service.createVideo(file, display, frames, dim, overlay, workingDir);
+	public MIFVideo createVideo(File file, String display, int frames, int overlay, String workingDir) throws MIFException {
+		return service.createVideo(file, display, frames, overlay, workingDir);
 	}
 
 	public MIFFile createPreview(MIFFile file, String workingDir) throws MIFException {
@@ -53,8 +53,8 @@ public class CoreGateway {
 		service.createManualPreview(image);
 	}
 
-	public MIFImage createImage(File file, String display, int frames, String dim, int overlay, String workingDir) throws MIFException {
-		return service.createImage(file, display, frames, dim, overlay, workingDir);
+	public MIFImage createImage(File file, String display, int frames, int overlay, String workingDir) throws MIFException {
+		return service.createImage(file, display, frames, overlay, workingDir);
 	}
 
 	public MIFAudio createAudio(String path) throws MIFException {

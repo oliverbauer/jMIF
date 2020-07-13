@@ -4,7 +4,6 @@ import java.awt.Image;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -28,12 +27,10 @@ public class MIFVideo extends MIFFile {
 
 	}
 
-	public MIFVideo(File file, String display, int duration, String dim, int overlay) {
+	public MIFVideo(File file, String display, int duration, int overlay) {
 		setFile(file);
 		setDisplayName(display);
 		setDuration(duration);
-		setWidth(Integer.parseInt(dim.substring(0, dim.indexOf('x'))));
-		setHeight(Integer.parseInt(dim.substring(dim.indexOf('x') + 1)));
 		setOverlayToPrevious(overlay);
 	}
 

@@ -120,8 +120,8 @@ public class LocalService {
 		}
 	}
 	
-	public MIFVideo createVideo(File file, String display, int frames, String dim, int overlay, String workingDir) throws MIFException {
-		var video = new MIFVideo(file, display, frames, dim, overlay);
+	public MIFVideo createVideo(File file, String display, int frames, int overlay, String workingDir) throws MIFException {
+		var video = new MIFVideo(file, display, frames, overlay);
 		copy(video, workingDir);
 		var filename = video.getFile().getName();
 
@@ -303,8 +303,8 @@ public class LocalService {
 		}
 	}
 	
-	public MIFImage createImage(File file, String display, int frames, String dim, int overlay, String workingDir) throws MIFException {
-		var image = new MIFImage(file, display, frames, dim, overlay);
+	public MIFImage createImage(File file, String display, int frames, int overlay, String workingDir) throws MIFException {
+		var image = new MIFImage(file, display, frames, overlay);
 		copy(image, workingDir);
 		var filename = image.getFile().getName();
 

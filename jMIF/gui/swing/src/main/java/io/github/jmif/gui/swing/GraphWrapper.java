@@ -197,7 +197,6 @@ public class GraphWrapper {
 		var file = fileToAdd.getAbsoluteFile().getAbsolutePath();
 		
 		if (file.endsWith("mp3") || file.endsWith("MP3")) {
-			// TODO Service
 			var audioFile = service.createAudio(fileToAdd.getAbsolutePath());
 			
 			var n = "mp3";
@@ -241,7 +240,6 @@ public class GraphWrapper {
 				fileToAdd, 
 				display, 
 				userConfig.getIMAGE_DURATION(), 
-				"-1x-1", // Will be updated by thread
 				userConfig.getIMAGE_OVERLAY(),
 				pr.getWorkingDir()
 			);
@@ -267,7 +265,6 @@ public class GraphWrapper {
 				fileToAdd, 
 				display, 
 				-1, 
-				"1920x1080", // Will be updated by thread
 				userConfig.getVIDEO_OVERLAY(),
 				pr.getWorkingDir()
 			);
@@ -636,7 +633,6 @@ public class GraphWrapper {
 		try {
 			var time = System.currentTimeMillis();
 	    		
-			// TODO Use temp dir...
 			var output = pr.getWorkingDir()+"frame-"+frame+".jpg";
 			service.exportImage(pr, output, frame);
 	    		
