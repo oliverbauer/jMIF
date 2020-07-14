@@ -7,7 +7,6 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.io.File;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -21,7 +20,7 @@ import io.github.jmif.entities.MIFTextFile;
 
 public class PangoColorChooser extends Box {
 	private static final long serialVersionUID = 5368430354551770709L;
-	private File backgroundImage;
+	private Image backgroundImage;
 	private MIFTextFile mifText;
 	private TextDetailsView textDetailsView;
 	
@@ -41,7 +40,7 @@ public class PangoColorChooser extends Box {
 		@Override
 		public void paint(Graphics g) {
 			if (backgroundImage != null) {
-				var ic = new ImageIcon(backgroundImage.getAbsolutePath());
+				var ic = new ImageIcon(backgroundImage);
 				var image = getScaledImage(ic.getImage(), 200, 200);
 				g.drawImage(image, 0, 0, null);
 			}
@@ -115,7 +114,7 @@ public class PangoColorChooser extends Box {
 	    return resizedImg;
 	}
 	
-	public PangoColorChooser(File backgroundImage, MIFTextFile mifText) {
+	public PangoColorChooser(Image backgroundImage, MIFTextFile mifText) {
 		super(BoxLayout.X_AXIS);
 		
 		this.backgroundImage = backgroundImage;
@@ -260,8 +259,8 @@ public class PangoColorChooser extends Box {
     	}
 	}
 	
-	public void setBackgroundFile(File file) {
-		this.backgroundImage = file;
+	public void setBackgroundImage(Image image) {
+		this.backgroundImage = image;
 		imagePreview.updateUI();
 	}
 

@@ -1,6 +1,7 @@
 package io.github.jmif.gui.swing.selection.text;
 
 import java.awt.Dimension;
+import java.awt.Image;
 import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -23,6 +24,7 @@ import io.github.jmif.core.LocalService;
 import io.github.jmif.core.MIFException;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFTextFile;
+import io.github.jmif.entities.MIFVideo;
 import io.github.jmif.gui.swing.GraphWrapper;
 
 public class TextDetailsView {
@@ -203,15 +205,48 @@ public class TextDetailsView {
 		affineTransition.setText(affineGeometry);
 		mifText.setAffineTransition(affineGeometry);
 		
-		for (mxCell c : graphwrapper.getCells()) {
-			var f = graphwrapper.get(c);
-			if (f instanceof MIFImage) {
-				chooser.setBackgroundFile(f.getFile());
-				chooser.updateUI();
+		var startFrameOfText = 0;
+		for (mxCell c : graphwrapper.getTextCells()) {
+			MIFTextFile text = graphwrapper.getText(c);
+			if (text == mifText) {
 				break;
 			}
+			startFrameOfText += (text.getLength()/1000)*graphwrapper.getPr().getProfileFramerate();
+		}
+		var currentFrame = 0;
+		Image backgroundImage = null;
+		var isFirst = true;
+		for (mxCell c : graphwrapper.getCells()) {
+			var f = graphwrapper.get(c);
+				
+			var duration = (f.getDuration()/1000)*graphwrapper.getPr().getProfileFramerate();
+			var overlay = (f.getOverlayToPrevious()/1000)*graphwrapper.getPr().getProfileFramerate();
+			if (isFirst) {
+				overlay = 0;
+			}
+				
+			if (f instanceof MIFImage) {
+				if (currentFrame+duration-overlay > startFrameOfText) {
+					currentFrame += startFrameOfText;
+					backgroundImage = ((MIFImage) f).getPreviewCrop();
+					break;
+				}
+				currentFrame += duration - overlay;
+					
+			} else if (f instanceof MIFVideo) {
+				if (currentFrame+duration-overlay > startFrameOfText) {
+					currentFrame += startFrameOfText;
+					backgroundImage = ((MIFVideo)f).getPreviewImages().iterator().next();
+					break;
+				}
+				
+				currentFrame += duration - overlay;
+			}
+			isFirst = false;
 		}
 		
+		chooser.setBackgroundImage(backgroundImage);
+		chooser.updateUI();
 		box.updateUI();
 	}
 }
