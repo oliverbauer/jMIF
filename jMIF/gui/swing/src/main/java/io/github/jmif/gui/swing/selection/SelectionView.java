@@ -22,6 +22,7 @@ import io.github.jmif.entities.MIFTextFile;
 import io.github.jmif.entities.MIFVideo;
 import io.github.jmif.entities.melt.Melt;
 import io.github.jmif.gui.swing.GraphWrapper;
+import io.github.jmif.gui.swing.UISingleton;
 import io.github.jmif.gui.swing.selection.audio.AudioDetailsView;
 import io.github.jmif.gui.swing.selection.frame.FrameView;
 import io.github.jmif.gui.swing.selection.image.ImageDetailsView;
@@ -70,6 +71,8 @@ public class SelectionView {
 		audioDetailsView = new AudioDetailsView(graphWrapper);
 		textDetailsView = new TextDetailsView(graphWrapper);
 		
+		UISingleton.get().setImageDetailsView(imageDetailsView);
+		
 		var melt = new Melt();
 		var audioFilters = graphWrapper.getService().getMeltAudioFilterDetails(melt);
 		var imageAndVideoFilters = graphWrapper.getService().getMeltVideoFilterDetails(melt);
@@ -78,6 +81,7 @@ public class SelectionView {
 		filterViewAudio = new FilterView(graphWrapper, audioFilters);
 		
 		imageView.init(graphWrapper);
+		UISingleton.get().setImageView(imageView);
 		
 		videoView = new VideoView();
 		var videoPanel = videoView.getPanel();

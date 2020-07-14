@@ -28,7 +28,7 @@ import io.github.jmif.entities.MIFVideo;
 import io.github.jmif.entities.melt.MeltFilter;
 import io.github.jmif.util.TimeUtil;
 
-class MIFProjectExecutor { 
+public class MIFProjectExecutor { 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MIFProjectExecutor.class);
 	
 	private MIFProject project;
@@ -374,7 +374,7 @@ class MIFProjectExecutor {
 					sb.append("   ").append(input).append(" in=0 out=").append(frames - 1);
 					
 					for (MeltFilter currentlyAddedFilters : meltfile.getFilters()) {
-						sb.append(" -attach ");
+						sb.append(" -attach-cut ");
 						sb.append(currentlyAddedFilters.getFiltername());
 						sb.append(" ");
 						var filterUsage = currentlyAddedFilters.getFilterUsage();
@@ -542,6 +542,7 @@ class MIFProjectExecutor {
 		
 		try {
 			process.waitFor();
+			LOGGER.info("Completed... {}", command);
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}

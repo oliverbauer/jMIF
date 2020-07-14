@@ -5,10 +5,12 @@ import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -18,16 +20,21 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.jmif.core.MIFException;
+import io.github.jmif.core.MIFProjectExecutor;
 import io.github.jmif.entities.MIFFile;
+import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.melt.Melt;
 import io.github.jmif.entities.melt.MeltFilter;
 import io.github.jmif.entities.melt.MeltFilterDetails;
+import io.github.jmif.gui.swing.CoreGateway;
 import io.github.jmif.gui.swing.GraphWrapper;
+import io.github.jmif.gui.swing.UISingleton;
 import io.github.jmif.gui.swing.selection.image.ImageView;
 
 public class FilterView {
@@ -36,6 +43,8 @@ public class FilterView {
 	
 	private MeltFilter selectedFilter = null;
 	private MIFFile selectedMIFFile;
+	
+	private final CoreGateway service = new CoreGateway();
 	
 	private final GraphWrapper graphWrapper;
 	private final List<MeltFilterDetails> filters;
@@ -145,8 +154,55 @@ public class FilterView {
 		if (filterName.equals(filterCombobox.getSelectedItem())) {
 			addFilter.setEnabled(true);
 		}
-
+		
 		updateCurrentlyAppliedFilters();
+		updateImage();
+	}
+
+	private void updateImage() {
+		if (selectedMIFFile instanceof MIFImage) {
+			MIFImage mifImage = (MIFImage) selectedMIFFile;
+			
+			int startFrameOfImage = 0;
+			for (MIFFile t : graphWrapper.getPr().getMIFFiles()) {
+				if (t == selectedMIFFile) {
+					break;
+				}
+				
+				int f = (t.getDuration()/1000)*graphWrapper.getPr().getProfileFramerate();
+				if (startFrameOfImage == 0) {
+					// no overlay
+				} else {
+					f -= (t.getOverlayToPrevious()/1000)*graphWrapper.getPr().getProfileFramerate();
+				}
+				
+				startFrameOfImage += f;
+			}
+			// center of image
+			startFrameOfImage += ((mifImage.getDuration()/1000)*graphWrapper.getPr().getProfileFramerate()/2); 
+			
+			var temp = mifImage.getImagePreviewPath().toFile().getAbsolutePath();
+			final var frame = startFrameOfImage;
+			SwingUtilities.invokeLater(() -> {
+				try {
+					service.exportImage(graphWrapper.getPr(), temp, frame);
+	
+					// Override image preview
+					var command = "convert -geometry " + mifImage.getPreviewWidth() + "x " + temp + " " + mifImage.getImagePreviewPath();
+					new MIFProjectExecutor(graphWrapper.getPr()).execute(command);
+					
+					mifImage.setPreviewHardResize(ImageIO.read(mifImage.getImagePreviewPath().toFile()));
+					mifImage.setPreviewCrop(ImageIO.read(mifImage.getImagePreviewPath().toFile()));
+					
+					UISingleton.get().getImageView().setSelectedPicture(mifImage.getPreviewCrop());
+					UISingleton.get().getImageView().getJPanel().updateUI();
+					
+				} catch (MIFException | IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			});
+		}		
 	}
 
 	private Box getAvailableFiltersBox() throws MIFException {
@@ -195,6 +251,8 @@ public class FilterView {
 			// TODO Filter: The image should be updated! Needs new creation and execution of melt file!
 			updateCurrentlyAppliedFilters();
 	
+			updateImage();
+			
 			addFilter.setEnabled(false); // since now added... do not add twice...
 		});
 		previewFilter = new JButton("preview");

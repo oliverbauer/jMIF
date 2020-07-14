@@ -372,9 +372,9 @@ public class LocalService {
 
 		var original = workingDir + "orig/" + filename;
 
-		var origHeight = 3888;
+		var origHeight = 3888; // TODO hard coded image height
 		var aspectHeight = origHeight / 16;
-		var estimatedWith = (int) (aspectHeight * 1.78);
+		var estimatedWith = (int) (aspectHeight * 1.78); // TODO hard coded aspect ratio
 
 		// Create preview: convert -thumbnail 200 abc.png thumb.abc.png
 		logger.info("Init: Create Preview-Image {}", image);
@@ -415,7 +415,7 @@ public class LocalService {
 				.append(estimatedWith)
 				.append("x")
 				.append(aspectHeight)
-				.append("+0+46 ")
+				.append("+0+46 ") // TODO hard coded crop
 				.append(image.getPreviewCropPath())
 				.toString();
 			try {
