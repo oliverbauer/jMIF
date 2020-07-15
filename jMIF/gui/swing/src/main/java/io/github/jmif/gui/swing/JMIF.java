@@ -280,6 +280,10 @@ public class JMIF {
 				for (mxCell cell : graphWrapper.getAudioCells()) {
 					mifGraphView.remove(cell, graphWrapper.getAudio(cell));
 				}
+				// Remove all text cells
+				for (mxCell cell : graphWrapper.getTextCells()) {
+					mifGraphView.remove(cell, graphWrapper.getText(cell));
+				}
 				
 				graphWrapper.save();
 				try {

@@ -72,6 +72,15 @@ public class GraphView implements AddRemoveListener {
 		// Timeline etc.
 		graphWrapper.redrawGraph();
 	}
+	
+	public void remove(mxCell cell, MIFTextFile textfile) {
+		graphWrapper.remove(textfile, cell);
+		graphWrapper.remove(cell);
+
+		selectionView.clearSelection();
+		// Timeline etc.
+		graphWrapper.redrawGraph();
+	}
 
 	@Override
 	public void onRemoveFile() {

@@ -28,7 +28,6 @@ import io.github.jmif.core.MIFException;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.gui.swing.GraphWrapper;
 
-// TODO Implement AspectRatioUtil
 public class ManualSize {
 	private static final Logger logger = LoggerFactory.getLogger(ManualSize.class);
 
