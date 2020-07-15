@@ -68,8 +68,8 @@ public class RESTService extends Application {
 	@POST
 	@Path("/createVideo")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response createVideo(File file, String display, int frames, int overlay, String workingDir) throws MIFException {
-		return Response.accepted(delegate.createVideo(file, display, frames, overlay, workingDir)).build();
+	public Response createVideo(File file, String display, int overlay, String workingDir) throws MIFException {
+		return Response.accepted(delegate.createVideo(file, display, overlay, workingDir)).build();
 	}
 
 	@POST

@@ -65,7 +65,9 @@ public class GraphWrapper {
 
 	private static final int XOFFSET = 40;
 	private static final int YOFFSET = 10;
-	private int currentLength = 0;
+	private int currentImageVideoLength = 0;
+	private int currentAudioLength = 0;
+	private int currentTextLength = 0;
 
 	private mxGraph graph;
 	private mxGraphComponent graphComponent;
@@ -151,6 +153,10 @@ public class GraphWrapper {
 				remove(cell);
 			}
 			
+			currentAudioLength = 0;
+			currentImageVideoLength = 0;
+			currentTextLength = 0;
+			
 			for (MIFFile f : project.getMIFFiles()) {
 				createMIFFile(f.getFile()).getFilters().addAll(f.getFilters());
 			}
@@ -211,7 +217,7 @@ public class GraphWrapper {
 			var audioFile = service.createAudio(fileToAdd);
 			
 			var n = "mp3";
-			var x = currentLength + XOFFSET;
+			var x = currentAudioLength + XOFFSET;
 			var y = YOFFSET*2 +YOFFSET/2 + 2*Configuration.timelineentryHeight;
 			var w = getPixelwidth(audioFile);
 			var h = Configuration.timelineentryHeight;
@@ -224,12 +230,10 @@ public class GraphWrapper {
 	}
 	
 	public MIFTextFile createMIFTextfile() throws MIFException {
-		logger.info("Create textnode");
-		
 		var textFile = service.createText();
 
 		var n = "text";
-		var x = currentLength + XOFFSET;
+		var x = currentTextLength + XOFFSET;
 		var y = YOFFSET*2 +YOFFSET/2 + 2*Configuration.timelineentryHeight;
 		var w = getPixelwidth(textFile);
 		var h = Configuration.timelineentryHeight;
@@ -240,8 +244,6 @@ public class GraphWrapper {
 	}
 	
 	public MIFFile createMIFFile(File fileToAdd) throws MIFException, InterruptedException, IOException {
-		logger.info("Create node for {}", fileToAdd);
-		
 		var file = fileToAdd.getAbsoluteFile().getAbsolutePath();
 		var extension = FilenameUtils.getExtension(file);
 
@@ -256,12 +258,8 @@ public class GraphWrapper {
 			);
 			result.setFile(fileToAdd);
 
-			if (!pr.getMIFFiles().isEmpty()) {
-				currentLength -= (result.getOverlayToPrevious() / 1000d) * 25; // TODO Framerate?
-			}
-
 			var n = result.getDisplayName();
-			var x = currentLength + XOFFSET;
+			var x = currentImageVideoLength + XOFFSET;
 			var y = pr.getMIFFiles().size() % 2 == 0 ? 0 + YOFFSET : Configuration.timelineentryHeight + YOFFSET;
 			var w = getPixelwidth(result);
 			var h = Configuration.timelineentryHeight;
@@ -275,18 +273,13 @@ public class GraphWrapper {
 			var result = service.createVideo(
 				fileToAdd, 
 				display, 
-				-1, 
 				userConfig.getVIDEO_OVERLAY(),
 				pr.getWorkingDir()
 			);
 			result.setFile(fileToAdd);
 			
-			if (!pr.getMIFFiles().isEmpty()) {
-				currentLength -= (result.getOverlayToPrevious() / 1000d) * 25;
-			}
-
 			var n = result.getDisplayName();
-			var x = currentLength + XOFFSET;
+			var x = currentImageVideoLength + XOFFSET;
 			var y = pr.getMIFFiles().size() % 2 == 0 ? 0 + YOFFSET : Configuration.timelineentryHeight + YOFFSET;
 			var w = getPixelwidth(result);
 			var h = Configuration.timelineentryHeight;
@@ -302,7 +295,10 @@ public class GraphWrapper {
 	
 	public void redrawGraph() {
 		var current = 0;
-		currentLength = 0;
+		currentImageVideoLength = 0;
+		currentAudioLength = 0;
+		currentTextLength = 0;
+		
 		for (mxCell c : getCells()) {
 
 			var file = get(c);
@@ -310,23 +306,22 @@ public class GraphWrapper {
 			c.setValue(file.getDisplayName());
 
 			if (current > 0) {
-				currentLength -= getOverlaywidth(file);
+				currentImageVideoLength -= getOverlaywidth(file);
 			}
 
 			// Erklären warum folgende Methode scheisse ist (benutzt preferredisze)
 //    		graph.updateCellSize(c);
 
-			var x = currentLength + XOFFSET;
+			var x = currentImageVideoLength + XOFFSET;
 			var y = current % 2 == 0 ? 0 + YOFFSET : Configuration.timelineentryHeight + YOFFSET;
 			var w = getPixelwidth(file);
 			var h = Configuration.timelineentryHeight;
 			
 			resize(c, new mxRectangle(x, y, w, h));
 
-			currentLength += w;
+			currentImageVideoLength += w;
 			current++;
 		}
-		var audioLength = 0;
 		current = 0;
 		for (Entry<mxCell, MIFAudio> audioEntry : nodeToMIFAudio.entrySet()) {
 			current++;
@@ -335,10 +330,10 @@ public class GraphWrapper {
 			var audioFile = audioEntry.getValue();
 			
 			if (current > 1) {
-				audioLength -= getOverlaywidth(audioFile);
+				currentAudioLength -= getOverlaywidth(audioFile);
 			}
 			
-			var x = XOFFSET + audioLength;
+			var x = XOFFSET + currentAudioLength;
 			var y = YOFFSET*2 +YOFFSET/2 + 2*Configuration.timelineentryHeight;
 			if (current % 2 == 0) {
 				y += Configuration.timelineentryHeight;
@@ -346,11 +341,10 @@ public class GraphWrapper {
 			var w = getPixelwidth(audioFile);
 			var h = Configuration.timelineentryHeight;
 			
-			audioLength += w;
+			currentAudioLength += w;
 			resize(mxCell, new mxRectangle(x, y, w, h));
 		}
 		
-		var textLength = 0;
 		current = 0;
 		for (Entry<mxCell, MIFTextFile> textEntry : nodeToMIFText.entrySet()) {
 			current++;
@@ -359,10 +353,10 @@ public class GraphWrapper {
 			var textFile = textEntry.getValue();
 			
 			if (current > 1) {
-				textLength -= getOverlaywidth(textFile);
+				currentTextLength -= getOverlaywidth(textFile);
 			}
 			
-			var x = XOFFSET + textLength;
+			var x = XOFFSET + currentTextLength;
 			var y = YOFFSET*4 +YOFFSET/2 + 4*Configuration.timelineentryHeight;
 			if (current % 2 == 0) {
 				y += Configuration.timelineentryHeight;
@@ -370,7 +364,7 @@ public class GraphWrapper {
 			var w = getPixelwidth(textFile);
 			var h = Configuration.timelineentryHeight;
 			
-			textLength += w;
+			currentTextLength += w;
 			resize(mxCell, new mxRectangle(x, y, w, h));
 			
 		}
@@ -659,7 +653,7 @@ public class GraphWrapper {
 
 	public void remove(MIFTextFile meltFile, mxCell cell) {
 		pr.getTexttrack().getEntries().remove(meltFile);
-		nodeToMIFFile.remove(cell);
+		nodeToMIFText.remove(cell);
 	}
 	
 	public void put(MIFFile meltFile, mxCell cell) {

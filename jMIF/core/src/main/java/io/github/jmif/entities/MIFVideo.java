@@ -27,10 +27,9 @@ public class MIFVideo extends MIFFile {
 
 	}
 
-	public MIFVideo(File file, String display, int duration, int overlay) {
+	public MIFVideo(File file, String display, int overlay) {
 		setFile(file);
 		setDisplayName(display);
-		setDuration(duration);
 		setOverlayToPrevious(overlay);
 	}
 

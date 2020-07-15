@@ -120,8 +120,8 @@ public class LocalService {
 		}
 	}
 	
-	public MIFVideo createVideo(File file, String display, int frames, int overlay, String workingDir) throws MIFException {
-		var video = new MIFVideo(file, display, frames, overlay);
+	public MIFVideo createVideo(File file, String display, int overlay, String workingDir) throws MIFException {
+		var video = new MIFVideo(file, display, overlay);
 		copy(video, workingDir);
 		var filename = video.getFile().getName()
 				.replace(" ", "\\ ")
@@ -218,8 +218,10 @@ public class LocalService {
 		var videoFileName = workingDir+"/orig/"+filename;
 
 		if (video.getWidth() == -1 || video.getHeight() == -1) {
-			logger.info("Init: Check Width/Height");
 			var command = "ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 " + videoFileName;
+			
+			logger.info("Execute {}", command);
+			
 			Process process;
 			try {
 				process = new ProcessBuilder("bash", "-c", command)
@@ -248,7 +250,6 @@ public class LocalService {
 
 		video.getPreviewImagesPath().clear();
 		
-		logger.info("Init: Create preview images for video");
 		for (var i = 1; i <= 10; i++) {
 			var image = Paths.get(workingDir).resolve("preview").resolve("_low_"+video.getFile().getName()+"_"+i+".png");
 
@@ -276,7 +277,6 @@ public class LocalService {
 				throw new MIFException(e);
 			}
 		}
-		logger.info("Init: Create preview images for video: Done...");
 		
 		return video;
 	}
@@ -317,9 +317,10 @@ public class LocalService {
 		var copy = workingDir + "orig/" + filename;
 
 		if (image.getWidth() == -1 || image.getHeight() == -1) {
-			logger.debug("Init: Check Width/Height of '{}'", image);
-
 			var command = "ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "	+ copy;
+			
+			logger.info("Execute {}", command);
+			
 			Process process;
 			try {
 				process = new ProcessBuilder("bash", "-c", command)
@@ -356,7 +357,6 @@ public class LocalService {
 						extension));
 				image.setPreviewCropPath(Paths.get(workingDir).resolve("preview").resolve(basename+"_kill."+wxh+"."+extension));
 				image.setPreviewManualPath(Paths.get(workingDir).resolve("preview").resolve(basename+"_manual."+wxh+"."+extension));
-				logger.debug("Width/Height = {}/{}", image.getWidth(), image.getHeight());
 			} catch (IOException | InterruptedException e) {
 				logger.error("Unable to get image dimension", e);
 			}
@@ -377,9 +377,11 @@ public class LocalService {
 		var estimatedWith = (int) (aspectHeight * 1.78); // TODO hard coded aspect ratio
 
 		// Create preview: convert -thumbnail 200 abc.png thumb.abc.png
-		logger.info("Init: Create Preview-Image {}", image);
 		var command = "convert -geometry " + image.getPreviewWidth() + "x " + original + " " + image.getImagePreviewPath();
 		try {
+			
+			logger.info("Execute {}", command);
+			
 			var process = new ProcessBuilder("bash", "-c", command)
 				.directory(new File(workingDir))
 				.redirectErrorStream(true)
@@ -403,8 +405,6 @@ public class LocalService {
 		// Preview: 324x243 (Aspect ration) from 5184/16 x 3888/16
 
 		if (!Files.exists(image.getPreviewCropPath())) {
-			logger.info("Init: Create CROP-Preview-Image {}", image.getPreviewCropPath());
-
 		    // E.g. "convert input.jpg -geometry 1920x -crop 1920x1080+0+180 -quality 100 output.jpg"
 			command = new StringBuilder()
 				.append("convert ")
@@ -419,11 +419,13 @@ public class LocalService {
 				.append(image.getPreviewCropPath())
 				.toString();
 			try {
+				logger.info("Execute {}", command);
+				
 				new ProcessBuilder("bash", "-c", command)
-				.directory(new File(workingDir))
-				.redirectErrorStream(true)
-				.start()
-				.waitFor();
+					.directory(new File(workingDir))
+					.redirectErrorStream(true)
+					.start()
+					.waitFor();
 
 				image.setPreviewCrop(ImageIO.read(image.getPreviewCropPath().toFile()));
 			} catch (InterruptedException | IOException e) {
@@ -457,6 +459,8 @@ public class LocalService {
 			
 			var command = "ffprobe -v error -select_streams a:0 -show_entries stream=duration,bit_rate -of default=noprint_wrappers=1:nokey=1 "+filename;
 
+			logger.info("Execute {}", command);
+			
 			process = new ProcessBuilder("bash", "-c", command)
 					.redirectErrorStream(true)
 					.start();

@@ -20,7 +20,7 @@ public interface MIF {
 
 	long createWorkingDirs(MIFProject project) throws MIFException;
 
-	long createVideo(File file, String display, int frames, int overlay, String workingDir) throws MIFException;
+	long createVideo(File file, String display, int overlay, String workingDir) throws MIFException;
 
 	long createPreview(MIFFile file, String workingDir) throws MIFException;
 
