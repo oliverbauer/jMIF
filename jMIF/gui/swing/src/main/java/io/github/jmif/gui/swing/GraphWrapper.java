@@ -134,11 +134,22 @@ public class GraphWrapper {
 			var unmarshaller = context.createUnmarshaller();
 
 			var project = (MIFProject) unmarshaller.unmarshal(file);
-			getCells().clear();
-			getTextCells().clear();
-			pr.getMIFFiles().clear();
-			pr.getAudiotrack().getAudiofiles().clear();
-			pr.getTexttrack().getEntries().clear();
+			
+			// Remove all image/video cells
+			for (mxCell cell : getCells()) {
+				remove(get(cell), cell);
+				remove(cell);
+			}
+			// Remove all audio cells
+			for (mxCell cell : getAudioCells()) {
+				remove(getAudio(cell), cell);
+				remove(cell);
+			}
+			// Remove all text cells
+			for (mxCell cell : getTextCells()) {
+				remove(getText(cell), cell);
+				remove(cell);
+			}
 			
 			for (MIFFile f : project.getMIFFiles()) {
 				createMIFFile(f.getFile()).getFilters().addAll(f.getFilters());
@@ -287,69 +298,6 @@ public class GraphWrapper {
 			return result;
 		}
 		return null;
-	}
-	
-	public void initializeProject() {
-		var current = 0;
-		for (MIFFile file : pr.getMIFFiles()) {
-			logger.info("Adding file {}", file.getFile());
-
-			if (current > 0) {
-				currentLength -= getOverlaywidth(file);
-			}
-			
-			var n = file.getDisplayName();
-			var x = currentLength + XOFFSET;
-			var y = current % 2 == 0 ? 0 + YOFFSET : Configuration.timelineentryHeight + YOFFSET;
-			var w = getPixelwidth(file);
-			var h = Configuration.timelineentryHeight;
-
-			put(file, createVertex(n, x, y, w, h));
-			
-			currentLength += w;
-			current++;
-		}
-		var audioLength = 0;
-		current = 0;
-		for (Entry<mxCell, MIFAudio> audioEntry : nodeToMIFAudio.entrySet()) {
-			current++;
-			
-			var mxCell = audioEntry.getKey();
-			var audioFile = audioEntry.getValue();
-			
-			var x = XOFFSET + audioLength;
-			var y = YOFFSET*2 +YOFFSET/2 + 2*Configuration.timelineentryHeight;
-			var w = getPixelwidth(audioFile);
-			var h = Configuration.timelineentryHeight;
-			if (current % 2 == 0) {
-				y += + Configuration.timelineentryHeight;
-			}
-			
-			audioLength += w;
-			resize(mxCell, new mxRectangle(x, y, w, h));
-		}
-		
-		var textLength = 0;
-		current = 0;
-		for (Entry<mxCell, MIFTextFile> textEntry : nodeToMIFText.entrySet()) {
-			current++;
-			
-			var mxCell = textEntry.getKey();
-			var textFile = textEntry.getValue();
-			
-			var x = XOFFSET + textLength;
-			var y = YOFFSET*4 +YOFFSET/2 + 4*Configuration.timelineentryHeight;
-			var w = getPixelwidth(textFile);
-			var h = Configuration.timelineentryHeight;
-			if (current % 2 == 0) {
-				y += + Configuration.timelineentryHeight;
-			}
-			
-			textLength += w;
-			resize(mxCell, new mxRectangle(x, y, w, h));
-		}
-		
-		createFramePreview();
 	}
 	
 	public void redrawGraph() {

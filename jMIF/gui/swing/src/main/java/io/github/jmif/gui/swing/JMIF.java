@@ -252,8 +252,6 @@ public class JMIF {
 
 			if (t == type.LOAD_PROJECT) {
 				try {
-					graphWrapper.initializeProject();
-
 					// Exec background threads...
 					var executor = Executors.newWorkStealingPool();
 					
@@ -287,7 +285,6 @@ public class JMIF {
 				
 				graphWrapper.save();
 				try {
-					graphWrapper.initializeProject();
 					graphWrapper.redrawGraph();
 				} catch (Exception e) {
 					LOGGER.error("Unable to create new project. Error: {}", e.getMessage());
