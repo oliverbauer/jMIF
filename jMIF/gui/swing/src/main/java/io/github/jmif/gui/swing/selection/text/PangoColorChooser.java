@@ -16,11 +16,15 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.colorchooser.AbstractColorChooserPanel;
 
+import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFTextFile;
+import io.github.jmif.util.AspectRatioUtil;
 
 public class PangoColorChooser extends Box {
 	private static final long serialVersionUID = 5368430354551770709L;
+	
 	private Image backgroundImage;
+	
 	private MIFTextFile mifText;
 	private TextDetailsView textDetailsView;
 	
@@ -34,6 +38,9 @@ public class PangoColorChooser extends Box {
     private AbstractColorChooserPanel fgACCP = null;
     private AbstractColorChooserPanel olACCP = null;
 	
+    private int width = 400;
+    private int height = 200;
+    
 	private JPanel imagePreview = new JPanel() {
 		private static final long serialVersionUID = -3901061582672633414L;
 
@@ -41,11 +48,15 @@ public class PangoColorChooser extends Box {
 		public void paint(Graphics g) {
 			if (backgroundImage != null) {
 				var ic = new ImageIcon(backgroundImage);
-				var image = getScaledImage(ic.getImage(), 200, 200);
+				var image = getScaledImage(ic.getImage(), width, height);
 				g.drawImage(image, 0, 0, null);
 			}
 			
 			g.setColor(bgColor);
+
+			// size of the text
+			var w = width/2;
+			var h = height/4;
 			
 			if (mifText != null) {
 				var valign = mifText.getValign();
@@ -57,10 +68,10 @@ public class PangoColorChooser extends Box {
 						x = 0;
 						break;
 					case "center":
-						x = 50; // [50 to 150]
+						x = width/2 - w/2;
 						break;
 					case "right":
-						x = 100; // [100 to 200]
+						x = width - w;
 						break;
 					default: throw new RuntimeException("Unknown horizontal alignment");
 				}
@@ -70,21 +81,20 @@ public class PangoColorChooser extends Box {
 						y = 0;
 						break;
 					case "middle":
-						y = 75;
+						y = height/2 - h/2;
 						break;
 					case "bottom":
-						y = 150;
+						y = height - h;
 						break;
 					default: throw new RuntimeException("Unknown vertical alignment");
 				}
 				
-				var w = 100;
-				var h = 50;
+
 				
 				g.fillRect(x, y, w, h);
 				
 				g.setColor(olColor);
-				g.drawRect(x, y, 200, 200);
+				g.drawRect(x, y, width, height);
 				
 				g.setColor(fgColor);
 				g.setFont(new Font("TimesRoman", Font.BOLD, 20));
@@ -94,7 +104,7 @@ public class PangoColorChooser extends Box {
 
 		@Override
 		public Dimension getPreferredSize() {
-			return new Dimension(200, 200);
+			return new Dimension(width, height);
 		}
 
 		@Override
@@ -259,8 +269,10 @@ public class PangoColorChooser extends Box {
     	}
 	}
 	
-	public void setBackgroundImage(Image image) {
+	public void setBackgroundImage(MIFFile mifFile, Image image) {
 		this.backgroundImage = image;
+		// TODO 4:3? What if 16:9 is selected as profile?
+		height = (int)new AspectRatioUtil().getHeight(mifFile.getWidth(), mifFile.getHeight(), width);
 		imagePreview.updateUI();
 	}
 

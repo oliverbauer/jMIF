@@ -22,6 +22,7 @@ import com.mxgraph.model.mxCell;
 
 import io.github.jmif.core.LocalService;
 import io.github.jmif.core.MIFException;
+import io.github.jmif.entities.MIFFile;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.entities.MIFTextFile;
 import io.github.jmif.entities.MIFVideo;
@@ -214,6 +215,7 @@ public class TextDetailsView {
 			startFrameOfText += (text.getLength()/1000)*graphwrapper.getPr().getProfileFramerate();
 		}
 		var currentFrame = 0;
+		MIFFile file = null;
 		Image backgroundImage = null;
 		var isFirst = true;
 		for (mxCell c : graphwrapper.getCells()) {
@@ -229,6 +231,7 @@ public class TextDetailsView {
 				if (currentFrame+duration-overlay > startFrameOfText) {
 					currentFrame += startFrameOfText;
 					backgroundImage = ((MIFImage) f).getPreviewCrop();
+					file = f;
 					break;
 				}
 				currentFrame += duration - overlay;
@@ -237,6 +240,7 @@ public class TextDetailsView {
 				if (currentFrame+duration-overlay > startFrameOfText) {
 					currentFrame += startFrameOfText;
 					backgroundImage = ((MIFVideo)f).getPreviewImages().iterator().next();
+					file = f;
 					break;
 				}
 				
@@ -245,7 +249,7 @@ public class TextDetailsView {
 			isFirst = false;
 		}
 		
-		chooser.setBackgroundImage(backgroundImage);
+		chooser.setBackgroundImage(file, backgroundImage);
 		chooser.updateUI();
 		box.updateUI();
 	}

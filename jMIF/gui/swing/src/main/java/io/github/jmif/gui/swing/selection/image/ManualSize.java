@@ -28,6 +28,7 @@ import io.github.jmif.core.MIFException;
 import io.github.jmif.entities.MIFImage;
 import io.github.jmif.gui.swing.GraphWrapper;
 
+// TODO Implement AspectRatioUtil
 public class ManualSize {
 	private static final Logger logger = LoggerFactory.getLogger(ManualSize.class);
 
@@ -94,7 +95,7 @@ public class ManualSize {
 				logger.debug("  AR displayed " + arS + " (" + ws + "x" + hs + "), AR real " + arR + " (" + wr + "x"
 						+ hr + ")");
 
-				command = "-quality 100 -crop " + wr + "x" + hr	+ "+" + 5 * bounds.getX() + "+" + 5 * bounds.getY() + " -geometry 1920";
+				command = "-quality 100 -crop " + wr + "x" + hr	+ "+" + 5 * bounds.getX() + "+" + 5 * bounds.getY() + " -geometry 1920"; // TODO hard coded geometry
 
 				return super.resizeCell(cell, bounds);
 			}
